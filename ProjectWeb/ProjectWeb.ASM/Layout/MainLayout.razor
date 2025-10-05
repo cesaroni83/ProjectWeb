@@ -1,16 +1,32 @@
 ﻿@inherits LayoutComponentBase
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+<div class="bb-page">
 
+    <!-- Sidebar -->
+    <SidebarMenu @ref="appSidebar" />
+
+    <!-- Contenido principal -->
     <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+        <!-- Top bar -->
+        <div class="bb-top-row px-4 d-flex justify-content-between">
+            <Icon Name="IconName.List" role="button" @onclick="ToggleSidebar" />
+            <div class="bb-top-row bb-top-row-sticky px-4 d-flex justify-content-end">
+                <AuthLinks></AuthLinks>
+                <ThemeSwitcher Position="DropdownMenuPosition.End" />
+                <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+            </div>
         </div>
 
+        <!-- Renderizado de páginas -->
         <article class="content px-4">
             @Body
         </article>
     </main>
+
 </div>
+<Toasts class="p-3" AutoHide="true" Delay="2000" Placement="ToastsPlacement.TopRight" StackLength="3" />
+
+@code {
+    private SidebarMenu appSidebar = default!;
+
+    private void ToggleSidebar() => appSidebar.ToggleSidebar();
+}
