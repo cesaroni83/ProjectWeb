@@ -1,0 +1,230 @@
+﻿@page "/EditUser"
+@using ProjectWeb.ASM.Repositorio
+@using ProjectWeb.Shared.Account
+@using ProjectWeb.Shared.Enums
+@using ProjectWeb.Shared.Modelo.DTO.Ciudad
+@using ProjectWeb.Shared.Modelo.DTO.Pais
+@using ProjectWeb.Shared.Modelo.DTO.Provincia
+@inject IRepository repository
+@inject SweetAlertService sweetAlertService
+@inject NavigationManager navigationManager
+@inject ILoginService loginService
+
+@if (user is null)
+{
+    <div class="spinner" />
+}
+else
+{
+    <EditForm Model="user" OnValidSubmit="SaveUserAsync">
+        <DataAnnotationsValidator />
+
+        <div class="card">
+            <div class="card-header">
+                <span>
+                    <i class="oi oi-person" /> Editar Usuario
+                    <a class="btn btn-sm btn-secondary float-end" href="/changePassword"><i class="oi oi-key" /> Cambiar Contraseña</a>
+                    <button class="btn btn-sm btn-primary float-end mx-2" type="submit"><i class="oi oi-check" /> Guardar Cambios</button>
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="mb-3">
+                            <label>Nombres:</label>
+                            <div>
+                                <InputText class="form-control" @bind-Value="@user.FirstName" />
+                                <ValidationMessage For="@(() => user.FirstName)" />
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label>Apellidos:</label>
+                            <div>
+                                <InputText class="form-control" @bind-Value="@user.LastName" />
+                                <ValidationMessage For="@(() => user.LastName)" />
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label>Teléfono:</label>
+                            <div>
+                                <InputText class="form-control" @bind-Value="@user.PhoneNumber" />
+                                <ValidationMessage For="@(() => user.PhoneNumber)" />
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label>Dirección:</label>
+                            <div>
+                                <InputText class="form-control" @bind-Value="@user.Address" />
+                                <ValidationMessage For="@(() => user.Address)" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="mb-3">
+                            <label>País:</label>
+                            <div>
+                                <select class="form-select" @onchange="CountryChangedAsync">
+                                    <option value="">-- Seleccione un país --</option>
+                                    @if (countries is not null)
+                                    {
+                                        @foreach (var country in countries)
+                                        {
+                                            <option value="@country.Id_pais" selected="@(country.Id_pais == user.Ciudades!.Provincias!.Paises!.Id_pais)">@country.Nombre_pais</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label>Estado/Departamento:</label>
+                            <div>
+                                <select class="form-select" @onchange="StateChangedAsync">
+                                    <option value="">-- Seleccione un estado/departamento --</option>
+                                    @if (states is not null)
+                                    {
+                                        @foreach (var state in states)
+                                        {
+                                            <option value="@state.Id_provincia" selected="@(state.Id_provincia == user.Ciudades!.Provincias!.Id_provincia)">@state.Nombre_provincia</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label>Ciudad:</label>
+                            <div>
+                                <select class="form-select" @bind="user.Id_ciudad">
+                                    <option value="">-- Seleccione una ciudad --</option>
+                                    @if (cities is not null)
+                                    {
+                                        @foreach (var city in cities)
+                                        {
+                                            <option value="@city.Id_ciudad" selected="@(city.Id_ciudad == user.Ciudades!.Id_ciudad)">@city.Nombre_ciudad </option>
+                                        }
+                                    }
+                                </select>
+                                <ValidationMessage For="@(() => user.Id_ciudad)" />
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <InputImg Label="Foto" ImageSelected="ImageSelected" ImageURL="@imageUrl" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </EditForm>
+}
+
+@code {
+    private User? user;
+    private List<PaisDropDTO>? countries;
+    private List<ProvinciaDropDTO>? states;
+    private List<CiudadDropDTO>? cities;
+    private string? imageUrl;
+    string Estado = "A";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUserAsyc();
+        await LoadCountriesAsync();
+        await LoadStatesAsyn(user!.Ciudades!.Provincias!.Paises!.Id_pais);
+        await LoadCitiesAsyn(user!.Ciudades!.Provincias!.Id_provincia);
+
+        if (!string.IsNullOrEmpty(user!.Photo))
+        {
+            imageUrl = user.Photo;
+            user.Photo = null;
+        }
+
+    }
+
+    private async Task LoadUserAsyc()
+    {
+        var responseHTTP = await repository.Get<User>($"/api/Accounts");
+        if (responseHTTP.Error)
+        {
+            if (responseHTTP.HttpResponseMessage.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                navigationManager.NavigateTo("/");
+                return;
+            }
+            var messageError = await responseHTTP.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", messageError, SweetAlertIcon.Error);
+            return;
+        }
+        user = responseHTTP.Response;
+    }
+
+    private void ImageSelected(string imagenBase64)
+    {
+        user!.Photo = imagenBase64;
+        imageUrl = null;
+    }
+
+    private async Task CountryChangedAsync(ChangeEventArgs e)
+    {
+        var selectedCountry = Convert.ToInt32(e.Value!);
+        await LoadStatesAsyn(selectedCountry);
+    }
+
+    private async Task StateChangedAsync(ChangeEventArgs e)
+    {
+        var selectedState = Convert.ToInt32(e.Value!);
+        await LoadCitiesAsyn(selectedState);
+    }
+
+    private async Task LoadCountriesAsync()
+    {
+        var responseHttp = await repository.Get<List<PaisDropDTO>>($"/api/Paises/ComboPais/{Estado}");
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        countries = responseHttp.Response;
+    }
+
+    private async Task LoadStatesAsyn(int countryId)
+    {
+        var responseHttp = await repository.Get<List<ProvinciaDropDTO>>($"/api/Provincias/ComboProvincia/{countryId}/{Estado}");
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        states = responseHttp.Response;
+    }
+
+    private async Task LoadCitiesAsyn(int stateId)
+    {
+        var responseHttp = await repository.Get<List<CiudadDropDTO>>($"/api/Ciudades/ComboCiudades/{stateId}/{Estado}");
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        cities = responseHttp.Response;
+    }
+
+    private async Task SaveUserAsync()
+    {
+        var responseHttp = await repository.Put<User, TokenDTO>("/api/Accounts", user!);
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        await loginService.LoginAsync(responseHttp.Response!.Token);
+        navigationManager.NavigateTo("/");
+    }
+}

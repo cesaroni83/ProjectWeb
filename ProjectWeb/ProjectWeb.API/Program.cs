@@ -68,6 +68,8 @@ builder.Services.AddScoped<IUserHelper, UserHelper>();
 builder.Services.AddScoped<IPaises, Paises>();
 builder.Services.AddScoped<IProvincias, Provincias>();
 builder.Services.AddScoped<ICiudades, Ciudades>();
+builder.Services.AddScoped<IFileStorage, FileStorage>();
+builder.Services.AddScoped<IMailHelper, MailHelper>();
 builder.Services.AddIdentity<User, IdentityRole>(x =>
 {
     x.User.RequireUniqueEmail = true;
@@ -105,6 +107,7 @@ void SeedData(WebApplication app)
         service!.SeedAsync().Wait();
     }
 }
+app.UseStaticFiles();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
