@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
+    <ProjectReference Include="..\ProjectWeb.Shared\ProjectWeb.Shared.csproj" />
   </ItemGroup>
 
 </Project>
