@@ -1,0 +1,321 @@
+﻿html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+/* Estilo del body para centrar el contenedor */
+body {
+    background: #e9eef7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* Contenedor principal centrado */
+.login-register-container {
+    background: white;
+    border-radius: 20px;
+    width: 900px;
+    max-width: 100%;
+    height: 600px;
+    max-height: 100%;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    position: relative;
+    margin: auto; /* centrado */
+    box-sizing: border-box;
+}
+
+    /* Form-wrapper estilo */
+    .login-register-container .form-wrapper {
+        display: flex;
+        width: 200%;
+        height: 100%;
+        transition: transform 0.6s ease-in-out;
+    }
+
+    /* Paneles */
+    .login-register-container .form-panel {
+        width: 50%;
+        height: 100%;
+        display: flex;
+    }
+
+    /* Login panel izquierdo */
+    .login-register-container .form-left {
+        background: #6888ff;
+        color: white;
+        text-align: center;
+        border-top-left-radius: 20px;
+        border-bottom-left-radius: 20px;
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-width: 300px;
+    }
+
+    .login-register-container select {
+        width: 220px;
+        max-width: 100%;
+        padding: 12px 12px 12px 40px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-size: 1em;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background: white url('data:image/svg+xml;utf8,<svg fill="gray" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 10px center;
+        background-size: 16px 16px;
+        cursor: pointer;
+        box-sizing: border-box;
+    }
+
+    /* Forgot password alineado a la izquierda */
+    .login-register-container .forgot-password {
+        width: 100%;
+        display: flex;
+        justify-content: flex-start; /* corregido flex-left -> flex-start */
+        margin-bottom: 10px;
+    }
+
+    /* Login panel derecho */
+    .login-register-container .form-right {
+        background: #ffffff;
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-width: 300px;
+        max-width: 450px;
+    }
+
+    /* Registro panel izquierdo */
+    .login-register-container .form-left-white {
+        background: #ffffff;
+        color: #000;
+        border-top-left-radius: 20px;
+        border-bottom-left-radius: 20px;
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        width: 60%;
+        max-height: 600px;
+        overflow-y: visible;
+        min-width: 300px;
+        max-width: 600px;
+    }
+
+    /* Registro panel derecho */
+    .login-register-container .form-right-blue {
+        background: #6888ff;
+        color: white;
+        text-align: center;
+        border-top-right-radius: 20px;
+        border-bottom-right-radius: 20px;
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 40%;
+        max-height: 600px;
+        min-width: 200px;
+    }
+
+    /* Iconos y inputs */
+    .login-register-container .input-icon,
+    .login-register-container .form-group {
+        position: relative;
+        margin-bottom: 15px;
+        width: 100%;
+    }
+
+        .login-register-container .input-icon i,
+        .login-register-container .form-group i {
+            position: absolute;
+            top: 50%;
+            left: 12px;
+            transform: translateY(-50%);
+            color: #6888ff;
+            pointer-events: none;
+        }
+
+        .login-register-container .input-icon input,
+        .login-register-container .form-group input {
+            width: 100%;
+            padding: 12px 12px 12px 40px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 1em;
+        }
+
+    .login-register-container .form-left-white .input-icon input,
+    .login-register-container .form-left-white .form-group input {
+        width: 220px;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Botones */
+    .login-register-container button {
+        background: #6888ff;
+        color: white;
+        padding: 12px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background 0.3s ease;
+    }
+
+        .login-register-container button:hover {
+            background: #506ee8;
+        }
+
+        .login-register-container button[type="reset"] {
+            background: #ccc;
+            color: #333;
+        }
+
+            .login-register-container button[type="reset"]:hover {
+                background: #bbb;
+            }
+
+    /* Enlaces */
+    .login-register-container a {
+        color: #333;
+        font-size: 0.9em;
+        text-align: right;
+        text-decoration: none;
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    /* Iconos sociales */
+    .login-register-container .social-icons {
+        display: flex;
+        gap: 10px;
+        margin-top: 0px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+        .login-register-container .social-icons button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #eee;
+            color: #333;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+    /* Grilla para formulario registro */
+    .login-register-container .grid-form {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        width: 100%;
+    }
+
+        .login-register-container .grid-form .full-width {
+            grid-column: span 2;
+        }
+
+    /* Botones en fila */
+    .login-register-container .form-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+        .login-register-container .form-buttons button {
+            width: 120px;
+        }
+
+/* Tabs para registro */
+.tabs {
+    width: 100%;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #6888ff;
+    display: flex;
+    gap: 10px;
+}
+
+.tab-button {
+    flex: 1;
+    padding: 10px 0;
+    background: #eee;
+    border: none;
+    border-radius: 5px 5px 0 0;
+    cursor: pointer;
+    font-weight: bold;
+    color: #333;
+    transition: background 0.3s ease;
+}
+
+    .tab-button.active {
+        background: #6888ff;
+        color: white;
+    }
+
+.tab-content {
+    display: none;
+    width: 100%;
+}
+
+    .tab-content.active {
+        display: block;
+    }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .login-register-container .form-panel {
+        flex-direction: column;
+    }
+
+    .login-register-container .form-left,
+    .login-register-container .form-right,
+    .login-register-container .form-left-white,
+    .login-register-container .form-right-blue {
+        width: 100% !important;
+        max-height: none !important;
+        overflow-y: visible !important;
+        border-radius: 0 !important;
+    }
+
+    .login-register-container .form-wrapper {
+        flex-direction: column;
+        transform: none !important;
+        width: 100%;
+        height: auto;
+    }
+
+    .login-register-container .form-panel {
+        width: 100%;
+        height: auto;
+        margin-bottom: 20px;
+    }
+
+    .login-register-container .grid-form {
+        grid-template-columns: 1fr;
+    }
+
+        .login-register-container .grid-form .full-width {
+            grid-column: span 1;
+        }
+}
