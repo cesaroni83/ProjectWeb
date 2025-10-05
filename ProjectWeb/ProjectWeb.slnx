@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="ProjectWeb.API/ProjectWeb.API.csproj" />
+  <Project Path="ProjectWeb.ASM/ProjectWeb.ASM.csproj" />
+  <Project Path="ProjectWeb.Shared/ProjectWeb.Shared.csproj" />
+</Solution>
