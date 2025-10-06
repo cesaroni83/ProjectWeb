@@ -190,7 +190,7 @@ namespace ProjectWeb.API.Controllers
         //    double totalPages = Math.Ceiling(count / pagination.RecordsNumber);
         //    return Ok(totalPages);
         //}
-
+        [AllowAnonymous]
         [HttpPost("CreateUser")]
         public async Task<ActionResult> CreateUser([FromBody] UserDTO model)
         {
