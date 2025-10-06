@@ -13,8 +13,6 @@
         {
             try
             {
-               
-
                 // 1️⃣ Limpiar encabezado si viene con data:image/...
                 if (base64Image.Contains(","))
                     base64Image = base64Image[(base64Image.IndexOf(",") + 1)..];
@@ -22,11 +20,15 @@
                 // 2️⃣ Decodificar base64
                 byte[] imageBytes = Convert.FromBase64String(base64Image);
 
-               
+                // 3️⃣ Obtener ruta segura de wwwroot
+                string webRootPath = _env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot");
 
+                // Crear carpeta wwwroot si no existe
+                if (!Directory.Exists(webRootPath))
+                    Directory.CreateDirectory(webRootPath);
 
-                // 3️⃣ Crear carpeta /wwwroot/uploads si no existe
-                string uploadsPath = Path.Combine(_env.WebRootPath, "UserImagen");
+                // Crear carpeta UserImagen dentro de wwwroot
+                string uploadsPath = Path.Combine(webRootPath, "UserImagen");
                 if (!Directory.Exists(uploadsPath))
                     Directory.CreateDirectory(uploadsPath);
 
@@ -37,8 +39,8 @@
                 // 5️⃣ Guardar archivo
                 await File.WriteAllBytesAsync(filePath, imageBytes);
 
-                // 6️⃣ Devolver URL pública
-                return $"/uploads/{fileName}";
+                // 6️⃣ Devolver URL pública relativa correcta
+                return $"/UserImagen/{fileName}";
             }
             catch (FormatException)
             {
