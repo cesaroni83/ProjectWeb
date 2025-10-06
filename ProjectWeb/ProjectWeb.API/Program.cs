@@ -11,16 +11,17 @@ using ProjectWeb.API.InterfazGeneral;
 using ProjectWeb.API.Servicios;
 using ProjectWeb.API.Servicios.Implementacion;
 using ProjectWeb.Shared.Enums;
-using System;
 using System.Text;
 using System.Text.Json.Serialization;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+
 builder.Services.AddControllers()
-    .AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles); 
+    .AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -107,7 +108,7 @@ void SeedData(WebApplication app)
         service!.SeedAsync().Wait();
     }
 }
-app.UseStaticFiles();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -118,7 +119,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.UseStaticFiles();
 app.MapControllers();
 app.UseCors(x => x
 .AllowAnyMethod()

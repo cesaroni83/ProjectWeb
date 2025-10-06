@@ -13,6 +13,8 @@
         {
             try
             {
+               
+
                 // 1️⃣ Limpiar encabezado si viene con data:image/...
                 if (base64Image.Contains(","))
                     base64Image = base64Image[(base64Image.IndexOf(",") + 1)..];
@@ -20,8 +22,11 @@
                 // 2️⃣ Decodificar base64
                 byte[] imageBytes = Convert.FromBase64String(base64Image);
 
+               
+
+
                 // 3️⃣ Crear carpeta /wwwroot/uploads si no existe
-                string uploadsPath = Path.Combine(_env.WebRootPath, "uploads");
+                string uploadsPath = Path.Combine(_env.WebRootPath, "UserImagen");
                 if (!Directory.Exists(uploadsPath))
                     Directory.CreateDirectory(uploadsPath);
 

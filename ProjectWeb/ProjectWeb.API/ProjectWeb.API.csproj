@@ -30,4 +30,8 @@
     <ProjectReference Include="..\ProjectWeb.Shared\ProjectWeb.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Nuova cartella\" />
+  </ItemGroup>
+
 </Project>
