@@ -31,7 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Nuova cartella\" />
+    <Folder Include="wwwroot\" />
     <Folder Include="wwwroot\UserImagen\" />
   </ItemGroup>
 
