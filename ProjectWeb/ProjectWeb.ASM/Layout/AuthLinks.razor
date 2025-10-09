@@ -1,11 +1,40 @@
 ﻿<AuthorizeView>
 	<Authorized>
-		<span>Hola, @context.User.Identity!.Name</span>
-		<a href="/Logout" class="nav-link btn btn-link">Cerrar Sesión</a>
+		<span>Hola, </span>
+		@if (!string.IsNullOrEmpty(photoUser))
+		{
+			<Image src="@photoUser" Class="rounded" Alt="placeholder" width="30" height="30" style="border-radius:50%" />
+			
+		}
+		<Dropdown  Size="DropdownSize.Large">
+			<DropdownToggleButton><span>@context.User.Identity!.Name</span></DropdownToggleButton>
+			<DropdownMenu>
+				<DropdownItem To="/EditUser" Type="DropdownItemType.Link">Setting</DropdownItem>
+				<DropdownItem To="#" Type="DropdownItemType.Link">Profile</DropdownItem>
+				<DropdownItem To="/Logout" Type="DropdownItemType.Link">Logout</DropdownItem>
+			</DropdownMenu>
+		</Dropdown>
+				<a href="/Logout" class="nav-link btn btn-link">Logout</a>
 	</Authorized>
 	<NotAuthorized>
-		<a href="/Register" class="nav-link btn btn-link">Registro</a>
-
-		<a href="/Login" class="nav-link btn btn-link">Iniciar Sesión</a>
+		<a href="/Login" class="nav-link btn btn-link">Login</a>
 	</NotAuthorized>
 </AuthorizeView>
+@code {
+	private string? photoUser;
+	
+	[CascadingParameter]
+	private Task<AuthenticationState> authenticationStateTask { get; set; } = null!;
+	
+
+	protected async override Task OnParametersSetAsync()
+	{
+		var authenticationState = await authenticationStateTask;
+		var claims = authenticationState.User.Claims.ToList();
+		var photoClaim = claims.FirstOrDefault(x => x.Type == "Photo");
+		if (photoClaim is not null)
+		{
+			photoUser = photoClaim.Value;
+		}
+	}
+}

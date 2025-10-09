@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ProjectWeb.API.AutoMaper;
@@ -119,7 +120,14 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseStaticFiles();
+// Servir la carpeta UserImagen
+var imagePath = Path.Combine(builder.Environment.ContentRootPath, "wwwroot", "UserImagen");
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(imagePath),
+    RequestPath = "/UserImagen"
+});
+
 app.MapControllers();
 app.UseCors(x => x
 .AllowAnyMethod()
