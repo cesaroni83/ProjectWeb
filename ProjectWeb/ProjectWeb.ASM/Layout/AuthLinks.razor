@@ -3,7 +3,7 @@
 		<span>Hola, </span>
 		@if (!string.IsNullOrEmpty(photoUser))
 		{
-			<Image src="@photoUser" Class="rounded" Alt="placeholder" width="30" height="30" style="border-radius:50%" />
+			<Image src="@photoUser" Class="rounded" Alt="placeholder" width="50" height="50" style="border-radius:50%" />
 			
 		}
 		<Dropdown  Size="DropdownSize.Large">
@@ -22,10 +22,10 @@
 </AuthorizeView>
 @code {
 	private string? photoUser;
-	
+
 	[CascadingParameter]
 	private Task<AuthenticationState> authenticationStateTask { get; set; } = null!;
-	
+
 
 	protected async override Task OnParametersSetAsync()
 	{
@@ -34,6 +34,7 @@
 		var photoClaim = claims.FirstOrDefault(x => x.Type == "Photo");
 		if (photoClaim is not null)
 		{
+			//photoUser = photoClaim.Value;
 			photoUser = photoClaim.Value;
 		}
 	}

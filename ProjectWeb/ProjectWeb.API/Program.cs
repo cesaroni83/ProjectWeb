@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
@@ -120,12 +120,22 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-// Servir la carpeta UserImagen
-var imagePath = Path.Combine(builder.Environment.ContentRootPath, "wwwroot", "UserImagen");
+
+// Carpeta wwwroot/UserImagen
+string webRootPath = Path.Combine(builder.Environment.ContentRootPath, "wwwroot");
+string userImagePath = Path.Combine(webRootPath, "UserImagen");
+
+// Crear carpetas si no existen
+if (!Directory.Exists(webRootPath))
+    Directory.CreateDirectory(webRootPath);
+if (!Directory.Exists(userImagePath))
+    Directory.CreateDirectory(userImagePath);
+
+// Servir archivos directamente desde UserImagen en la raíz
 app.UseStaticFiles(new StaticFileOptions
 {
-    FileProvider = new PhysicalFileProvider(imagePath),
-    RequestPath = "/UserImagen"
+    FileProvider = new PhysicalFileProvider(userImagePath),
+    RequestPath = "/UserImagen" // <- vacío significa que la carpeta se sirve desde /
 });
 
 app.MapControllers();

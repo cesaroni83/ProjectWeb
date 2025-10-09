@@ -1,12 +1,16 @@
-﻿namespace ProjectWeb.API.Helper.Implementacion
+﻿using Microsoft.AspNetCore.Http;
+
+namespace ProjectWeb.API.Helper.Implementacion
 {
     public class FileStorage : IFileStorage
     {
         private readonly IWebHostEnvironment _env;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public FileStorage(IWebHostEnvironment env)
+        public FileStorage(IWebHostEnvironment env, IHttpContextAccessor httpContextAccessor)
         {
             _env = env;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<string> SaveImageAsync(string base64Image)
@@ -39,8 +43,15 @@
                 // 5️⃣ Guardar archivo
                 await File.WriteAllBytesAsync(filePath, imageBytes);
 
-                // 6️⃣ Devolver URL pública relativa correcta
-                return $"/UserImagen/{fileName}";
+                // 6️⃣ Construir URL completa usando IHttpContextAccessor
+                var request = _httpContextAccessor.HttpContext?.Request;
+                if (request == null)
+                    throw new InvalidOperationException("No se pudo obtener el contexto HTTP para construir la URL.");
+
+                string baseUrl = $"{request.Scheme}://{request.Host}";
+                string publicUrl = $"{baseUrl}/UserImagen/{fileName}";
+
+                return publicUrl;
             }
             catch (FormatException)
             {
