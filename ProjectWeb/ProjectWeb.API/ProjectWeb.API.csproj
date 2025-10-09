@@ -32,6 +32,7 @@
 
   <ItemGroup>
     <Folder Include="Nuova cartella\" />
+    <Folder Include="wwwroot\UserImagen\" />
   </ItemGroup>
 
 </Project>

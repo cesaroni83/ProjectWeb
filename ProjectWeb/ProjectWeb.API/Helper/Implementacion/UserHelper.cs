@@ -90,7 +90,7 @@ namespace ProjectWeb.API.Helper.Implementacion
 
         public async Task<SignInResult> LoginAsync(LoginDTO model)
         {
-            return await _signInManager.PasswordSignInAsync(model.Email, model.Password, false, false);
+            return await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
         }
 
         public async Task LogoutAsync()
