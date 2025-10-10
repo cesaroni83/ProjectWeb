@@ -76,7 +76,7 @@ namespace ProjectWeb.API.Helper.Implementacion
             try
             {
                 string fileName = Path.GetFileName(imageUrl);
-                string filePath = Path.Combine(_env.WebRootPath, "uploads", fileName);
+                string filePath = Path.Combine(_env.WebRootPath, "UserImagen", fileName);
 
                 if (File.Exists(filePath))
                 {

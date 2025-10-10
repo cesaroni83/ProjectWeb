@@ -115,6 +115,7 @@ namespace ProjectWeb.API.Controllers
             {
                 if (!string.IsNullOrEmpty(user.Photo))
                 {
+                    
                     var photoUser = await _fileStorage.SaveImageAsync(user.Photo);
                     user.Photo = photoUser;
                 }
