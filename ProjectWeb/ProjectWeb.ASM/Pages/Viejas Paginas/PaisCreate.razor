@@ -1,0 +1,174 @@
+﻿@page "/CreatePais"
+
+@using Microsoft.Extensions.DependencyInjection
+@using ProjectWeb.ASM.Repositorio
+@using ProjectWeb.Shared.Modelo.DTO.Pais
+@using ProjectWeb.Shared.Modelo.Estatico
+@inject SweetAlertService sweetAlertService
+@inject IRepository repository
+<div class="row justify-content-center">
+    <Card style="width:90%; height:auto; margin:50px">
+        <CardHeader class="text-center fs-4">
+            Registro De Paises
+        </CardHeader>
+        <CardBody>
+            <EditForm Model="Input" OnValidSubmit="@Create_Pais">
+                <DataAnnotationsValidator />
+                <div class="container">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-4">
+                                <label>Nombre Del Pais :</label>
+                            </div>
+                            <div class="col-7">
+                                <InputText @bind-Value="Input.Nombre_pais" placeholder="Nombre Del Pais" class="form-control" />
+                                <ValidationMessage For="() => Input.Nombre_pais" />
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-4">
+                                <label>Información :</label>
+                            </div>
+                            <div class="col-7">
+                                <InputTextArea @bind-Value="Input.Informacion" placeholder="Información del País" class="form-control" Rows="4"  />
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-4">
+                                <label>Foto :</label>
+                            </div>
+                            <div class="col-7">
+                                <Image Src="@previewUrl" IsThumbnail="true" Alt="placeholder" style="max-width:200px; border:1px solid #ccc;"  />
+                                <br />
+                                <InputFile OnChange="CargarImagen" accept=".jpg,.jpeg,.png" >></InputFile>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-4">
+                                <label>Estado:</label>
+                            </div>
+                            <div class="col-7">
+                                <InputSelect @bind-Value="Input.Estado_pais" class="form-control" >
+                                    <option value="">Seleccione</option>
+                                    @foreach (var item in items)
+                                    {
+                                        <option value="@item.Id">@item.Text</option>
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="() => Input.Estado_pais" />
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-4">
+                            </div>
+                            <div class="col-7 d-flex justify-content-center">
+                                <div class=" d-flex align-items-center gap-5">
+                                    <button type="submit" class="btn btn-primary">Save</button>
+                                    <button type="reset" class="btn btn-secondary" @onclick="ResetForm" >Cancelar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </EditForm>
+            
+        </CardBody>
+    </Card>
+</div>
+@code {
+    [Inject] ToastService ToastService { get; set; } = default!;
+    public PaisDTO Input = new PaisDTO();
+    private List<Estado> items = new();
+    private string? previewUrl;
+    [CascadingParameter]
+    BlazoredModalInstance BlazoredModal { get; set; } = default!;
+
+    private async Task ResetForm()
+    {
+        Input = new PaisDTO();
+
+        previewUrl = "";
+        await BlazoredModal.CloseAsync(ModalResult.Cancel());
+
+    }
+    private async Task CargarImagen(InputFileChangeEventArgs e)
+    {
+        var archivo = e.File;
+        if (archivo != null)
+        {
+            var formato = Path.GetExtension(archivo.Name).ToLower();
+            if (formato != ".jpg" && formato != ".jpeg" && formato != ".png")
+            {
+                // Mostrar mensaje de error
+                ToastService.Notify(new(ToastType.Danger, $"Upload Only File *.jpg, *.jpeg, *.png"));
+                await Task.Delay(3000);
+                return;
+            }
+            // Convertimos el archivo a base64 para mostrarlo en un <img>
+            using var stream = archivo.OpenReadStream(maxAllowedSize: 10_000_000); // 10 MB máx
+            using var ms = new MemoryStream();
+            await stream.CopyToAsync(ms);
+            var bytes = ms.ToArray();
+
+            previewUrl = $"data:{archivo.ContentType};base64,{Convert.ToBase64String(bytes)}";
+        }
+    }
+
+    public async Task Create_Pais()
+    {
+        Input.Foto_pais = ObtenerBytes(previewUrl);
+        var responseHttp = await repository.Post<PaisDTO>("/api/Paises/CreatePais", Input);
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+        ToastService.Notify(new(ToastType.Success, $"Record Pais Update Successfully."));
+        await Task.Delay(3000);
+        await BlazoredModal.CloseAsync(ModalResult.Ok());
+        return;
+
+    }
+    
+    private string? ObtenerImagen(byte[]? bytes)
+    {
+        if (bytes == null || bytes.Length == 0)
+            return null;
+
+        string base64 = Convert.ToBase64String(bytes);
+        return $"data:image/jpeg;base64,{base64}";
+    }
+
+    private byte[]? ObtenerBytes(string? base64Image)
+    {
+        if (string.IsNullOrWhiteSpace(base64Image))
+            return null;
+
+        // Si la cadena incluye el encabezado tipo "data:image/jpeg;base64,"
+        var parts = base64Image.Split(',');
+        string base64 = parts.Length > 1 ? parts[1] : parts[0];
+
+        return Convert.FromBase64String(base64);
+    }
+
+    protected override void OnInitialized()
+    {
+        // Llenar el combo usando el método estático de tu clase
+        items = Estado.GetItems();
+
+    }
+
+}

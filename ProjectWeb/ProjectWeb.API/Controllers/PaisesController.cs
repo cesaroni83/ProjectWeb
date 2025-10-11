@@ -27,9 +27,20 @@ namespace ProjectWeb.API.Controllers
             return Ok(lista);
         }
 
+        /******************************************************************************/
+
+        [HttpGet("GetPais/{id:int}", Name = "GetPais")]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> GetPais(int id)
+        {
+            var lista = await _pais.GetPais(id);
+            return Ok(lista);
+        }
+
         /*--------------------------------- Insert ---------------------------------*/
 
-        [HttpPost]
+        [HttpPost("CreatePais")]
         [ProducesResponseType(201, Type = typeof(PaisDTO))]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
