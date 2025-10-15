@@ -15,7 +15,7 @@
     <div class="container-tabla">
         <Card style="width:93%; height:auto; margin:50px">
         <CardHeader class="text-center fs-4">
-            Registro De Paises
+            Lista De Paises
         </CardHeader>
              <CardBody>
                  <Grid TItem="PaisDTO"
@@ -39,7 +39,7 @@
                     </GridColumn>
 
                     <GridColumn TItem="PaisDTO" HeaderText="Id País" PropertyName="Id_pais" SortString="Id_pais" SortKeySelector="item => item.Id_pais" FilterTextboxWidth="100" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
-                        <a href="#">@context.Id_pais</a>
+                        <a href="/ListProv/@context.Id_pais/@context.Nombre_pais">@context.Id_pais</a>
                     </GridColumn>
 
                     <GridColumn TItem="PaisDTO" HeaderText="País" PropertyName="Nombre_pais" HeaderTextAlignment="Alignment.Center" SortString="Nombre_pais" SortKeySelector="item => item.Nombre_pais" FilterTextboxWidth="200">
@@ -95,7 +95,7 @@
         else
         {
             var parameters = new ModalParameters();
-            parameters.Add("InputDTO", Input);
+            parameters.Add("InputDTO", Input=new());
             parameters.Add("SubmitButtonText", "Save");
             parameters.Add("Titulo", "Registro De Pais");
             modalReference = Modal.Show<PaisComponent>(parameters);

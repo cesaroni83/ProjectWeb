@@ -6,6 +6,7 @@ namespace ProjectWeb.API.Servicios
     {
         Task<List<ProvinciaDTO>> GetListaAllProvincia();
         Task<ProvinciaDTO> GetProvincia(int id);
+        Task<List<ProvinciaDTO>> GetProvinciaByPais(int id_pais);
         Task<ProvinciaDTO> CreateProvincia(ProvinciaDTO modelo);
         Task<bool> UpdateProvincia(ProvinciaDTO modelo);
         Task<bool> DeleteProvincia(int id);

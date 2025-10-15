@@ -1,0 +1,14 @@
+﻿.select-with-icon .input-group-text {
+    background-color: #f8f9fa; /* color claro para coincidir con bootstrap */
+    border-right: 0;
+}
+
+.select-with-icon .form-select {
+    border-left: 0;
+    padding-left: 0.75rem;
+}
+
+.select-with-icon .input-group-text i {
+    color: #0d6efd; /* color azul bootstrap */
+    font-size: 1rem;
+}

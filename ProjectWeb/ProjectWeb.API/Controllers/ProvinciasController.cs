@@ -27,11 +27,20 @@ namespace ProjectWeb.API.Controllers
             return Ok(lista);
         }
 
+        [HttpGet("ProvinciaByPais/{id_pais:int}", Name = "ProvinciaByPais")]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> ProvinciaByPais(int id_pais)
+        {
+            var lista = await _provincia.GetProvinciaByPais(id_pais);
+            return Ok(lista);
+        }
+
         /**********************************************************************/
 
         /*--------------------------------- Insert ---------------------------------*/
 
-        [HttpPost]
+        [HttpPost("CreateProvincia")]
         [ProducesResponseType(201, Type = typeof(ProvinciaDTO))]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
