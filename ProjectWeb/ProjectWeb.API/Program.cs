@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
@@ -85,6 +86,8 @@ builder.Services.AddIdentity<User, IdentityRole>(x =>
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
 
+
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 .AddJwtBearer(x => x.TokenValidationParameters = new TokenValidationParameters
 {
@@ -94,7 +97,33 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     ValidateIssuerSigningKey = true,
     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["jwtKey"]!)),
     ClockSkew = TimeSpan.Zero
-});
+})
+.AddFacebook(fb =>
+{
+    fb.AppId = builder.Configuration["Authentication:Facebook:AppId"]!;
+    fb.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"]!;
+    fb.CallbackPath = "/signin-facebook";
+
+    fb.Events = new Microsoft.AspNetCore.Authentication.OAuth.OAuthEvents
+    {
+        OnRemoteFailure = context =>
+        {
+            //// Puedes manejar el error como desees
+            //context.Response.Redirect("/login?error=facebook");
+            //context.HandleResponse(); // evita que la excepción se propague
+            //return Task.CompletedTask;
+            var authProperties = fb.StateDataFormat.Unprotect(context.Request.Query["state"]);
+            context.Response.Redirect("/Login");
+            return Task.FromResult(0);
+        }
+    };
+})
+;
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+})
+.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme); // "Cookies"
 
 ///**************************************
 var app = builder.Build();

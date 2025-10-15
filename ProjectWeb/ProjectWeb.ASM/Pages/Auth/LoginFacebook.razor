@@ -1,0 +1,30 @@
+﻿@page "/login-facebook"
+@using ProjectWeb.ASM.Repositorio
+@inject NavigationManager NavigationManager
+@inject ILoginService loginService
+
+<h3>Iniciando sesión con Facebook...</h3>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        // Obtener el token de la URL
+        var uri = new Uri(NavigationManager.Uri);
+        var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+        var token = query["token"];
+
+        if (!string.IsNullOrEmpty(token))
+        {
+            // Guardar token en AuthenticationProviderJWT
+            await loginService.LoginAsync(token);
+
+            // Redirigir al home y limpiar la URL
+            NavigationManager.NavigateTo("/", forceLoad: true, replace: true);
+        }
+        else
+        {
+            // Si algo falla, volver al login
+            NavigationManager.NavigateTo("/Login");
+        }
+    }
+}
