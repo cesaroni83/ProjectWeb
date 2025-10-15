@@ -152,6 +152,22 @@ namespace ProjectWeb.API.Servicios.Implementacion
             }
         }
 
+        public async Task<List<ProvinciaDTO>> GetProvinciaByPais(int id_pais)
+        {
+            try
+            {
+                var consulta = _modeloRepositorio.GetAllWithWhere(p=> p.Id_pais==id_pais).OrderBy(m => m.Id_provincia);
+                List<ProvinciaDTO> lista = _mapper.Map<List<ProvinciaDTO>>(await consulta.ToListAsync());
+                return lista;
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
         public async Task<List<ProvinciaDropDTO>> GetProvinciaCombo(int id_pais, string Estado_Activo)
         {
             try

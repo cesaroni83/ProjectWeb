@@ -7,12 +7,19 @@ using ProjectWeb.ASM;
 using ProjectWeb.ASM.Authentication;
 using ProjectWeb.ASM.Repositorio;
 using ProjectWeb.ASM.Repositorio.Implementacion;
+using System.Text.Json;
+
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddSingleton(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7135/") });
+// ?? Aquí puedes agregar la configuración del JSON:
+builder.Services.Configure<JsonSerializerOptions>(options =>
+{
+    options.PropertyNameCaseInsensitive = true; // Ignora mayúsculas/minúsculas en nombres de propiedades
+});
 builder.Services.AddBlazorBootstrap();
 // para regiostrar la utenticacion
 builder.Services.AddScoped<AuthenticationProviderJWT>();
