@@ -6,7 +6,7 @@
 @inject SweetAlertService sweetAlertService
 @inject NavigationManager navigationManager
 @inject ILoginService loginService
-
+@inject IJSRuntime JS
 <div class="principal">
     <div class="login-register-container">
         <div class="form-wrapper" id="formWrapper">
@@ -45,25 +45,33 @@
                             <button type="submit" class="btn btn-primary">Login</button>
                             <button type="reset" class="btn btn-secondary">Reset</button>
                         </div>
+                    </EditForm>
                         <p class="text-center mt-4">O inicia sesión con</p>
                         <div class="social-icons">
                             <button><i class="fab fa-google"></i></button>
-                            <button><i class="fab fa-facebook-f"></i></button>
+                            <button @onclick="Facebook"><i class="fab fa-facebook-f"></i></button>
                             <button><i class="fab fa-pinterest"></i></button>
                             <button><i class="fab fa-linkedin-in"></i></button>
                         </div>
-                    </EditForm>
+                    
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<script>
+    // Función para abrir URL en otra pestaña
+    function openInNewTab(url) {
+        window.open(url, '_blank');
+    }
+</script>
 
 @code {
     private LoginDTO loginDTO = new();
     private Switch switch1 = default!;
     private bool agree = false;
+
     private async Task LoginAsync()
     {
         loginDTO.RememberMe = agree;
@@ -82,4 +90,12 @@
      {
         navigationManager.NavigateTo("/Register");
      }
+    private async Task Facebook()
+    {
+        // Redirige al endpoint de la API que inicia OAuth
+        // await JS.InvokeVoidAsync("openInNewTab", "https://localhost:7135/api/ExternalAuth/facebook-login");
+        navigationManager.NavigateTo("https://localhost:7135/api/ExternalAuth/facebook-login");
+       
+    }
+    
 }
