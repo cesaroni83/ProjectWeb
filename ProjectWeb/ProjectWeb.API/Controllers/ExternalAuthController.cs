@@ -39,20 +39,20 @@ namespace ProjectWeb.API.Controllers
 
             var name = result.Principal.FindFirst(ClaimTypes.Name)?.Value ?? "";
             var email = result.Principal.FindFirst(ClaimTypes.Email)?.Value ?? "";
-            ///*   crear el usuario si no exite**//
-            var user = await _userService.GetByEmailAsync(email);
-            if (user == null)
-            {
-                // Crear usuario si no existe
-                user = await _userService.CreateUserAsync(new User
-                {
-                    Name = name,
-                    Email = email,
-                    PhotoUrl = photo,
-                    LoginProvider = "Facebook",
-                    CreatedAt = DateTime.UtcNow
-                });
-            }
+            /////*   crear el usuario si no exite**//
+            //var user = await _userService.GetByEmailAsync(email);
+            //if (user == null)
+            //{
+            //    // Crear usuario si no existe
+            //    user = await _userService.CreateUserAsync(new User
+            //    {
+            //        Name = name,
+            //        Email = email,
+            //        PhotoUrl = photo,
+            //        LoginProvider = "Facebook",
+            //        CreatedAt = DateTime.UtcNow
+            //    });
+            //}
 
 
             //////////////////////////////////
