@@ -28,6 +28,28 @@ namespace ProjectWeb.API.Controllers
             return Ok(lista);
         }
 
+
+        [HttpGet("GetCiudad/{id_ciudad:int}", Name = "GetCiudad")]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> GetCiudad(int id_ciudad)
+        {
+            var lista = await _ciudad.GetCiudad(id_ciudad);
+            return Ok(lista);
+        }
+
+
+        [HttpGet("CiudadesByProvincia/{id_provincia:int}", Name = "CiudadesByProvincia")]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> CiudadesByProvincia(int id_provincia)
+        {
+            var lista = await _ciudad.GetCiudadByProvincia(id_provincia);
+            return Ok(lista);
+        }
+
+
+
         /**********************************************************************/
 
         //[HttpGet("AllRegisterMix", Name = "AllRegisterMixCiudad")]
@@ -40,7 +62,7 @@ namespace ProjectWeb.API.Controllers
         //}
         /*--------------------------------- Insert ---------------------------------*/
 
-        [HttpPost]
+        [HttpPost("CreateCiudad")]
         [ProducesResponseType(201, Type = typeof(CiudadDTO))]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

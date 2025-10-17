@@ -30,7 +30,7 @@ namespace ProjectWeb.Shared.Modelo.DTO.Ciudad
         [Required(ErrorMessage = "El Campo {0} es Obligatorio!")]
         [MaxLength(10, ErrorMessage = "El Campo {0} no puede mas de {1} Caracteres")]
         public string Estado_ciudad { get; set; } = string.Empty;
-        public ProvinciaDTO? Provincias { get; set; }
+        public ProvinciaDTO? Provincias { get; set; } = null;
 
     }
 }

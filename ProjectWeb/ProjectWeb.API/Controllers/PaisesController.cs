@@ -116,6 +116,7 @@ namespace ProjectWeb.API.Controllers
             return Ok(lista);
         }
 
+        
         [HttpDelete("{id_pais:int}", Name = "CancelPais")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]

@@ -36,7 +36,7 @@
                       @ref="grid">
 
                     <GridColumn TItem="ProvinciaDTO" HeaderText="Id Provincia" PropertyName="Id_provincia" SortString="Id_provincia" SortKeySelector="item => item.Id_provincia" FilterTextboxWidth="100" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
-                        <a href="#">@context.Id_provincia</a>
+                        <a href="/ListCiudad/@context.Id_provincia/@context.Nombre_provincia">@context.Id_provincia</a>
                     </GridColumn> 
 
                     <GridColumn TItem="ProvinciaDTO" HeaderText="Provincia" PropertyName="Nombre_provincia" HeaderTextAlignment="Alignment.Center" SortString="Nombre_provincia" SortKeySelector="item => item.Nombre_provincia" FilterTextboxWidth="200">
@@ -54,7 +54,7 @@
                     <GridColumn TItem="ProvinciaDTO" HeaderText="Acción" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Start" Filterable="false" FilterTextboxWidth="150">
                         <div class="d-flex justify-content-end gap-2" style="width:150px;">
                             <button class="btn btn-success btn-sm" @onclick=@(() => ShowModal(context.Id_provincia, true))>Update</button>
-                            <button class="btn btn-danger btn-sm">Delete</button>
+                            <button class="btn btn-danger btn-sm" @onclick="() => DeleteReg(context.Id_provincia, context.Nombre_provincia)">Delete</button>
                         </div>
                     </GridColumn>
                 </Grid>
@@ -71,12 +71,13 @@
     private ConfirmDialog dialog = default!;
     [Inject] protected PreloadService PreloadService { get; set; } = default!;
     public ProvinciaDTO Input = new ProvinciaDTO();
-
+    [Inject] ToastService ToastService { get; set; } = default!;
     private List<ProvinciaDTO> ListaProv { get; set; } = default!;
     private BlazorBootstrap.Grid<ProvinciaDTO>? grid;
     private List<Estado> items = new();
     [CascadingParameter]
     IModalService Modal { get; set; } = default!;
+
     private async Task ShowModal(int id = 0, bool isEdit = false)
 
     {
@@ -141,5 +142,35 @@
     {
         await LoadProvincia();
         await grid.RefreshDataAsync();
+    }
+    private async Task DeleteReg(int id, string nombre)
+    {
+        var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
+        var confirmation = await dialog.ShowAsync(
+            title: "Eliminacion De Regitro",
+            message1: "Desea Eliminar La Provincia?",
+            message2: "ID:" + id + "  Provincia:" + nombre,
+            confirmDialogOptions: options);
+
+        if (confirmation)
+        {
+            // call API to delete the employee
+            // show acknowledgment to the user
+            var responseHttp = await repository.Delete($"/api/Provincias/{Input.Id_provincia}");
+            if (responseHttp.Error)
+            {
+                var message = await responseHttp.GetErrorMessageAsync();
+                await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                return;
+            }
+            ToastService.Notify(new ToastMessage(ToastType.Success, $"Pais Eliminado con Exito!"));
+            await RefrescarGrid();
+            return;
+        }
+        else
+        {
+            ToastService.Notify(new ToastMessage(ToastType.Secondary, $"Operacion Cancelada!"));
+        }
+
     }
 }

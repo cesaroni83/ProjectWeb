@@ -57,7 +57,7 @@
                     <GridColumn TItem="PaisDTO" HeaderText="Acción" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Start" Filterable="false" FilterTextboxWidth="150">
                         <div class="d-flex justify-content-end gap-2" style="width:150px;">
                             <button class="btn btn-success btn-sm" @onclick=@(() => ShowModal(context.Id_pais, true))>Update</button>
-                            <button class="btn btn-danger btn-sm" >Delete</button>
+                            <button class="btn btn-danger btn-sm" @onclick="() => DeleteReg(context.Id_pais, context.Nombre_pais)">Delete</button>
                         </div>
                     </GridColumn>
                 </Grid>
@@ -70,6 +70,8 @@
 </div>
 @code {
     private ConfirmDialog dialog = default!;
+    [Inject] ToastService ToastService { get; set; } = default!;
+
     [Inject] protected PreloadService PreloadService { get; set; } = default!;
     public PaisDTO Input = new PaisDTO();
     private string? previewUrl;
@@ -86,6 +88,7 @@
 
         if (isEdit)
         {
+
             var parameters = new ModalParameters();
             parameters.Add("InputDTO", Input);
             parameters.Add("SubmitButtonText", "Update");
@@ -117,7 +120,7 @@
             await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
             return;
         }
-        
+
         ListaPais = responseHttp.Response?.ToList() ?? new List<PaisDTO>();
         StateHasChanged();
         PreloadService.Hide();
@@ -165,5 +168,34 @@
         await LoadPais();
         await grid.RefreshDataAsync();
     }
-    
+    private async Task DeleteReg(int id, string nombre)
+    {
+        var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
+        var confirmation = await dialog.ShowAsync(
+            title: "Eliminacion De Regitro",
+            message1: "Desea Eliminar El Pais?", 
+            message2: "ID:" + id + "  Pais:" + nombre,
+            confirmDialogOptions: options);
+        
+        if (confirmation)
+        {
+            // call API to delete the employee
+            // show acknowledgment to the user
+            var responseHttp = await repository.Delete($"/api/Paises/{Input.Id_pais}");
+            if (responseHttp.Error)
+            {
+                var message = await responseHttp.GetErrorMessageAsync();
+                await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                return;
+            }
+            ToastService.Notify(new ToastMessage(ToastType.Success, $"Pais Eliminado con Exito!"));
+            await RefrescarGrid();
+            return;
+        }
+        else
+        {
+            ToastService.Notify(new ToastMessage(ToastType.Secondary, $"Operacion Cancelada!"));
+        }
+       
+    }
 }

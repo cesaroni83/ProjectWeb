@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using ProjectWeb.API.Data;
 using ProjectWeb.API.InterfazGeneral;
 using ProjectWeb.Shared.Modelo.DTO.Ciudad;
+using ProjectWeb.Shared.Modelo.DTO.Provincia;
 using ProjectWeb.Shared.Modelo.Entidades;
 
 namespace ProjectWeb.API.Servicios.Implementacion
@@ -134,7 +135,9 @@ namespace ProjectWeb.API.Servicios.Implementacion
         {
             try
             {
-                var consulta = _modeloRepositorio.GetAllWithWhere(p => p.Id_ciudad == id);
+                var consulta = _modeloRepositorio.GetAllWithWhere(p => p.Id_ciudad == id)
+                                                 .Include(pv=> pv.Provincias)
+                                                 .ThenInclude(p=> p.Paises);
                 var fromDBmodelo = await consulta.FirstOrDefaultAsync();
                 if (fromDBmodelo != null)
                 {
@@ -196,7 +199,23 @@ namespace ProjectWeb.API.Servicios.Implementacion
             }
         }
 
-        
+        public async Task<List<CiudadDTO>> GetCiudadByProvincia(int id_provincia)
+        {
+            try
+            {
+                var consulta = _modeloRepositorio.GetAllWithWhere(p => p.Id_provincia == id_provincia)
+                    .Include(pr=> pr.Provincias)
+                    .ThenInclude(p => p.Paises)
+                    .OrderBy(m => m.Id_ciudad);
+                List<CiudadDTO> lista = _mapper.Map<List<CiudadDTO>>(await consulta.ToListAsync());
+                return lista;
 
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
     }
 }

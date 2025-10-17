@@ -1,4 +1,5 @@
 ﻿using ProjectWeb.Shared.Modelo.DTO.Ciudad;
+using ProjectWeb.Shared.Modelo.DTO.Provincia;
 
 namespace ProjectWeb.API.Servicios
 {
@@ -12,7 +13,7 @@ namespace ProjectWeb.API.Servicios
         Task<List<CiudadDTO>> GetListCiudadActivo(string Estado_Activo);
 
         Task<List<CiudadDropDTO>> GetCiudadCombo(int id_provincia,string Estado_Activo);
-
         Task<bool> DeleteCiudadLogica(int id_Ciudad);
+        Task<List<CiudadDTO>> GetCiudadByProvincia(int id_provincia);
     }
 }
