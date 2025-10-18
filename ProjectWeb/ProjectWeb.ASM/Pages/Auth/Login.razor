@@ -1,5 +1,6 @@
 ﻿@page "/Login"
 @using ProjectWeb.ASM.Repositorio
+@using ProjectWeb.ASM.Repositorio.Google
 @using ProjectWeb.ASM.Repositorio.Implementacion
 @using ProjectWeb.Shared.Account
 @inject IRepository repository
@@ -7,6 +8,7 @@
 @inject NavigationManager navigationManager
 @inject ILoginService loginService
 @inject IJSRuntime JS
+@inject GoogleAuthService GoogleAuth
 <div class="principal">
     <div class="login-register-container">
         <div class="form-wrapper" id="formWrapper">
@@ -48,7 +50,7 @@
                     </EditForm>
                         <p class="text-center mt-4">O inicia sesión con</p>
                         <div class="social-icons">
-                            <button><i class="fab fa-google"></i></button>
+                            <button @onclick="Google"><i class="fab fa-google"></i></button>
                             <button @onclick="Facebook"><i class="fab fa-facebook-f"></i></button>
                             <button><i class="fab fa-pinterest"></i></button>
                             <button><i class="fab fa-linkedin-in"></i></button>
@@ -97,5 +99,15 @@
         navigationManager.NavigateTo("https://localhost:7135/api/ExternalAuth/facebook-login");
        
     }
-    
+    private async Task Google()
+    {
+         var url = await GoogleAuth.GetAuthorizationUrlAsync();
+        if (!string.IsNullOrEmpty(url))
+        {
+            //navigationManager.NavigateTo(url, forceLoad: true); // redirige a Google OAuth
+          // await JS.InvokeVoidAsync("open", url, "_blank");
+            //await JS.InvokeVoidAsync("openUrl", url, "_self");
+             await JS.InvokeVoidAsync("MyBlazorJS.openUrl", url, "_self");
+        }
+    }
 }

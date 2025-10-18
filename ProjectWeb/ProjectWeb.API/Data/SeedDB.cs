@@ -1,6 +1,9 @@
-﻿using ProjectWeb.API.Helper;
+﻿using Microsoft.EntityFrameworkCore;
+using ProjectWeb.API.Helper;
+using ProjectWeb.API.Helper.Implementacion;
 using ProjectWeb.Shared.Enums;
 using ProjectWeb.Shared.Modelo.Entidades;
+using System.Runtime.InteropServices;
 
 namespace ProjectWeb.API.Data
 {
@@ -19,6 +22,9 @@ namespace ProjectWeb.API.Data
             await _context.Database.EnsureCreatedAsync();
             await CheckPaisAsync();
             await CheckRolesAsync();
+            //await CheckUserAsync("Cesar", "Morocho", "cesarmopdev83@gmail.com", "322 311 4620", "Calle Luna Calle Sol", "", UserType.Admin);
+            await CheckUserAsync( "Armando", "Pucuna", "cesarmop83@gmail.com", "322 311 4620", "Calle Luna Calle Sol", "", UserType.User);
+           // await CheckUserAsync( "Cesar Armando", "Morocho Pcuna", "cesarmop83@hotmail.it", "322 311 4620", "Calle Luna Calle Sol", "", UserType.User);
         }
         private async Task CheckPaisAsync()
         {
@@ -60,6 +66,53 @@ namespace ProjectWeb.API.Data
         {
             await _userHelper.CheckRoleAsync(UserType.Admin.ToString());
             await _userHelper.CheckRoleAsync(UserType.User.ToString());
+        }
+        private async Task<User> CheckUserAsync( string firstName, string lastName, string email, string phone, string address, string image, UserType userType)
+        {
+            var user = await _userHelper.GetUserAsync(email);
+            if (user == null)
+            {
+                var city = await _context.Tbl_Ciudad.FirstOrDefaultAsync(x => x.Nombre_ciudad == "Naranjito");
+                if (city == null)
+                {
+                    city = await _context.Tbl_Ciudad.FirstOrDefaultAsync();
+                }
+
+                //string filePath;
+                //if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                //{
+                //    filePath = $"{Environment.CurrentDirectory}\\Images\\users\\{image}";
+                //}
+                //else
+                //{
+                //    filePath = $"{Environment.CurrentDirectory}/Images/users/{image}";
+                //}
+
+                //var fileBytes = File.ReadAllBytes(filePath);
+                //var imagePath = await _fileStorage.SaveFileAsync(fileBytes, "jpg", "users");
+
+                user = new User
+                {
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Email = email,
+                    UserName = email,
+                    PhoneNumber = phone,
+                    Address = address,
+                    Id_ciudad = city!.Id_ciudad,
+                    Ciudades=city,
+                    UserType = userType,
+                    Photo = null,
+                };
+
+                await _userHelper.AddUserAsync(user, "Carolina");
+                await _userHelper.AddUserToRoleAsync(user, userType.ToString());
+
+                var token = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+                await _userHelper.ConfirmEmailAsync(user, token);
+            }
+
+            return user;
         }
     }
 }

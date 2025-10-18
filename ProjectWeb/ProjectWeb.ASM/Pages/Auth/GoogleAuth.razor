@@ -1,0 +1,49 @@
+﻿@page "/auth/callback"
+@inject NavigationManager Navigation
+@inject ILoginService LoginService
+@using System.Web
+@using ProjectWeb.ASM.Repositorio
+
+<h3>Conectando cuenta...</h3>
+
+@if (isLoading)
+{
+    <p>Obteniendo token...</p>
+}
+else if (error)
+{
+    <p>Error en la autenticación 😢</p>
+}
+
+@code {
+    private bool isLoading = true;
+    private bool error = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var uri = new Uri(Navigation.Uri);
+            var token = HttpUtility.ParseQueryString(uri.Query).Get("token");
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                // Guardar token JWT y actualizar estado de autenticación
+                await LoginService.LoginAsync(token);
+
+                // Redirigir al dashboard
+                Navigation.NavigateTo("/", forceLoad: true);
+            }
+            else
+            {
+                error = true;
+            }
+        }
+        catch
+        {
+            error = true;
+        }
+
+        isLoading = false;
+    }
+}

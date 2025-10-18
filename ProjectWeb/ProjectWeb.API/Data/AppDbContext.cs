@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ProjectWeb.Shared.Enums;
+using ProjectWeb.Shared.Google;
 using ProjectWeb.Shared.Modelo.Entidades;
 
 namespace ProjectWeb.API.Data
@@ -18,6 +19,8 @@ namespace ProjectWeb.API.Data
         public DbSet<Sucursal> Tbl_Sucursal { get; set; }
         public DbSet<Persona> Tbl_Persona { get; set; }
         public DbSet<Menu> Tbl_Menu { get; set; }
+
+        public DbSet<Credential> Credentials => Set<Credential>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

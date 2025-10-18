@@ -32,9 +32,26 @@ namespace ProjectWeb.ASM.Authentication
         }
         private AuthenticationState BuildAuthenticationState(string token)
         {
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
-            var claims = ParseClaimsFromJWT(token);
-            return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(claims, "jwt")));
+            //_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+            //var claims = ParseClaimsFromJWT(token);
+            //return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(claims, "jwt")));
+            if (string.IsNullOrWhiteSpace(token) || token.Split('.').Length != 3)
+            {
+                // Token inválido, retorna usuario no autenticado
+                return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+            }
+
+            try
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                var claims = ParseClaimsFromJWT(token);
+                return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(claims, "jwt")));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error construyendo AuthenticationState: {ex.Message}");
+                return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+            }
         }
         private IEnumerable<Claim> ParseClaimsFromJWT(string token)
         {

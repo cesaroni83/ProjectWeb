@@ -51,6 +51,32 @@
                 : window.location.hash = '';
         }
     </script>
+    <script>
+        // Objeto global para Blazor
+        window.MyBlazorJS = {
+
+            // Abrir URL
+            openUrl: function (url, target) {
+                if (target === "_self") {
+                    window.location.href = url; // misma ventana
+                } else {
+                    window.open(url, target); // nueva ventana
+                }
+            },
+
+            // Revisar permisos clipboard
+            checkClipboardPermission: async function () {
+                try {
+                    const result = await navigator.permissions.query({ name: 'clipboard-read' });
+                    // Devolver un objeto simple
+                    return { state: result.state };
+                } catch (err) {
+                    return { state: "error", message: err.message };
+                }
+            }
+
+        };
+    </script>
 
 </body>
 

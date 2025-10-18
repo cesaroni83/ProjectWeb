@@ -155,8 +155,8 @@ namespace ProjectWeb.API.Controllers
             return Ok(await _userHelper.GetUserAsync(User.Identity!.Name!));
         }
 
-        [HttpGet("all")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        //[HttpGet("all")]
+        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         //public async Task<ActionResult> GetAll([FromQuery] PaginationDTO pagination)
         //{
         //    var queryable = _context.Users

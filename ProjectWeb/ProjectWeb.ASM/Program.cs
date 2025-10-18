@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using ProjectWeb.ASM;
 using ProjectWeb.ASM.Authentication;
 using ProjectWeb.ASM.Repositorio;
+using ProjectWeb.ASM.Repositorio.Google;
 using ProjectWeb.ASM.Repositorio.Implementacion;
 using System.Text.Json;
 
@@ -29,7 +30,17 @@ builder.Services.AddSweetAlert2();
 builder.Services.AddBlazoredModal();
 builder.Services.AddScoped<IRepository, Repository>();
 builder.Services.AddAuthorizationCore();
+builder.Services.AddScoped<GoogleAuthService>();
+///***Google**/
+//builder.Services.AddOidcAuthentication(options =>
+//{
+//    builder.Configuration.Bind("Authentication:Google", options.ProviderOptions);
 
+//    options.ProviderOptions.ResponseType = "code";
+//    options.ProviderOptions.DefaultScopes.Add("openid");
+//    options.ProviderOptions.DefaultScopes.Add("profile");
+//    options.ProviderOptions.DefaultScopes.Add("email");
+//});
 
 
 await builder.Build().RunAsync();

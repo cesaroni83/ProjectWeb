@@ -87,8 +87,37 @@ namespace ProjectWeb.ASM.Repositorio.Implementacion
 
         private async Task<T> UnserializeAnswer<T>(HttpResponseMessage httpResponse, JsonSerializerOptions jsonSerializerOptions)
         {
+            //var respuestaString = await httpResponse.Content.ReadAsStringAsync();
+            //return JsonSerializer.Deserialize<T>(respuestaString, jsonSerializerOptions)!;
             var respuestaString = await httpResponse.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<T>(respuestaString, jsonSerializerOptions)!;
+
+            if (string.IsNullOrWhiteSpace(respuestaString))
+                return default!;
+
+            // Si parece JSON (empieza con { o [)
+            if (respuestaString.TrimStart().StartsWith("{") || respuestaString.TrimStart().StartsWith("["))
+            {
+                try
+                {
+                    return JsonSerializer.Deserialize<T>(respuestaString, jsonSerializerOptions)!;
+                }
+                catch (JsonException ex)
+                {
+                    Console.WriteLine($"⚠️ Error al deserializar JSON: {ex.Message}");
+                    Console.WriteLine($"Contenido recibido: {respuestaString}");
+                    return default!;
+                }
+            }
+
+            // Si no es JSON y el tipo esperado es string, devuelve el texto tal cual
+            if (typeof(T) == typeof(string))
+            {
+                return (T)(object)respuestaString;
+            }
+
+            // Si no es JSON ni string, devolvemos default para evitar excepciones
+            Console.WriteLine($"⚠️ Respuesta no JSON y tipo T no es string: {respuestaString}");
+            return default!;
         }
     }
 }
