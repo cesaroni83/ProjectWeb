@@ -1,0 +1,78 @@
+﻿@using ProjectWeb.ASM.Helper
+@using ProjectWeb.ASM.Repositorio
+@using ProjectWeb.Shared.Modelo.DTO.Menu
+@using ProjectWeb.Shared.Modelo.Estatico
+@inject SweetAlertService sweetAlertService
+@inject IRepository repository
+
+<Sidebar2 @ref="MenuDinamic"
+          Href="/"
+          IconName="IconName.BootstrapFill"
+          Title="System Automation"
+          BadgeText="v2.1.0"
+          ShowIcons="true"
+          Width="300"
+          WidthUnit="Unit.Px"
+          DataProvider="Sidebar2DataProvider" />
+
+@code {
+
+    private Sidebar2 MenuDinamic = default!;
+    private IEnumerable<NavItem>? navItems;
+    private List<MenuDTO> ListaMenu { get; set; } = default!;
+    [Inject] ToastService ToastService { get; set; } = default!;
+
+
+    private async Task<Sidebar2DataProviderResult> Sidebar2DataProvider(Sidebar2DataProviderRequest request)
+    {
+        if (navItems is null)
+            navItems = await GetNavItems();
+
+        await Task.Delay(200); // Simula carga de datos
+        return await Task.FromResult(request.ApplyTo(navItems));
+    }
+    private async Task<IEnumerable<NavItem>> GetNavItems()
+    {
+        try
+        {
+            var responseHttp = await repository.Get<List<MenuDTO>>("/api/Menus/");
+            if (responseHttp.Error)
+            {
+                var message = await responseHttp.GetErrorMessageAsync();
+                await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                return Enumerable.Empty<NavItem>();
+            }
+
+            ListaMenu = responseHttp.Response?.ToList() ?? new List<MenuDTO>();
+
+            // ✅ Convertir MenuDTO en NavItem
+            var navList = ListaMenu.Select(menu => new NavItem
+            {
+                Id = menu.Id_menu.ToString(),
+                Text = menu.Descripcion ?? "Sin descripción",
+                Href = string.IsNullOrWhiteSpace(menu.Referencia) ? "#" : menu.Referencia,
+                ParentId = !string.IsNullOrEmpty(menu.Id_parend) ? menu.Id_parend : string.Empty,
+                // ✅ Conversión de ícono y color con funciones auxiliares
+                IconName = IconColorHelper.ParseToIconName(
+                    Icono.GetTextIcono(menu.Icono_name ?? string.Empty)
+                ),
+                IconColor = IconColorHelper.ParseToIconColor(
+                    IconoColor.GetTextIconoColor(menu.Icono_color ?? string.Empty)
+                ),
+            }).ToList();
+
+            return navList;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al cargar menú: {ex.Message}");
+            return new List<NavItem>();
+        }
+    }
+
+    
+
+    public void ToggleSidebar() => MenuDinamic.ToggleSidebar();
+
+    
+}

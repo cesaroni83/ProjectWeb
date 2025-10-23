@@ -1,9 +1,17 @@
-﻿@inherits LayoutComponentBase
+﻿
+@inherits LayoutComponentBase
 <div class="bb-page">
 
     <!-- Sidebar -->
-    <SidebarMenu @ref="appSidebar" />
-
+    <AuthorizeView>
+	    <Authorized> 
+            <MenuDinamico @ref="SideMenuDinamic" />
+        </Authorized>
+	    <NotAuthorized>
+            <SidebarMenu @ref="appSidebar" />
+        </NotAuthorized>
+    </AuthorizeView>
+            
     <!-- Contenido principal -->
     <main>
         <!-- Top bar -->
@@ -27,6 +35,23 @@
 <Preload LoadingText="Loading..." />
 @code {
     private SidebarMenu appSidebar = default!;
+    private MenuDinamico SideMenuDinamic = default!;
 
-    private void ToggleSidebar() => appSidebar.ToggleSidebar();
+    private async Task ToggleSidebar()
+    {
+        // Intenta cerrar el Sidebar autorizado si existe y está visible
+        if (SideMenuDinamic is not null)
+        {
+            SideMenuDinamic.ToggleSidebar();
+            return;
+        }
+
+        // Si no, cierra el Sidebar no autorizado
+        if (appSidebar is not null)
+        {
+            appSidebar.ToggleSidebar();
+        }
+    }
+
+   
 }
