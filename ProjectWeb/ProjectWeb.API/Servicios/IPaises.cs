@@ -10,8 +10,8 @@ namespace ProjectWeb.API.Servicios
         Task<bool> UpdatePais(PaisDTO modelo);
         Task<bool> DeletePais(int id);
         Task<List<PaisDTO>> GetListPaisActivo(string Estado_Activo);
-
         Task<List<PaisDropDTO>> GetPaisCombo(string Estado_Activo);
         Task<bool> DeletePaisLogica(int id_pais);
+
     }
 }

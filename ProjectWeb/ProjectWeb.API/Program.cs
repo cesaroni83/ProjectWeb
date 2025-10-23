@@ -267,6 +267,7 @@ builder.Services.AddScoped<IUserHelper, UserHelper>();
 builder.Services.AddScoped<IPaises, Paises>();
 builder.Services.AddScoped<IProvincias, Provincias>();
 builder.Services.AddScoped<ICiudades, Ciudades>();
+builder.Services.AddScoped<IMenus, Menus>();
 builder.Services.AddScoped<IFileStorage, FileStorage>();
 builder.Services.AddScoped<IMailHelper, MailHelper>();
 builder.Services.AddScoped<IGoogleAuth, GoogleAuth>();

@@ -1,9 +1,11 @@
 ﻿<Sidebar2 @ref="sidebar2"
           Href="/"
           IconName="IconName.BootstrapFill"
-          Title="Blazor Bootstrap"
+          Title="System Automation"
           BadgeText="v2.1.0"
           ShowIcons="true"
+          Width="300"
+          WidthUnit="Unit.Px"
           DataProvider="Sidebar2DataProvider" />
 
 @code {
@@ -15,7 +17,7 @@
         if (navItems is null)
             navItems = GetNavItems();
 
-        await Task.Delay(500); // Simula carga de datos
+        await Task.Delay(200); // Simula carga de datos
         return await Task.FromResult(request.ApplyTo(navItems));
     }
 
@@ -25,29 +27,18 @@
         {
             new NavItem { Id = "1", Href = "/", IconName = IconName.HouseDoorFill, Text = "Home" },
 
-            new NavItem { Id = "2", IconName = IconName.HouseDoorFill, Text = "Content", IconColor = IconColor.Primary },
-            new NavItem { Id = "3", Href = "/ListPaises", IconName = IconName.PersonSquare, Text = "Paise", ParentId="2" },
+            new NavItem { Id = "2", Href = "/Dasboard",IconName = IconName.Newspaper, Text = "Dashboad" },
 
-            new NavItem { Id = "4", IconName = IconName.PersonLock, Text = "Authentication", IconColor = IconColor.Success },
-            new NavItem { Id = "5", Href = "/Register", IconName = IconName.CheckCircleFill, Text = "Register", ParentId="4" },
-            new NavItem { Id = "6", Href = "/Login", IconName = IconName.SegmentedNav, Text = "Login", ParentId="4" },
+            new NavItem { Id = "3", Href = "#", IconName = IconName.PersonLock, Text = "Athentication" },
 
-            new NavItem { Id = "7", IconName = IconName.ListNested, Text = "Sidebar 2", ParentId="4" },
-            new NavItem { Id = "701", Href = "/", IconName = IconName.Dash, Text = "Login", ParentId="7" },
+            new NavItem { Id = "4", Href = "/Login", IconName = IconName.Key, Text = "Login", IconColor = IconColor.Success, ParentId="3" },
+            
+            new NavItem { Id = "5", Href = "/Register", IconName = IconName.PersonVCard , IconColor = IconColor.Success, Text = "Register", ParentId="3" },
+            
+            new NavItem { Id = "6", Href = "/Contact" ,IconName = IconName.PinMapFill, Text = "Contacto" },
 
-            new NavItem { Id = "702", IconName = IconName.Dash, Text = "Examples", ParentId="7" },
-            new NavItem { Id = "70201", Href = "/sidebar2", IconName = IconName.Dash, Text = "Nested levels", ParentId="702" },
-
-            new NavItem { Id = "8", IconName = IconName.Grid, Text = "Grid", ParentId="4", IconColor = IconColor.Danger },
-            new NavItem { Id = "801", Href = "/grid/#", IconName = IconName.Dash, Text = "How to use", ParentId="8" },
-            new NavItem { Id = "802", IconName = IconName.Dash, Text = "Examples", ParentId="8" },
-            new NavItem { Id = "80201", Href = "/grid/#", IconName = IconName.Dash, Text = "Filters", ParentId="802" },
-
-            new NavItem { Id = "9", IconName = IconName.WindowPlus, Text = "Forms", IconColor = IconColor.Warning },
-            new NavItem { Id = "10", Href = "/autocomplete", IconName = IconName.InputCursorText, Text = "Auto Complete", ParentId="9" },
-            new NavItem { Id = "11", Href = "/currency-input", IconName = IconName.CurrencyDollar, Text = "Currency Input", ParentId="9" },
-            new NavItem { Id = "12", Href = "/number-input", IconName = IconName.InputCursor, Text = "Number Input", ParentId="9" },
-            new NavItem { Id = "13", Href = "/switch", IconName = IconName.ToggleOn, Text = "Switch", ParentId="9" },
+             new NavItem { Id = "", Href = "/ListMenu" ,IconName = IconName.PinMapFill, Text = "Menu" },
+            
         };
 
         return navItems;

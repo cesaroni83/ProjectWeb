@@ -1,0 +1,234 @@
+﻿@page "/ListMenu"
+
+
+@using ClosedXML.Excel
+@using ProjectWeb.ASM.Helper
+@using ProjectWeb.ASM.Repositorio
+@using ProjectWeb.Shared.Modelo.DTO.Menu
+@using ProjectWeb.Shared.Modelo.Estatico
+@using System.Threading.Tasks
+@using System.Reflection
+@using System.ComponentModel.DataAnnotations
+@inject NavigationManager navigationManager
+@inject SweetAlertService sweetAlertService
+@inject IRepository repository
+@inject IJSRuntime JS
+
+<PageTitle>Menu</PageTitle>
+<ConfirmDialog @ref="dialog" />
+<div class="centrado-pantalla">
+    <div class="container-tabla">
+        <Card style="width:93%; height:auto; margin:50px">
+            <CardHeader class="text-center fs-4">
+                Lista De Paises
+            </CardHeader>
+            <CardBody>
+                <Grid TItem="MenuDTO"
+                      Class="table table-hover table-bordered align-middle"
+                      FiltersRowCssClass="bg-primary text-white bg-opacity-25 border-bottom-0"
+                      HeaderRowCssClass="bg-primary text-white border-bottom-0"
+                      DataProvider="PaisDataProvider"
+                      AllowFiltering="true"
+                      AllowPaging="true"
+                      PageSize="10"
+                      AllowSorting="true"
+                      AllowRowClick="true"
+                      OnRowClick="OnrowClick"
+                      Responsive="true"
+                      @ref="grid">
+                     <GridTemplates Class="gap-2">
+						<ExportLayout TItem="MenuDTO" GridRef="grid" Items="ListaMenu" />
+                     </GridTemplates>
+                     <GridColumn TItem="MenuDTO" HeaderText="ID Menu" PropertyName="Id_menu" SortString="Id_menu" SortKeySelector="item => item.Id_menu" FilterTextboxWidth="100" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
+                        @context.Id_menu
+                    </GridColumn>
+
+                    <GridColumn TItem="MenuDTO" HeaderText="Nombre Menu" PropertyName="Decripcion" HeaderTextAlignment="Alignment.Center" SortString="Descripcion" SortKeySelector="item => item.Descripcion" FilterTextboxWidth="150">
+                        @context.Descripcion
+                    </GridColumn>
+                    <GridColumn TItem="MenuDTO" HeaderText="Pagina Navengacion" PropertyName="Referencia" HeaderTextAlignment="Alignment.Center" SortString="Referencia" SortKeySelector="item => item.Referencia" FilterTextboxWidth="150">
+                        @context.Referencia
+                    </GridColumn>
+
+                    <GridColumn TItem="MenuDTO" HeaderText="Información" PropertyName="Informacion_menu" SortString="Informacion_menu" SortKeySelector="item => item.Informacion_menu" FilterTextboxWidth="100">
+                        @context.Informacion_menu
+                    </GridColumn>
+
+                    <GridColumn TItem="MenuDTO" HeaderText="Icono">
+                        <Icon Name="@IconColorHelper.ParseToIconName(Icono.GetTextIcono(context.Icono_name ?? string.Empty))"
+                              Size="IconSize.x1"
+                              Color="@IconColorHelper.ParseToIconColor(IconoColor.GetTextIconoColor(context.Icono_color ?? string.Empty))" />
+                    </GridColumn>
+
+                    <GridColumn TItem="MenuDTO" HeaderText="Icono" PropertyName="Icono_name" SortString="Icono_name" SortKeySelector="item => item.Icono_name" FilterTextboxWidth="100">
+                        @(context.Icono_name != null ? Icono.GetTextIcono(context.Icono_name) : "")
+                    </GridColumn>
+                    <GridColumn TItem="MenuDTO" HeaderText="Color" PropertyName="Icono_color" SortString="Icono_color" SortKeySelector="item => item.Icono_color" FilterTextboxWidth="100">
+                        @(context.Icono_color != null ? IconoColor.GetTextIconoColor(context.Icono_color) : "")
+                    </GridColumn>
+
+                    <GridColumn TItem="MenuDTO" HeaderText="Menu Padre" PropertyName="Nombre_padre" SortString="Nombre_padre" SortKeySelector="item => item.Nombre_padre" FilterTextboxWidth="100">
+                        @context.Nombre_padre
+                    </GridColumn>
+
+                    <GridColumn TItem="MenuDTO" HeaderText="Estado" PropertyName="Estado_pais" HeaderTextAlignment="Alignment.Center" SortString="Estado_pais" SortKeySelector="item => item.Estado_menu" FilterTextboxWidth="100">
+                        @Estado.GetTextEstado(@context.Estado_menu)
+                    </GridColumn>
+
+                    <GridColumn TItem="MenuDTO" HeaderText="Acción" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Start" Filterable="false" FilterTextboxWidth="150">
+                        <div class="d-flex justify-content-end gap-2" style="width:150px;">
+                            <button class="btn btn-success btn-sm" @onclick=@(() => ShowModal(context.Id_menu, true))>Update</button>
+                            <button class="btn btn-danger btn-sm" @onclick="() => DeleteReg(context.Id_menu, context.Descripcion)">Delete</button>
+                        </div>
+                    </GridColumn>
+                </Grid>
+            </CardBody>
+            <CardFooter class="d-flex justify-content-end ">
+                <button class="btn btn-success" @onclick=@(() => ShowModal())>Nuevo Registro</button>
+            </CardFooter>
+        </Card>
+    </div>
+</div>
+@code {
+	private ConfirmDialog dialog = default!;
+	[Inject] ToastService ToastService { get; set; } = default!;
+	[Inject] protected PreloadService PreloadService { get; set; } = default!;
+	public MenuDTO Input = new MenuDTO();
+	private List<MenuDTO> ListaMenu { get; set; } = default!;
+	private BlazorBootstrap.Grid<MenuDTO>? grid;
+	private string Padre_menu { get; set; } = default!;
+
+	[CascadingParameter]
+	IModalService Modal { get; set; } = default!;
+
+	private async Task ShowModal(int id = 0, bool isEdit = false)
+
+	{
+		IModalReference modalReference;
+
+		if (isEdit)
+		{
+
+			var parameters = new ModalParameters();
+			parameters.Add("InputDTO", Input);
+			parameters.Add("SubmitButtonText", "Update");
+			parameters.Add("Titulo", "Modifica Datos Del Menu");
+			modalReference = Modal.Show<MenuComponent>(parameters);
+		}
+		else
+		{
+			var parameters = new ModalParameters();
+			parameters.Add("InputDTO", Input = new());
+			parameters.Add("SubmitButtonText", "Save");
+			parameters.Add("Titulo", "Registro De Menu");
+			modalReference = Modal.Show<MenuComponent>(parameters);
+		}
+		var result = await modalReference.Result;
+		if (result.Confirmed)
+		{
+			await RefrescarGrid();
+		}
+
+	}
+	private async Task LoadMenu()
+	{
+		PreloadService.Show(SpinnerColor.Light, "Loading data...");
+		var responseHttp = await repository.Get<List<MenuDTO>>("/api/Menus");
+		if (responseHttp.Error)
+		{
+			var message = await responseHttp.GetErrorMessageAsync();
+			await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+			return;
+		}
+
+		ListaMenu = responseHttp.Response?.ToList() ?? new List<MenuDTO>();
+		if (ListaMenu.Any())
+		{
+			foreach (var menu in ListaMenu)
+			{
+				if (!string.IsNullOrEmpty(menu.Id_parend))
+				{
+					var padre = ListaMenu.FirstOrDefault(m => m.Id_menu.ToString() == menu.Id_parend);
+					menu.Nombre_padre = padre?.Descripcion?? string.Empty;
+				}
+			}
+		}
+
+		StateHasChanged();
+		PreloadService.Hide();
+
+
+	}
+	private async Task<GridDataProviderResult<MenuDTO>> PaisDataProvider(GridDataProviderRequest<MenuDTO> request)
+	{
+		if (ListaMenu is null) // pull employees only one time for client-side filtering, sorting, and paging
+			await LoadMenu();
+		return await Task.FromResult(request.ApplyTo(ListaMenu));
+	}
+	private async Task OnrowClick(GridRowEventArgs<MenuDTO> args)
+	{
+		//await ModalService.ShowAsync(new ModalOption { Type = ModalType.Primary, Title = "Event: Row Click", Message = $"Id: {args.Item.Id_user}, Name: {args.Item.User_name}" });
+		Input.Id_menu = args.Item.Id_menu;
+		Input.Descripcion = args.Item.Descripcion;
+		Input.Referencia = args.Item.Referencia;
+		Input.Informacion_menu = args.Item.Informacion_menu;
+		Input.Icono_color = args.Item.Icono_color;
+		Input.Icono_name = args.Item.Icono_name;
+		Input.Id_parend = args.Item.Id_parend;
+		Input.Estado_menu = args.Item.Estado_menu;
+
+		return;
+	}
+	private async Task RefrescarGrid()
+	{
+		await LoadMenu();
+		await grid.RefreshDataAsync();
+	}
+	private async Task DeleteReg(int id, string nombre)
+	{
+		var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
+		var confirmation = await dialog.ShowAsync(
+			title: "Eliminacion De Regitro",
+			message1: "Desea Eliminar El Menu?",
+			message2: "ID:" + id + "  Pais:" + nombre,
+			confirmDialogOptions: options);
+
+		if (confirmation)
+		{
+			// call API to delete the employee
+			// show acknowledgment to the user
+			var responseHttp = await repository.Delete($"/api/Menu/{Input.Id_menu}");
+			if (responseHttp.Error)
+			{
+				var message = await responseHttp.GetErrorMessageAsync();
+				await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+				return;
+			}
+			ToastService.Notify(new ToastMessage(ToastType.Success, $"Pais Eliminado con Exito!"));
+			await RefrescarGrid();
+			return;
+		}
+		else
+		{
+			ToastService.Notify(new ToastMessage(ToastType.Secondary, $"Operacion Cancelada!"));
+		}
+
+	}
+	private async Task<string>MenuPadre(string? Id)
+	{
+		if(Id!=null)
+		{
+			var responseHttp = await repository.Get<string>($"/api/Menus/MenuName/{int.Parse(Id)}");
+			if (responseHttp.Error)
+			{
+				var message = await responseHttp.GetErrorMessageAsync();
+				await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+				return string.Empty; 
+			}
+			Padre_menu = responseHttp.Response ?? string.Empty;
+			return (Padre_menu);
+		}
+		return string.Empty;
+	}
+
+}

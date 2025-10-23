@@ -14,14 +14,18 @@
             new IconoColor { Id = "5" , Text = "Warning" },
             new IconoColor { Id = "6" , Text = "Info" },
             new IconoColor { Id = "7" , Text = "Dark" },
-            new IconoColor { Id = "8" , Text = "Boby" },
-            new IconoColor { Id = "7" , Text = "Muted" },
-            new IconoColor { Id = "9"  , Text = "White" },
+            new IconoColor { Id = "8" , Text = "Body" },
+            new IconoColor { Id = "9" , Text = "Muted" },
+            new IconoColor { Id = "10", Text = "White" },
         };
+
+        // 🔹 Ritorna il testo (stringa)
         public static string GetTextIconoColor(string id)
         {
             var estado = GetItems().FirstOrDefault(e => e.Id == id);
-            return estado?.Text ?? string.Empty; // Retorna vacío si no encuentra
+            return estado?.Text ?? string.Empty; // Ritorna stringa vuota se non trova nulla
         }
+
+        
     }
 }

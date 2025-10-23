@@ -1,0 +1,93 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using System.Reflection
+@typeparam TItem
+
+<div class="d-flex gap-3 mb-3">
+    <Icon Name="IconName.FileExcel" Color="IconColor.Primary" Size="IconSize.x3" @onclick="() => ExportGridDataToExcel()" />
+    <Icon Name="IconName.FilePdf" Color="IconColor.Primary" Size="IconSize.x3" @onclick="() => ExportGridDataPdf()" />
+    <Icon Name="IconName.Printer" Color="IconColor.Primary" Size="IconSize.x3" @onclick="() => PrintGridData()" />
+</div>
+
+@code {
+    [Parameter] public BlazorBootstrap.Grid<TItem>? GridRef { get; set; }
+    [Parameter] public List<TItem> Items { get; set; } = new();
+
+    [Inject] IJSRuntime JS { get; set; } = default!;
+
+    private List<string> GetColumnHeaders()
+    {
+        var props = typeof(TItem).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+        return props.Select(p => 
+        {
+            var display = p.GetCustomAttribute<DisplayAttribute>();
+            return display != null ? display.Name : p.Name;
+        }).ToList();
+    }
+
+    private List<Dictionary<string, string>> GetData()
+    {
+        var props = typeof(TItem).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+        var data = Items.Select(item =>
+        {
+            var dict = new Dictionary<string, string>();
+            foreach (var prop in props)
+            {
+                var display = prop.GetCustomAttribute<DisplayAttribute>();
+                var key = display != null ? display.Name : prop.Name;
+                var value = prop.GetValue(item)?.ToString() ?? "";
+                dict[key] = value;
+            }
+            return dict;
+        }).ToList();
+        return data;
+    }
+
+    private async Task ExportGridDataPdf()
+    {
+        var columns = GetColumnHeaders();
+        var data = GetData();
+        await JS.InvokeVoidAsync("exportDynamicPdf", data, columns);
+    }
+
+    private async Task ExportGridDataToExcel()
+    {
+        var props = typeof(TItem).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+
+        using var workbook = new ClosedXML.Excel.XLWorkbook();
+        var worksheet = workbook.Worksheets.Add("Datos");
+
+        for (int i = 0; i < props.Length; i++)
+        {
+            var display = props[i].GetCustomAttribute<DisplayAttribute>();
+            var header = display != null ? display.Name : props[i].Name;
+            worksheet.Cell(1, i + 1).Value = header;
+            worksheet.Cell(1, i + 1).Style.Font.Bold = true;
+        }
+
+        for (int rowIndex = 0; rowIndex < Items.Count; rowIndex++)
+        {
+            var item = Items[rowIndex];
+            for (int colIndex = 0; colIndex < props.Length; colIndex++)
+            {
+                var value = props[colIndex].GetValue(item);
+                worksheet.Cell(rowIndex + 2, colIndex + 1).Value = value?.ToString() ?? "";
+            }
+        }
+
+        worksheet.Columns().AdjustToContents();
+
+        using var stream = new MemoryStream();
+        workbook.SaveAs(stream);
+        var bytes = stream.ToArray();
+        var base64 = Convert.ToBase64String(bytes);
+
+        await JS.InvokeVoidAsync("saveAsFile", "DatosGrid.xlsx", base64);
+    }
+
+    private async Task PrintGridData()
+    {
+        var columns = GetColumnHeaders();
+        var data = GetData();
+        await JS.InvokeVoidAsync("printGrid", columns, data);
+    }
+}

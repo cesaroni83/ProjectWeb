@@ -1,0 +1,225 @@
+﻿@using ProjectWeb.ASM.Repositorio
+@using ProjectWeb.Shared.Modelo.DTO.Menu
+@using ProjectWeb.Shared.Modelo.Estatico
+@inject ToastService ToastService
+@inject SweetAlertService sweetAlertService
+@inject IRepository repository
+
+<div class="row justify-content-center">
+    <Card style="width:90%; height:auto; margin:50px">
+        <CardHeader class="text-center fs-4">
+            @Titulo
+        </CardHeader>
+        <CardBody>
+            <EditForm Model="Input" OnValidSubmit="SubmitForm">
+                <DataAnnotationsValidator />
+                <div class="container">
+                    <!-- Nombre -->
+                    <div class="form-group row mb-3">
+                        <div class="col-4"><label>Descripcion :</label></div>
+                        <div class="col-7">
+                            <InputText @bind-Value="@Input.Descripcion" class="form-control" placeholder="Descripcion" />
+                            <ValidationMessage For="() => Input.Descripcion" />
+                        </div>
+                    </div>
+                    <div class="form-group row mb-3">
+                        <div class="col-4"><label> Referencia :</label></div>
+                        <div class="col-7">
+                            <InputText @bind-Value="@Input.Referencia" class="form-control" placeholder="Referencia" />
+                            
+                        </div>
+                    </div>
+                    <!-- Información -->
+                    <div class="form-group row mb-3">
+                        <div class="col-4"><label>Información :</label></div>
+                        <div class="col-7">
+                            <InputTextArea @bind-Value="@Input.Informacion_menu" class="form-control" Rows="4" />
+                        </div>
+                    </div>
+
+                    <!-- Icono Name -->
+                    <div class="form-group row mb-3">
+                        <div class="col-4"><label>Nombre Icono :</label></div>
+                        <div class="col-7">
+                            <select @onchange="@(e => CambiaNombre(e))" class="form-control">
+                                <option value="">Seleccione</option>
+                                @foreach (var item in Iconos)
+                                {
+                                    <option value="@item.Id" selected="@(item.Id == Input!.Icono_name)">@item.Text</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row mb-3">
+                        <div class="col-4"><label>Color :</label></div>
+                        <div class="col-7">
+                            <select @onchange="@CambiaColor" class="form-control">
+                                <option value="">Seleccione</option>
+                                @foreach (var item in Colores)
+                                {
+                                    <option value="@item.Id" selected="@(item.Id == Input!.Icono_color)">@item.Text</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row mb-3">
+                        <div class="col-4"><label>Imagen Previa:</label></div>
+                        <div class="col-7">
+                            <Icon Name="@(nombre ?? IconName.Question)"
+								  Size="IconSize.x1"
+                                  Color="@(color ?? IconColor.Primary)" />
+                        </div>
+                    </div>
+                    <!--  -->
+                    <div class="form-group row mb-3">
+                        <div class="col-4"><label>Menu Padre:</label></div>
+                        <div class="col-7">
+                            <InputSelect @bind-Value="@Input.Id_parend" class="form-control" >
+                                <option value="">Seleccione</option>
+                                @foreach (var item in MenuPadre!)
+                                {
+                                    <option value="@item.Id_menu">@item.Descripcion</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    </div>
+                    <!-- Estado -->
+                    <div class="form-group row mb-3">
+                        <div class="col-4"><label>Estado :</label></div>
+                        <div class="col-7">
+                            <InputSelect @bind-Value="@Input.Estado_menu" class="form-control">
+                                <option value="">Seleccione</option>
+                                @foreach (var item in items)
+                                {
+                                    <option value="@item.Id">@item.Text</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    </div>
+                    <!-- Botones -->
+                    <div class="form-group row">
+                        <div class="col-4"></div>
+                        <div class="col-7 d-flex justify-content-center gap-3">
+                            <button type="submit" class="btn btn-primary">@SubmitButtonText</button>
+                            <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+                        </div>
+                    </div>
+                </div>
+            </EditForm>
+
+        </CardBody>
+    </Card>
+</div>
+
+@code {
+    [CascadingParameter] BlazoredModalInstance Modal { get; set; } = default!;
+    [Parameter] public MenuDTO InputDTO { get; set; } = new MenuDTO();
+    [Parameter] public string SubmitButtonText { get; set; } = string.Empty;
+    [Parameter] public string Titulo { get; set; } = string.Empty;
+
+
+    private MenuDTO Input = new();
+
+
+    private List<Estado> items = new();
+    private List<IconoColor> Colores = new();
+    private List<Icono> Iconos = new();
+    private List<MenuDropDTO>? MenuPadre=new();
+    private string Estados = "A";
+    private IconName? nombre;
+    private IconColor? color;
+
+    protected override async Task OnInitializedAsync()
+    {
+        items = Estado.GetItems();
+        Colores = IconoColor.GetItems();
+        Iconos = Icono.GetItems();
+        await LoadMenuPadre();
+        if (InputDTO != null)
+        {
+            Input = InputDTO;
+            var valorColor = IconoColor.GetTextIconoColor(Input.Icono_color ?? "");
+            if (Enum.TryParse<IconColor>(valorColor, true, out var parsedColor))
+                color = parsedColor;
+            else
+                color = IconColor.Primary;
+
+            var valorNombre = Icono.GetTextIcono(Input.Icono_name ?? "");
+            if (Enum.TryParse<IconName>(valorNombre, true, out var parsedNombre))
+                nombre = parsedNombre;
+            else
+                nombre = IconName.Question;
+            //previewUrl = Input.Foto_pais != null ? $"data:image/jpeg;base64,{Convert.ToBase64String(Input.Foto_pais)}" : null;
+        }
+    }
+    private async Task LoadMenuPadre()
+    {
+        var responseHttp = await repository.Get<List<MenuDropDTO>>($"/api/Menus/ComboMenu/{Estados}");
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        MenuPadre = responseHttp.Response;
+    }
+    private void CambiaColor(ChangeEventArgs e)
+    {
+        var idColor = e.Value?.ToString();
+        Input.Icono_color = idColor;
+        var valor = IconoColor.GetTextIconoColor(idColor!);
+        if (Enum.TryParse<IconColor>(valor, true, out var parsed))
+            color = parsed;
+        StateHasChanged();
+    }
+    private void CambiaNombre(ChangeEventArgs e)
+    {
+        var Idnombre = e.Value?.ToString();
+        Input.Icono_name = Idnombre;
+        var value = Icono.GetTextIcono(Idnombre!);
+        if (Enum.TryParse<IconName>(value, true, out var parsed))
+            nombre = parsed;
+        StateHasChanged();
+    }
+
+
+    private async Task Cancelar()
+    {
+        await Modal.CancelAsync();
+    }
+
+    private async Task SubmitForm()
+    {
+       
+        if (SubmitButtonText == "Save")
+        {
+            var responseHttp = await repository.Post<MenuDTO>("/api/Menus/CreateMenu", Input);
+            if (responseHttp.Error)
+            {
+                var message = await responseHttp.GetErrorMessageAsync();
+                await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                return;
+            }
+            ToastService.Notify(new(ToastType.Success, $"Record Pais Update Successfully."));
+            await Task.Delay(3000);
+            await Modal.CloseAsync(ModalResult.Ok(Input));
+            return;
+        }
+        if (SubmitButtonText == "Update")
+        {
+            var responseHttp = await repository.Put<MenuDTO>($"/api/Menus/{Input.Id_menu}", Input);
+            if (responseHttp.Error)
+            {
+                var message = await responseHttp.GetErrorMessageAsync();
+                await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                return;
+            }
+
+            ToastService.Notify(new(ToastType.Success, $"Record Pais Saved Successfully."));
+            await Task.Delay(3000);
+            await Modal.CloseAsync(ModalResult.Ok(Input));
+            return;
+        }
+    }
+}
