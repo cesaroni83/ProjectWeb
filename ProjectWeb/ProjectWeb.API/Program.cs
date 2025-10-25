@@ -195,8 +195,8 @@
 //app.Run();
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.Facebook;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -213,7 +213,9 @@ using ProjectWeb.API.Servicios;
 using ProjectWeb.API.Servicios.Implementacion;
 using ProjectWeb.Shared.Enums;
 using ProjectWeb.Shared.Google;
+using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -324,10 +326,42 @@ builder.Services.AddAuthentication(options =>
     options.AppId = builder.Configuration["Authentication:Facebook:AppId"]!;
     options.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"]!;
     options.CallbackPath = "/signin-facebook"; // Debe coincidir con Redirect URI en Facebook
-    //options.SaveTokens = true;
+    options.SaveTokens = true;
+
+    options.Fields.Add("name");     // Nombre completo
+    options.Fields.Add("email");    // Email
+    options.Fields.Add("picture");  // Foto de perfil
+    // Pedir permisos correctos
+    options.Scope.Add("email");
+    options.Scope.Add("public_profile");
 
     options.Events = new Microsoft.AspNetCore.Authentication.OAuth.OAuthEvents
     {
+        OnCreatingTicket = async context =>
+        {
+            // 📌 Obtener el access token
+            var accessToken = context.AccessToken;
+
+            // 📞 Llamar al Graph API de Facebook para obtener la imagen de perfil
+            var request = new HttpRequestMessage(HttpMethod.Get,
+                $"https://graph.facebook.com/me?fields=id,name,email,picture.width(200).height(200)&access_token={accessToken}");
+
+            var response = await context.Backchannel.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+
+            using var user = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+            var root = user.RootElement;
+
+            // 📸 Extraer la URL de la imagen
+            var pictureUrl = root.GetProperty("picture").GetProperty("data").GetProperty("url").GetString();
+
+            // ✅ Agregar el claim manualmente
+            context.Identity.AddClaim(new Claim("urn:facebook:picture", pictureUrl!));
+        },
+
+
+
+
         OnRemoteFailure = context =>
         {
             context.Response.Redirect("/Login");

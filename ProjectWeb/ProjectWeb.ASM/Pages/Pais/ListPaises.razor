@@ -31,7 +31,9 @@
                       OnRowClick="OnrowClick"
                       Responsive="true"
                       @ref="grid">
-
+                    <GridTemplates Class="gap-2">
+                        <ExportLayout TItem="PaisDTO" GridRef="grid" Items="ListaPais" />
+                    </GridTemplates>
                     <GridColumn TItem="PaisDTO" HeaderText="Foto" FilterTextboxWidth="50" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
                         <div class="text-center">
                             <Image Src="@ObtenerImagen(@context.Foto_pais)" Class="rounded" Alt="placeholder" style="width:50px; height:auto;" />

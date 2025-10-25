@@ -34,7 +34,9 @@
                       OnRowClick="OnrowClick"
                       Responsive="true"
                       @ref="grid">
-
+                    <GridTemplates Class="gap-2">
+                        <ExportLayout TItem="ProvinciaDTO" GridRef="grid" Items="ListaProv" />
+                    </GridTemplates>
                     <GridColumn TItem="ProvinciaDTO" HeaderText="Id Provincia" PropertyName="Id_provincia" SortString="Id_provincia" SortKeySelector="item => item.Id_provincia" FilterTextboxWidth="100" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
                         <a href="/ListCiudad/@context.Id_provincia/@context.Nombre_provincia">@context.Id_provincia</a>
                     </GridColumn> 

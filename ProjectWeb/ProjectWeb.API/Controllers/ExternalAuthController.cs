@@ -6,10 +6,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using ProjectWeb.API.Helper;
 using ProjectWeb.Shared.Enums;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
 
 namespace ProjectWeb.API.Controllers
 {
@@ -18,9 +20,11 @@ namespace ProjectWeb.API.Controllers
     public class ExternalAuthController : ControllerBase
     {
         private readonly IConfiguration _configuration;
-        public ExternalAuthController(IConfiguration configuration)
+        private readonly IUserHelper _userHelper;
+        public ExternalAuthController(IConfiguration configuration, IUserHelper userHelper)
         {
             _configuration = configuration;
+            _userHelper = userHelper;
         }
         [HttpGet("facebook-login")]
         public IActionResult FacebookLogin(string? returnUrl = "/")
@@ -39,20 +43,48 @@ namespace ProjectWeb.API.Controllers
 
             var name = result.Principal.FindFirst(ClaimTypes.Name)?.Value ?? "";
             var email = result.Principal.FindFirst(ClaimTypes.Email)?.Value ?? "";
+            var pictureClaim = result.Principal.FindFirst("urn:facebook:picture")?.Value
+                ?? result.Principal.FindFirst("picture")?.Value;
+
+            string? photoUrl = pictureClaim; // ya es la URL directa
+            //var photo = result.Principal.FindFirst("picture")?.Value;
             /////*   crear el usuario si no exite**//
-            //var user = await _userService.GetByEmailAsync(email);
-            //if (user == null)
-            //{
-            //    // Crear usuario si no existe
-            //    user = await _userService.CreateUserAsync(new User
-            //    {
-            //        Name = name,
-            //        Email = email,
-            //        PhotoUrl = photo,
-            //        LoginProvider = "Facebook",
-            //        CreatedAt = DateTime.UtcNow
-            //    });
-            //}
+            // 3️⃣ Buscar usuario en AspNetUsers
+            var user = await _userHelper.GetUserAsync(email);
+            if (user == null)
+            {
+                // 4️⃣ Crear usuario nuevo
+                var names = name.Split(' ', 2);
+                user = new User
+                {
+                    Email = email,
+                    UserName = email,
+                    FirstName = names.Length > 0 ? names[0] : name,
+                    LastName = names.Length > 1 ? names[1] : "",
+                    Address = "Null",
+                    UserType = UserType.User,
+                    Id_ciudad = 1,
+                    Photo = photoUrl
+
+                };
+
+                // Guardar usuario con password aleatorio
+                var resultado = await _userHelper.AddUserAsync(user, Guid.NewGuid().ToString());
+                if (!resultado.Succeeded)
+                    return BadRequest(resultado.Errors.FirstOrDefault());
+
+                // Asignar rol
+                await _userHelper.AddUserToRoleAsync(user, user.UserType.ToString());
+            }
+            else
+            {
+                var names = name.Split(' ', 2);
+                user.FirstName = names.Length > 0 ? names[0] : user.FirstName;
+                user.LastName = names.Length > 1 ? names[1] : user.LastName;
+                user.Photo = photoUrl ?? user.Photo;
+                await _userHelper.UpdateUserAsync(user);
+                
+            }
 
 
             //////////////////////////////////
@@ -66,9 +98,11 @@ namespace ProjectWeb.API.Controllers
 
             var claims = new[]
             {
-            new Claim(ClaimTypes.Name, name),
-            new Claim(ClaimTypes.Email, email),
-            new Claim("LoginProvider", "Facebook")
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, name),
+                new Claim(ClaimTypes.Email, email),
+                 new Claim("Photo", photoUrl ?? ""),
+                new Claim("LoginProvider", "Facebook")
         };
 
             var token = new JwtSecurityToken(
@@ -80,7 +114,8 @@ namespace ProjectWeb.API.Controllers
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
             string? Url = "https://localhost:7188/login-facebook";
             // 🔹 Redirige al frontend con el token
-            var redirect = $"{Url}?token={jwt}";
+            //var redirect = $"{Url}?token={jwt}";
+            var redirect = $"{Url}?token={Uri.EscapeDataString(jwt)}";
             return Redirect(redirect);
         }
 
