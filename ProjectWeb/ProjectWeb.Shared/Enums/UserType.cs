@@ -9,6 +9,7 @@ namespace ProjectWeb.Shared.Enums
     public enum UserType
     {
         Admin,
-        User
+        User,
+        Employee
     }
 }

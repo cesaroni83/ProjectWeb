@@ -1,11 +1,12 @@
-﻿using ProjectWeb.Shared.Enums;
+﻿using ProjectWeb.Shared.Modelo.DTO.Ciudad;
+using ProjectWeb.Shared.Modelo.DTO.Empresa;
+using ProjectWeb.Shared.Modelo.DTO.Persona;
 using System.ComponentModel.DataAnnotations;
 
-namespace ProjectWeb.Shared.Modelo.Entidades
+namespace ProjectWeb.Shared.Modelo.DTO.Sucursal
 {
-    public class Sucursal
+    public class SucursalDTO
     {
-        [Key]
         [Display(Name = "ID Sucursal")]
         [Required(ErrorMessage = "El Campo {0} es Obligatorio!")]
         public int Id_sucursal { get; set; }
@@ -39,11 +40,11 @@ namespace ProjectWeb.Shared.Modelo.Entidades
         [Display(Name = "Telefono")]
         [Required(ErrorMessage = "El Campo {0} es Obligatorio!")]
         [MaxLength(20, ErrorMessage = "El Campo {0} no puede mas de {2} Caracteres")]
-        public string Telefono { get; set; } = null!;
+        public string? Telefono { get; set; } = null!;
 
         [Display(Name = "Telefono Secundario")]
         [MaxLength(20, ErrorMessage = "El Campo {0} no puede mas de {2} Caracteres")]
-        public string Telefono_secundario { get; set; } = string.Empty;
+        public string? Telefono_secundario { get; set; } = string.Empty;
 
         [Display(Name = "Email")]
         [Required(ErrorMessage = "El Campo {0} es Obligatorio!")]
@@ -63,7 +64,7 @@ namespace ProjectWeb.Shared.Modelo.Entidades
 
         [Display(Name = "Informacion Sucursal")]
         [MaxLength(100, ErrorMessage = "El Campo {0} no puede mas de {1} Caracteres")]
-        public string Informacion_sucursal { get; set; } = string.Empty;
+        public string? Informacion_sucursal { get; set; } = string.Empty;
 
         [Display(Name = "Fecha De Registro")]
         public DateTime Date_reg { get; set; } = DateTime.Now;
@@ -74,11 +75,12 @@ namespace ProjectWeb.Shared.Modelo.Entidades
         [MaxLength(10, ErrorMessage = "El Campo {0} no puede mas de {1} Caracteres")]
         public string Estado_sucursal { get; set; } = string.Empty;
 
-        public Ciudad? Ciudades { get; set; }
+        public CiudadDTO? Ciudades { get; set; }
+        public EmpresaDTO? Empresas { get; set; }
+        public PersonaDTO? Personas { get; set; }
 
-        public Persona? Personas { get; set; }
-        public Empresa? Empresas { get; set; }
-
-        //public ICollection<User>? Usuarios { get; set; } si hago estop en tabla user debo poner la clave id_sucursal
+        // Propiedad plana para Grid
+        public string NombreCiudad => Ciudades?.Nombre_ciudad ?? "";
+        //public List<UserDTO>? Usuarios { get; set; }
     }
 }

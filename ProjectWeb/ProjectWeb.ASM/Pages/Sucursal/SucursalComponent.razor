@@ -1,0 +1,435 @@
+﻿@using ProjectWeb.ASM.Repositorio
+@using ProjectWeb.Shared.Modelo.DTO.Ciudad
+@using ProjectWeb.Shared.Modelo.DTO.Empresa
+@using ProjectWeb.Shared.Modelo.DTO.Pais
+@using ProjectWeb.Shared.Modelo.DTO.Persona
+@using ProjectWeb.Shared.Modelo.DTO.Provincia
+@using ProjectWeb.Shared.Modelo.DTO.Sucursal
+@using ProjectWeb.Shared.Modelo.Estatico
+@inject ToastService ToastService
+@inject SweetAlertService sweetAlertService
+@inject IRepository repository
+@inject NavigationManager navigationManager
+
+<div class="page-wrapper">
+    <EditForm Model="@Input" OnValidSubmit="SubmitForm">
+        <DataAnnotationsValidator />
+        <div class="form-card">
+            <!-- Título del formulario -->
+            <h4 class="form-title"><i class="bi bi-ui-checks-grid"></i> @Titulo</h4>
+
+            <!-- Tabs -->
+            <Tabs class="custom-tabs">
+                <!-- TAB 1: Datos Personales -->
+                <Tab Title="Datos Empresa" Active="true">
+                    <Content>
+                        <div class="tab-content-inner">
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label>Nombre Sucursal</label>
+                                    <div class="input-icon">
+                                        <i class="bi bi-building"></i>
+                                        <InputText class="form-control" @bind-Value="Input.Nombre_sucursal" />
+                                        <ValidationMessage For="() => Input.Nombre_sucursal" />
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label>Empresa</label>
+                                    <div class="input-icon">
+                                        <i class="bi bi-card-text"></i>
+                                        <InputSelect @bind-Value="Input.Id_empresa" class="form-control">
+                                            <option value=""> -- Seleccione --</option>
+                                            @if (EmpresaCombo is not null)
+                                            {
+                                                @foreach (var item in EmpresaCombo)
+                                                {
+                                                    <option value="@item.Id_empresa">@item.Nombre_Empresa</option>
+                                                }
+                                            }
+                                            
+                                        </InputSelect>
+                                        <ValidationMessage For="() => Input.Id_empresa" />
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Fila 2:  -->
+                            <div class="form-group mt-3">
+                                <label>Gerente Sucursal</label>
+                                <div class="input-icon">
+                                    <i class="bi bi-geo-alt"></i>
+                                    <InputSelect @bind-Value="Input.Id_persona" class="form-control">
+                                        <option value=""> -- Seleccione --</option>
+                                        @if (PersonaCombo is not null)
+                                            {
+                                                @foreach (var item in PersonaCombo)
+                                                {
+                                                    <option value="@item.Id_persona"> @($"{item?.Nombre ?? ""} {item?.Apellido ?? ""}") </option>
+                                                    }
+                                            }
+                                    </InputSelect>
+                                    <ValidationMessage For="() => Input.Estado_sucursal" />
+
+                                </div>
+                            </div>
+
+                            <div class="form-group mt-3">
+                                <label>Informacion</label>
+                                <div class="input-icon">
+                                    <i class="bi bi-geo-alt"></i>
+                                    <InputTextArea class="form-control" @bind-Value="Input.Informacion_sucursal" rows="4" />
+                                    
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label>Estado</label>
+                                    <div class="input-icon">
+                                        <i class="bi bi-toggle-on"></i>
+                                        <InputSelect @bind-Value="Input.Estado_sucursal" class="form-control">
+                                            <option value=""> -- Seleccione --</option>
+                                            @foreach (var item in items)
+                                            {
+                                                <option value="@item.Id">@item.Text</option>
+                                            }
+                                        </InputSelect>
+                                        <ValidationMessage For="() => Input.Estado_sucursal" />
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    @* <label>Ocupación</label>
+                                    <div class="input-icon">
+                                        <i class="bi bi-briefcase"></i>
+                                        <InputText class="form-control" @bind-Value="Input.Ocupacion" />
+                                    </div> *@
+                                </div>
+                            </div>
+
+                        </div>
+                    </Content>
+                </Tab>
+
+                <!-- TAB 2: Contacto -->
+                <Tab Title="Contacto">
+                    <Content>
+                        <div class="tab-content-inner">
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label>Pais</label>
+                                    <div class="input-icon">
+                                        <i class="bi bi-globe"></i>
+                                        <select class="form-control" @onchange="CountryChangedAsync">
+                                            <option value="">-- Seleccione --</option>
+                                            @if (countries is not null)
+                                            {
+                                                @foreach (var country in countries)
+                                                {
+                                                    <option value="@country.Id_pais" selected="@(country.Id_pais == sucursal?.Ciudades?.Provincias?.Paises?.Id_pais)">@country.Nombre_pais</option>
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label>Provincia</label>
+                                    <div class="input-icon">
+                                        <i class="bi bi-map"></i>
+                                        <select class="form-control" @onchange="StateChangedAsync">
+                                            <option value="">-- Seleccione --</option>
+                                            @if (states is not null)
+                                            {
+                                                @foreach (var state in states)
+                                                {
+                                                    <option value="@state.Id_provincia" selected="@(state.Id_provincia == sucursal?.Ciudades?.Provincias?.Id_provincia)">@state.Nombre_provincia</option>
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label>Ciudad</label>
+                                    <div class="input-icon">
+                                        <i class="bi bi-buildings"></i>
+                                        <select class="form-control" @bind="sucursal.Id_ciudad">
+                                            <option value="">Seleccione Ciudad</option>
+                                            @if (cities is not null)
+                                            {
+                                                @foreach (var city in cities)
+                                                {
+                                                    <option value="@city.Id_ciudad" selected="@(city.Id_ciudad == sucursal?.Ciudades?.Id_ciudad)">@city.Nombre_ciudad </option>
+                                                }
+                                            }
+                                        </select>
+                                        <ValidationMessage For="() => Input.Id_ciudad" />
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label>CAP</label>
+                                    <div class="input-icon">
+                                        <i class="bi bi-mailbox2"></i>
+                                        <InputText class="form-control" @bind-Value="Input.Cap_sucursal" />
+                                        <ValidationMessage For="() => Input.Cap_sucursal" />
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group mt-3">
+                                <label>Dirección</label>
+                                <div class="input-icon">
+                                    <i class="bi bi-geo-alt"></i>
+                                    <InputText class="form-control" @bind-Value="Input.Direccion_sucursal" />
+                                    <ValidationMessage For="() => Input.Direccion_sucursal" />
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label>Teléfono</label>
+                                    <div class="input-icon">
+                                        <i class="bi bi-telephone"></i>
+                                        <InputText class="form-control" @bind-Value="Input.Telefono" />
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label>Telefono Secundario</label>
+                                    <div class="input-icon">
+                                        <i class="bi bi-telephone-plus"></i>
+                                        <InputText class="form-control" @bind-Value="Input.Telefono_secundario" />
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label>Horario Atencion</label>
+                                    <div class="input-icon">
+                                        <i class="bi bi-globe2"></i>
+                                        <InputText class="form-control" @bind-Value="Input.Horario_atencion" />
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label>Email</label>
+                                    <div class="input-icon">
+                                        <i class="bi bi-envelope"></i>
+                                        <InputText class="form-control" @bind-Value="Input.Email" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </Content>
+                </Tab>
+
+
+
+            </Tabs>
+
+            <!-- Botones -->
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-success btn-custom me-2">
+                    <i class="bi bi-save"></i> @SubmitButtonText
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-custom" @onclick="Cancelar">
+                    <i class="bi bi-eraser"></i> Cancelar
+                </button>
+            </div>
+        </div>
+    </EditForm>
+</div>
+
+@code {
+
+    [CascadingParameter] BlazoredModalInstance Modal { get; set; } = default!;
+    [Parameter] public SucursalDTO InputDTO { get; set; } = new SucursalDTO();
+    [Parameter] public string SubmitButtonText { get; set; } = string.Empty;
+    [Parameter] public string Titulo { get; set; } = string.Empty;
+
+    private List<PaisDropDTO>? countries;
+    private List<ProvinciaDropDTO>? states;
+    private List<CiudadDropDTO>? cities;
+    private List<EmpresaDropDTO>? EmpresaCombo;
+    private List<PersonaDropDTO>? PersonaCombo;
+    private string Estados = "A";
+    private SucursalDTO? sucursal { get; set; } = new SucursalDTO
+    {
+        Ciudades = new CiudadDTO
+        {
+            Provincias = new ProvinciaDTO
+            {
+                Paises = new PaisDTO()
+            }
+        }
+    };
+
+    private SucursalDTO Input = new();
+    private List<Estado> items = new();
+
+
+    private async Task SubmitForm()
+    {
+        if (SubmitButtonText == "Save")
+        {
+            Input.Id_ciudad = sucursal!.Id_ciudad;
+            var responseHttp = await repository.Post<SucursalDTO>("/api/Sucursales/CreateSucursal", Input);
+            if (responseHttp.Error)
+            {
+                var message = await responseHttp.GetErrorMessageAsync();
+                await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                return;
+            }
+            ToastService.Notify(new(ToastType.Success, $"Record Sucursal Saved Successfully."));
+            await Task.Delay(3000);
+            await Modal.CloseAsync(ModalResult.Ok(Input));
+            return;
+        }
+        if (SubmitButtonText == "Update")
+        {
+            var responseHttp = await repository.Put<SucursalDTO>($"/api/Sucursales/{Input.Id_sucursal}", Input);
+            if (responseHttp.Error)
+            {
+                var message = await responseHttp.GetErrorMessageAsync();
+                await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                return;
+            }
+            ToastService.Notify(new(ToastType.Success, $"Record Sucursal Updated Successfully."));
+            await Task.Delay(3000);
+            await Modal.CloseAsync(ModalResult.Ok(Input));
+            return;
+        }
+    }
+
+    private async Task Cancelar()
+    {
+        await Modal.CancelAsync();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Carica gli items dello stato
+        items = Estado.GetItems();
+
+        // Carica i paesi
+        await LoadCountriesAsync();
+        await LoadEmpresaAsync();
+        //llenar solo empreados
+        await LoadPersonaTypeAsync();
+        // Se abbiamo un input con nome
+        if (!string.IsNullOrEmpty(InputDTO.Nombre_sucursal))
+        {
+            // Carica l'empresa dal servizio
+            await LoadSucursalAsyc();
+
+            // Se l'empresa è null o le proprietà annidate sono null, usiamo default
+            var paisId = sucursal?.Ciudades?.Provincias?.Paises?.Id_pais;
+            var provinciaId = sucursal?.Ciudades?.Provincias?.Id_provincia;
+
+            if (paisId.HasValue)
+                await LoadStatesAsyn(paisId.Value);
+
+            if (provinciaId.HasValue)
+                await LoadCitiesAsyn(provinciaId.Value);
+
+            // Copia InputDTO nell'Input usato nel form
+            Input = InputDTO;
+        }
+        
+    }
+
+    private async Task LoadEmpresaAsync()
+    {
+        var responseHttp = await repository.Get<List<EmpresaDropDTO>>($"/api/Empresas/ComboEmpresa/{Estados}");
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        EmpresaCombo = responseHttp.Response;
+    }
+
+    private async Task LoadPersonaTypeAsync()
+    {
+        string Tipo = "Employee";
+        var responseHttp = await repository.Get<List<PersonaDropDTO>>($"/api/Personas/ComboPersonaByType/{Tipo}/{Estados}");
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        PersonaCombo = responseHttp.Response;
+    }
+
+    private async Task LoadSucursalAsyc()
+    {
+        var responseHTTP = await repository.Get<SucursalDTO>($"/api/Sucursales/GetSucursalAllDate/{InputDTO.Id_sucursal}");
+        if (responseHTTP.Error)
+        {
+            if (responseHTTP.HttpResponseMessage.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                navigationManager.NavigateTo("/");
+                return;
+            }
+            var messageError = await responseHTTP.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", messageError, SweetAlertIcon.Error);
+            return;
+        }
+        sucursal = responseHTTP.Response;
+    }
+    
+    private async Task LoadCountriesAsync()
+    {
+        var responseHttp = await repository.Get<List<PaisDropDTO>>($"/api/Paises/ComboPais/{Estados}");
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        countries = responseHttp.Response;
+    }
+
+    private async Task LoadStatesAsyn(int countryId)
+    {
+        var responseHttp = await repository.Get<List<ProvinciaDropDTO>>($"/api/Provincias/ComboProvincia/{countryId}/{Estados}");
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        states = responseHttp.Response;
+    }
+
+    private async Task LoadCitiesAsyn(int stateId)
+    {
+        var responseHttp = await repository.Get<List<CiudadDropDTO>>($"/api/Ciudades/ComboCiudades/{stateId}/{Estados}");
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        cities = responseHttp.Response;
+    }
+
+    private async Task CountryChangedAsync(ChangeEventArgs e)
+    {
+        var selectedCountry = Convert.ToInt32(e.Value!);
+        await LoadStatesAsyn(selectedCountry);
+    }
+
+    private async Task StateChangedAsync(ChangeEventArgs e)
+    {
+        var selectedState = Convert.ToInt32(e.Value!);
+        await LoadCitiesAsyn(selectedState);
+    }
+}

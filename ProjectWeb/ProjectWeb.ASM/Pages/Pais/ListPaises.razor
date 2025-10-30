@@ -133,7 +133,7 @@
     {
         if (ListaPais is null) // pull employees only one time for client-side filtering, sorting, and paging
             await LoadPais();
-        return await Task.FromResult(request.ApplyTo(ListaPais));
+        return await Task.FromResult(request.ApplyTo(ListaPais!));
     }
     private async Task OnrowClick(GridRowEventArgs<PaisDTO> args)
     {
@@ -168,7 +168,7 @@
     private async Task RefrescarGrid()
     {
         await LoadPais();
-        await grid.RefreshDataAsync();
+        await grid!.RefreshDataAsync();
     }
     private async Task DeleteReg(int id, string nombre)
     {

@@ -1,4 +1,5 @@
-﻿@page "/EditUser"
+﻿
+@page "/EditUser"
 @using ProjectWeb.ASM.Repositorio
 @using ProjectWeb.Shared.Account
 @using ProjectWeb.Shared.Enums
@@ -146,7 +147,7 @@ else
 
 
 @code {
-    private User? user;
+    private User? user { set; get; } = new User();
     private List<PaisDropDTO>? countries;
     private List<ProvinciaDropDTO>? states;
     private List<CiudadDropDTO>? cities;

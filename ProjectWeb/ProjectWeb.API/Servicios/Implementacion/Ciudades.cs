@@ -136,8 +136,8 @@ namespace ProjectWeb.API.Servicios.Implementacion
             try
             {
                 var consulta = _modeloRepositorio.GetAllWithWhere(p => p.Id_ciudad == id)
-                                                 .Include(pv=> pv.Provincias)
-                                                 .ThenInclude(p=> p.Paises);
+                                                 .Include(pv=> pv!.Provincias)
+                                                 .ThenInclude(p=> p!.Paises);
                 var fromDBmodelo = await consulta.FirstOrDefaultAsync();
                 if (fromDBmodelo != null)
                 {
@@ -165,8 +165,7 @@ namespace ProjectWeb.API.Servicios.Implementacion
             }
             catch (Exception ex)
             {
-
-                throw ex;
+               throw ex;
             }
         }
 
@@ -204,8 +203,8 @@ namespace ProjectWeb.API.Servicios.Implementacion
             try
             {
                 var consulta = _modeloRepositorio.GetAllWithWhere(p => p.Id_provincia == id_provincia)
-                    .Include(pr=> pr.Provincias)
-                    .ThenInclude(p => p.Paises)
+                    .Include(pr=> pr!.Provincias)
+                    .ThenInclude(p => p!.Paises)
                     .OrderBy(m => m.Id_ciudad);
                 List<CiudadDTO> lista = _mapper.Map<List<CiudadDTO>>(await consulta.ToListAsync());
                 return lista;

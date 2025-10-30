@@ -2,34 +2,33 @@
 using Microsoft.EntityFrameworkCore;
 using ProjectWeb.API.Data;
 using ProjectWeb.API.InterfazGeneral;
-using ProjectWeb.Shared.Modelo.DTO.Pais;
-using ProjectWeb.Shared.Modelo.DTO.Provincia;
+using ProjectWeb.Shared.Modelo.DTO.Empresa;
 using ProjectWeb.Shared.Modelo.Entidades;
 
 namespace ProjectWeb.API.Servicios.Implementacion
 {
-    public class Provincias : IProvincias
+    public class Empresas:IEmpresas
     {
-        public readonly IGenericoModelo<Provincia> _modeloRepositorio;
+        public readonly IGenericoModelo<Empresa> _modeloRepositorio;
         public readonly IMapper _mapper;
         public readonly AppDbContext _context;
         // private object fromDBmodelo;
-        public Provincias(IGenericoModelo<Provincia> modeloRepositorio, IMapper mapper, AppDbContext context)
+        public Empresas(IGenericoModelo<Empresa> modeloRepositorio, IMapper mapper, AppDbContext context)
         {
             _modeloRepositorio = modeloRepositorio;
             _mapper = mapper;
-            _context = context;
+            _context = context; 
         }
 
-        public async Task<ProvinciaDTO> CreateProvincia(ProvinciaDTO modelo)
+        public async Task<EmpresaDTO> CreateEmpresa(EmpresaDTO modelo)
         {
             try
             {
-                var dbModelo = _mapper.Map<Provincia>(modelo);
+                var dbModelo = _mapper.Map<Empresa>(modelo);
 
                 var RspModelo = await _modeloRepositorio.CreateReg(dbModelo);
-                if (RspModelo.Id_provincia != 0)
-                    return _mapper.Map<ProvinciaDTO>(RspModelo);
+                if (RspModelo.Id_empresa != 0)
+                    return _mapper.Map<EmpresaDTO>(RspModelo);
                 else
                     throw new TaskCanceledException("Nose puede crear");
 
@@ -41,11 +40,11 @@ namespace ProjectWeb.API.Servicios.Implementacion
             }
         }
 
-        public async Task<bool> DeleteProvincia(int id_provincia_aux)
+        public async Task<bool> DeleteEmpresa(int id)
         {
             try
             {
-                var consulta = _modeloRepositorio.GetAllWithWhere(p => p.Id_provincia == id_provincia_aux);
+                var consulta = _modeloRepositorio.GetAllWithWhere(p => p.Id_empresa == id);
                 var fromDbmodelo = await consulta.FirstOrDefaultAsync();
                 if (fromDbmodelo != null)
                 {
@@ -65,15 +64,15 @@ namespace ProjectWeb.API.Servicios.Implementacion
             }
         }
 
-        public async Task<bool> DeleteProvinciaLogica(int Id_provincia_aux)
+        public async Task<bool> DeleteEmpresaLogica(int id)
         {
             try
             {
-                var consulta = _modeloRepositorio.GetAllWithWhere(p => p.Id_provincia == Id_provincia_aux);
+                var consulta = _modeloRepositorio.GetAllWithWhere(p => p.Id_empresa == id);
                 var fromDbmodelo = await consulta.FirstOrDefaultAsync();
                 if (fromDbmodelo != null)
                 {
-                    fromDbmodelo.Estado_provincia = "I";
+                    fromDbmodelo.Estado_empresa = "I";
                     var respuesta = await _modeloRepositorio.Upadate(fromDbmodelo);
                     if (!respuesta)
                         throw new TaskCanceledException("No se puedo Eliminar");
@@ -90,13 +89,15 @@ namespace ProjectWeb.API.Servicios.Implementacion
             }
         }
 
-        public async Task<List<ProvinciaDTO>> GetListaAllProvincia()
+        public async Task<List<EmpresaDTO>> GetListaAllEmpresas()
         {
 
             try
             {
-                var consulta = _modeloRepositorio.GetAll().OrderBy(m => m.Id_provincia);
-                List<ProvinciaDTO> lista = _mapper.Map<List<ProvinciaDTO>>(await consulta.ToListAsync());
+                var consulta = _modeloRepositorio.GetAll()
+                    .Include(c => c.Ciudades)
+                    .OrderBy(m => m.Id_empresa);
+                List<EmpresaDTO> lista = _mapper.Map<List<EmpresaDTO>>(await consulta.ToListAsync());
                 return lista;
 
             }
@@ -108,17 +109,17 @@ namespace ProjectWeb.API.Servicios.Implementacion
 
         }
 
-        public async Task<List<ProvinciaDTO>> GetListProvinciaActivo(string Estado_Activo)
+        public async Task<List<EmpresaDTO>> GetListEmpresaActivo(string Estado_Activo)
         {
             try
             {
                 ///con referencia
-                var consulta = _modeloRepositorio.GetAllWithWhere(p => p.Estado_provincia == Estado_Activo);
+                var consulta = _modeloRepositorio.GetAllWithWhere(p => p.Estado_empresa == Estado_Activo);
 
                 var fromDBmodelo = await consulta.ToListAsync();
                 if (fromDBmodelo != null && fromDBmodelo.Any())
                 {
-                    return _mapper.Map<List<ProvinciaDTO>>(fromDBmodelo);
+                    return _mapper.Map<List<EmpresaDTO>>(fromDBmodelo);
                 }
                 else
                 { throw new TaskCanceledException("No nose encontraron considencia"); }
@@ -131,15 +132,15 @@ namespace ProjectWeb.API.Servicios.Implementacion
             }
         }
 
-      public async Task<ProvinciaDTO> GetProvincia(int Id_provincia_aux)
+        public async Task<EmpresaDTO> GetEmpresa(int id)
         {
             try
             {
-                var consulta = _modeloRepositorio.GetAllWithWhere(p => p.Id_provincia == Id_provincia_aux);
+                var consulta = _modeloRepositorio.GetAllWithWhere(p => p.Id_empresa == id);
                 var fromDBmodelo = await consulta.FirstOrDefaultAsync();
                 if (fromDBmodelo != null)
                 {
-                    return _mapper.Map<ProvinciaDTO>(fromDBmodelo);
+                    return _mapper.Map<EmpresaDTO>(fromDBmodelo);
                 }
                 else
                 { throw new TaskCanceledException("No nose encontraron considencia"); }
@@ -152,12 +153,12 @@ namespace ProjectWeb.API.Servicios.Implementacion
             }
         }
 
-        public async Task<List<ProvinciaDTO>> GetProvinciaByPais(int id_pais)
+        public async Task<List<EmpresaDropDTO>> GetEmpresaCombo(string Estado_Activo)
         {
             try
             {
-                var consulta = _modeloRepositorio.GetAllWithWhere(p=> p.Id_pais==id_pais).OrderBy(m => m.Id_provincia);
-                List<ProvinciaDTO> lista = _mapper.Map<List<ProvinciaDTO>>(await consulta.ToListAsync());
+                var consulta = _modeloRepositorio.GetAllWithWhere(x => x.Estado_empresa == Estado_Activo).OrderBy(m => m.Id_empresa);
+                List<EmpresaDropDTO> lista = _mapper.Map<List<EmpresaDropDTO>>(await consulta.ToListAsync());
                 return lista;
 
             }
@@ -168,30 +169,14 @@ namespace ProjectWeb.API.Servicios.Implementacion
             }
         }
 
-        public async Task<List<ProvinciaDropDTO>> GetProvinciaCombo(int id_pais, string Estado_Activo)
+        public async Task<string> GetEmpresaName(int id)
         {
             try
             {
-                var consulta = _modeloRepositorio.GetAllWithWhere(x => x.Paises.Id_pais == id_pais && x.Estado_provincia == Estado_Activo).OrderBy(m => m.Id_provincia);
-                List<ProvinciaDropDTO> lista = _mapper.Map<List<ProvinciaDropDTO>>(await consulta.ToListAsync());
-                return lista;
-
-            }
-            catch (Exception ex)
-            {
-
-                throw ex;
-            }
-        }
-
-        public async Task<string> GetProvinciaName(int Id_provincia_aux)
-        {
-            try
-            {
-                var consulta = await _modeloRepositorio.GetAllWithWhere(p => p.Id_provincia == Id_provincia_aux).FirstOrDefaultAsync();
+                var consulta = await _modeloRepositorio.GetAllWithWhere(p => p.Id_empresa == id).FirstOrDefaultAsync();
                 if (consulta != null)
                 {
-                    return consulta.Nombre_provincia ?? "";
+                    return consulta.Nombre_Empresa ?? "";
 
                 }
                 else
@@ -205,18 +190,29 @@ namespace ProjectWeb.API.Servicios.Implementacion
             }
         }
 
-        public async Task<bool> UpdateProvincia(ProvinciaDTO modelo)
+        public async Task<bool> UpdateEmpresa(EmpresaDTO modelo)
         {
             try
             {
-                var consulta = _modeloRepositorio.GetAllWithWhere(p => p.Id_provincia == modelo.Id_provincia);
+                var consulta = _modeloRepositorio.GetAllWithWhere(p => p.Id_empresa == modelo.Id_empresa);
                 var fromDbmodelo = await consulta.FirstOrDefaultAsync();
                 if (fromDbmodelo != null)
                 {
-                    fromDbmodelo.Id_pais = modelo.Id_pais;
-                    fromDbmodelo.Nombre_provincia = modelo.Nombre_provincia;
-                    fromDbmodelo.Informacion_provincia = modelo.Informacion_provincia;
-                    fromDbmodelo.Estado_provincia = modelo.Estado_provincia;
+                    fromDbmodelo.Nombre_Empresa = modelo.Nombre_Empresa;
+                    fromDbmodelo.Razon_social = modelo.Razon_social;
+                    fromDbmodelo.Ruc = modelo.Ruc;
+                    fromDbmodelo.Id_ciudad = modelo.Id_ciudad;
+                    fromDbmodelo.Direccion = modelo.Direccion;
+                    fromDbmodelo.Cap = modelo.Cap;
+                    fromDbmodelo.Telefono = modelo.Telefono!;
+                    fromDbmodelo.Telefono_secundario = modelo.Telefono_secundario!;
+                    fromDbmodelo.Pagina_web = modelo.Pagina_web!;
+                    fromDbmodelo.Email = modelo.Email;
+                    fromDbmodelo.Tipo_empresa = modelo.Tipo_empresa!;
+                    fromDbmodelo.Representante_legal = modelo.Representante_legal!;
+                    fromDbmodelo.Capital_social = modelo.Capital_social;
+                    fromDbmodelo.Logo = modelo.Logo;
+                    fromDbmodelo.Estado_empresa = modelo.Estado_empresa;
                     var respuesta = await _modeloRepositorio.Upadate(fromDbmodelo);
                     if (!respuesta)
                         throw new TaskCanceledException("No se puedo Editar");
@@ -233,6 +229,18 @@ namespace ProjectWeb.API.Servicios.Implementacion
             }
         }
 
+        public async Task<EmpresaDTO> GetEmpresaAllDate(int id)
+        {
+            var empresa = await _context.Tbl_Empresa
+                .Include(u => u!.Ciudades)
+                .ThenInclude(c => c!.Provincias!)
+                .ThenInclude(s => s!.Paises!)
+                .FirstOrDefaultAsync(x => x.Id_empresa == id);
+            if (empresa is null)
+                return null; // o lancia eccezione
 
+            var empresaDto = _mapper.Map<EmpresaDTO>(empresa);
+            return empresaDto;
+        }
     }
 }

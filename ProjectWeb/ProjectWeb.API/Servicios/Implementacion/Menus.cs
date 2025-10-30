@@ -14,10 +14,11 @@ namespace ProjectWeb.API.Servicios.Implementacion
         public readonly IMapper _mapper;
         public readonly AppDbContext _db;
 
-        public Menus(IGenericoModelo<Menu> modeloRepositorio, IMapper mapper)
+        public Menus(IGenericoModelo<Menu> modeloRepositorio, IMapper mapper, AppDbContext db)
         {
             _modeloRepositorio = modeloRepositorio;
             _mapper = mapper;
+            _db = db;
         }
 
         public async Task<MenuDTO> CreateMenu(MenuDTO modelo)
@@ -134,8 +135,8 @@ namespace ProjectWeb.API.Servicios.Implementacion
                 if (fromDbmodelo != null)
                 {
                     fromDbmodelo.Descripcion = modelo.Descripcion;
-                    fromDbmodelo.Referencia = modelo.Referencia;
-                    fromDbmodelo.Informacion_menu = modelo.Informacion_menu;
+                    fromDbmodelo.Referencia = modelo.Referencia!;
+                    fromDbmodelo.Informacion_menu = modelo.Informacion_menu!;
                     fromDbmodelo.Icono_name = modelo.Icono_name;
                     fromDbmodelo.Icono_color = modelo.Icono_color;
                     fromDbmodelo.Id_parend = modelo.Id_parend;

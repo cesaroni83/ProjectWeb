@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using ProjectWeb.Shared.Account;
 using ProjectWeb.Shared.Enums;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ProjectWeb.API.Helper
 {
@@ -33,5 +34,7 @@ namespace ProjectWeb.API.Helper
         Task<string> GeneratePasswordResetTokenAsync(User user);
 
         Task<IdentityResult> ResetPasswordAsync(User user, string token, string password);
+
+        Task<IdentityResult> AddOrUpdateUserWithPersonaAsync(User user);
     }
 }

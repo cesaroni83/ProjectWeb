@@ -1,0 +1,224 @@
+﻿@page "/ListSucursal/{IdEmpresa:int}/{EmpresaName}"
+@using ProjectWeb.ASM.Repositorio
+@using ProjectWeb.Shared.Modelo.DTO.Sucursal
+@using ProjectWeb.Shared.Modelo.Estatico
+
+
+@inject NavigationManager navigationManager
+@inject SweetAlertService sweetAlertService
+@inject IRepository repository
+<PageTitle>Sucursal</PageTitle>
+<ConfirmDialog @ref="dialog" />
+
+<div class="centrado-pantalla">
+    <div class="container-tabla">
+        <div class="d-flex justify-content-lg-start">
+            <a href="/ListEmpresa"><i class="fa-solid fa-arrow-left"></i></a>
+        </div>
+        <Card style="width:93%; height:auto; margin:50px">
+            <CardHeader class="text-center fs-4">
+                Lista De Sucurales De @EmpresaName
+            </CardHeader>
+            <CardBody>
+                <Grid TItem="SucursalDTO"
+                      Class="table table-hover table-bordered"
+                      FiltersRowCssClass="bg-primary text-white bg-opacity-25 border-bottom-0"
+                      HeaderRowCssClass="bg-primary text-white border-bottom-0"
+                      DataProvider="SucursalDataProvider"
+                      AllowFiltering="true"
+                      AllowPaging="true"
+                      PageSize="10"
+                      AllowSorting="true"
+                      AllowRowClick="true"
+                      OnRowClick="OnrowClick"
+                      Responsive="true"
+                      @ref="grid">
+                    <GridTemplates Class="gap-2">
+                        <ExportLayout TItem="SucursalDTO" GridRef="grid" Items="ListaSucursal" />
+                    </GridTemplates>
+                    <GridColumn TItem="SucursalDTO" HeaderText="ID Sucursal" PropertyName="Id_sucursal" SortString="Id_sucursal" SortKeySelector="item => item.Id_sucursal" FilterTextboxWidth="100" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
+                        @context.Id_sucursal
+                    </GridColumn>
+
+                    <GridColumn TItem="SucursalDTO" HeaderText="Sucursal" PropertyName="Nombre_sucursal" HeaderTextAlignment="Alignment.Center" SortString="Nombre_sucursal" SortKeySelector="item => item.Nombre_sucursal" FilterTextboxWidth="150">
+                        @context.Nombre_sucursal
+                    </GridColumn>
+
+
+                    <GridColumn TItem="SucursalDTO" HeaderText="Ciudad" PropertyName="NombreCiudad" SortString="NombreCiudad" SortKeySelector="item => item.NombreCiudad" FilterTextboxWidth="100" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
+                        @context.NombreCiudad
+                    </GridColumn>
+
+                    <GridColumn TItem="SucursalDTO" HeaderText="Direccion" PropertyName="Direccion_sucursal" HeaderTextAlignment="Alignment.Center" SortString="Direccion_sucursal" SortKeySelector="item => item.Direccion_sucursal" FilterTextboxWidth="150">
+                        @context.Direccion_sucursal
+                    </GridColumn>
+                    <GridColumn TItem="SucursalDTO" HeaderText="Telefono" PropertyName="Telefono" SortString="Telefono" SortKeySelector="item => item.Telefono" FilterTextboxWidth="100" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
+                        @context.Telefono
+                    </GridColumn>
+
+                    <GridColumn TItem="SucursalDTO" HeaderText="Horario Atencion" PropertyName="Horario_atencion" HeaderTextAlignment="Alignment.Center" SortString="Horario_atencion" SortKeySelector="item => item.Horario_atencion" FilterTextboxWidth="150">
+                        @context.Horario_atencion
+                    </GridColumn>
+
+                    <GridColumn TItem="SucursalDTO" HeaderText="Información" PropertyName="Informacion_sucursal" SortString="Informacion_sucursal" SortKeySelector="item => item.Informacion_sucursal" FilterTextboxWidth="200">
+                        @context.Informacion_sucursal
+                    </GridColumn>
+
+                    <GridColumn TItem="SucursalDTO" HeaderText="Estado" PropertyName="Estado_sucursal" HeaderTextAlignment="Alignment.Center" SortString="Estado_sucursal" SortKeySelector="item => item.Estado_sucursal" FilterTextboxWidth="100">
+                        @Estado.GetTextEstado(@context.Estado_sucursal)
+                    </GridColumn>
+
+                    <GridColumn TItem="SucursalDTO" HeaderText="Acción" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Start" Filterable="false" FilterTextboxWidth="150">
+                        <div class="d-flex justify-content-end gap-2" style="width:150px;">
+                            <button class="btn btn-success btn-sm" @onclick=@(() => ShowModal(context.Id_sucursal, true))>Update</button>
+                            <button class="btn btn-danger btn-sm" @onclick="() => DeleteReg(context.Id_sucursal, context.Nombre_sucursal)">Delete</button>
+                        </div>
+                    </GridColumn>
+                </Grid>
+            </CardBody>
+            <CardFooter class="d-flex justify-content-end ">
+                <button class="btn btn-success" @onclick=@(() => ShowModal())>Nuevo Registro</button>
+            </CardFooter>
+        </Card>
+    </div>
+</div>
+
+@code {
+    private ConfirmDialog dialog = default!;
+    [Inject] ToastService ToastService { get; set; } = default!;
+    [Parameter] public int IdEmpresa { get; set; }
+    [Parameter] public string EmpresaName { get; set; } = string.Empty;
+
+    [Inject] protected PreloadService PreloadService { get; set; } = default!;
+    public SucursalDTO Input = new SucursalDTO();
+    private string? previewUrl;
+    private List<SucursalDTO> ListaSucursal { get; set; } = default!;
+    private BlazorBootstrap.Grid<SucursalDTO>? grid;
+    private List<Estado> items = new();
+    [CascadingParameter]
+    IModalService Modal { get; set; } = default!;
+
+    private async Task ShowModal(int id = 0, bool isEdit = false)
+
+    {
+        IModalReference modalReference;
+
+        var options = new ModalOptions
+        {
+            Class = "modal-lg",
+        };
+        if (isEdit)
+        {
+
+            var parameters = new ModalParameters();
+            parameters.Add("InputDTO", Input);
+            parameters.Add("SubmitButtonText", "Update");
+            parameters.Add("Titulo", " Modifica Datos De Sucursal");
+            modalReference = Modal.Show<SucursalComponent>(parameters, options);
+        }
+        else
+        {
+            var parameters = new ModalParameters();
+            parameters.Add("InputDTO", Input = new());
+            parameters.Add("SubmitButtonText", "Save");
+            parameters.Add("Titulo", " Registro De Sucursal");
+            modalReference = Modal.Show<SucursalComponent>(parameters, options);
+        }
+        var result = await modalReference.Result;
+        if (result.Confirmed)
+        {
+            await RefrescarGrid();
+        }
+
+    }
+    private async Task LoadSucursal()
+    {
+        try
+        {
+            PreloadService.Show(SpinnerColor.Light, "Loading data...");
+            var responseHttp = await repository.Get<List<SucursalDTO>>($"/api/Sucursales/SucursalByEmpresa/{IdEmpresa}");
+            if (responseHttp.Error)
+            {
+                var message = await responseHttp.GetErrorMessageAsync();
+                await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                ListaSucursal = new List<SucursalDTO>(); // Evitar null
+                return;
+            }
+
+            ListaSucursal = responseHttp.Response?.ToList() ?? new List<SucursalDTO>();
+        }
+        catch (Exception ex)
+        {
+            await sweetAlertService.FireAsync("Error", ex.Message, SweetAlertIcon.Error);
+            ListaSucursal = new List<SucursalDTO>();
+        }
+        finally
+        {
+            StateHasChanged();
+            PreloadService.Hide();
+        }
+
+
+    }
+    private async Task<GridDataProviderResult<SucursalDTO>> SucursalDataProvider(GridDataProviderRequest<SucursalDTO> request)
+    {
+        if (ListaSucursal is null) // pull employees only one time for client-side filtering, sorting, and paging
+            await LoadSucursal();
+        return await Task.FromResult(request.ApplyTo(ListaSucursal!));
+    }
+    private async Task OnrowClick(GridRowEventArgs<SucursalDTO> args)
+    {
+        //await ModalService.ShowAsync(new ModalOption { Type = ModalType.Primary, Title = "Event: Row Click", Message = $"Id: {args.Item.Id_user}, Name: {args.Item.User_name}" });
+        Input.Id_empresa = args.Item.Id_empresa;
+        Input.Id_sucursal = args.Item.Id_sucursal;
+        Input.Nombre_sucursal = args.Item.Nombre_sucursal;
+        Input.Id_ciudad = args.Item.Id_ciudad;
+        Input.Direccion_sucursal = args.Item.Direccion_sucursal;
+        Input.Cap_sucursal = args.Item.Cap_sucursal;
+        Input.Telefono = args.Item.Telefono;
+        Input.Telefono_secundario = args.Item.Telefono_secundario;
+        Input.Id_persona = args.Item.Id_persona;
+        Input.Email = args.Item.Email;
+        Input.Horario_atencion = args.Item.Horario_atencion;
+        Input.Informacion_sucursal = args.Item.Informacion_sucursal;
+        Input.Estado_sucursal = args.Item.Estado_sucursal;
+        
+        return;
+    }
+    
+    private async Task RefrescarGrid()
+    {
+        await LoadSucursal();
+        await grid!.RefreshDataAsync();
+    }
+    private async Task DeleteReg(int id, string nombre)
+    {
+        var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
+        var confirmation = await dialog.ShowAsync(
+            title: "Eliminacion De Regitro",
+            message1: "Desea Eliminar La Sucursal?",
+            message2: "ID:" + id + "  Sucursal:" + nombre,
+            confirmDialogOptions: options);
+
+        if (confirmation)
+        {
+            // call API to delete the employee
+            // show acknowledgment to the user
+            var responseHttp = await repository.Delete($"/api/Sucursales/{Input.Id_sucursal}");
+            if (responseHttp.Error)
+            {
+                var message = await responseHttp.GetErrorMessageAsync();
+                await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                return;
+            }
+            ToastService.Notify(new ToastMessage(ToastType.Success, $"Sucursal Eliminado con Exito!"));
+            await RefrescarGrid();
+            return;
+        }
+        else
+        {
+            ToastService.Notify(new ToastMessage(ToastType.Secondary, $"Operacion Cancelada!"));
+        }
+
+    }
+}

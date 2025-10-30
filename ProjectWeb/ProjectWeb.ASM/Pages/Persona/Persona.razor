@@ -1,0 +1,498 @@
+﻿@page "/Profilo"
+
+@using Microsoft.AspNetCore.Authorization
+@using ProjectWeb.ASM.Repositorio
+@using ProjectWeb.Shared.Account
+@using ProjectWeb.Shared.Enums
+@using ProjectWeb.Shared.Modelo.DTO.Ciudad
+@using ProjectWeb.Shared.Modelo.DTO.Pais
+@using ProjectWeb.Shared.Modelo.DTO.Persona
+@using ProjectWeb.Shared.Modelo.DTO.Provincia
+@using ProjectWeb.Shared.Modelo.Estatico
+
+@inject NavigationManager navigationManager
+@inject SweetAlertService sweetAlertService
+@inject IRepository repository
+@inject ILoginService loginService
+
+
+@attribute [Authorize]
+<PageTitle>Profile Persona</PageTitle>
+<ConfirmDialog @ref="dialog" />
+
+<div class="page-wrapper">
+    <EditForm Model="@Input" OnValidSubmit="Guardar">
+        <DataAnnotationsValidator />
+        <div class="form-card">
+            <!-- Título del formulario -->
+            <h4 class="form-title"><i class="bi bi-ui-checks-grid"></i> Profile Del Usuario</h4>
+
+            <!-- Tabs -->
+            <Tabs class="custom-tabs">
+                <!-- TAB 1: Datos Personales -->
+                <Tab Title="Datos Personales" Active="true">
+                    <Content>
+                        <div class="tab-content-inner">
+                            <!-- Previsualización Imagen -->
+                            <div class="img-preview-container">
+                                <img src="@ImagePrev" class="img-preview" />
+                                <i class="bi bi-camera icon-overlay"></i>
+                            </div>
+                            <InputFile OnChange="OnInputFileChange" class="mb-3" />
+
+                            <!-- Fila 1: Nombre y Apellido -->
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label>Nombre</label>
+                                    <div class="input-icon">
+                                        <i class="bi bi-person"></i>
+                                        <InputText class="form-control" @bind-Value="Input.Nombre" />
+                                        <ValidationMessage For="() => Input.Nombre" />
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label>Apellido</label>
+                                    <div class="input-icon">
+                                        <i class="bi bi-person"></i>
+                                        <InputText class="form-control" @bind-Value="Input.Apellido" />
+                                        <ValidationMessage For="() => Input.Apellido" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Fila 2: Tipo y Número Documento -->
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label>Tipo Documento</label>
+                                    <div class="input-icon">
+                                        <i class="bi bi-person-vcard"></i>
+                                        <InputSelect @bind-Value="Input.Tipo_documento" class="form-control">
+                                            <option value="">-- Seleccione --</option>
+                                            @foreach (var item in TipoDocumento)
+                                            {
+                                                <option value="@item.Id">@item.Nombre</option>
+                                            }
+                                        </InputSelect>
+                                        <ValidationMessage For="() => Input.Tipo_documento" />
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label>Numero Documento</label>
+                                    <div class="input-icon">
+                                        <i class="bi bi-person-badge"></i>
+                                        <InputText class="form-control" @bind-Value="Input.Numero_documento" />
+                                        <ValidationMessage For="() => Input.Numero_documento" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Fila 3: Nacionalidad y Fecha Nacimiento -->
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label>Nacionalidad</label>
+                                    <div class="input-icon">
+                                        <i class="bi bi-flag"></i>
+                                        <InputText class="form-control" @bind-Value="Input.Nacionalidad" />
+                                        <ValidationMessage For="() => Input.Nacionalidad" />
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label>Fecha Nacimiento</label>
+                                    <div class="input-icon">
+                                        <i class="bi bi-calendar"></i>
+                                        <DateInput class="form-control" @bind-Value="Input.Date_nacimiento" />
+                                        <ValidationMessage For="() => Input.Date_nacimiento" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Fila 4: Género y Estado Civil -->
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label>Género</label>
+                                    <div class="input-icon">
+                                        <i class="bi bi-gender-ambiguous"></i>
+                                        <InputSelect @bind-Value="Input.Genero" class="form-control">
+                                            <option value="">-- Seleccione --</option>
+                                            @foreach (var item in Generos)
+                                            {
+                                                <option value="@item.Id">@item.Text</option>
+                                            }
+                                        </InputSelect>
+                                        <ValidationMessage For="() => Input.Genero" />
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label>Estado Civil</label>
+                                    <div class="input-icon">
+                                        <i class="bi bi-person-lines-fill"></i>
+                                        <InputSelect @bind-Value="Input.Estado_civil" class="form-control">
+                                            <option value="">-- Seleccione --</option>
+                                            @foreach (var item in EstadoCivil)
+                                            {
+                                                <option value="@item.Id">@item.Text</option>
+                                            }
+                                        </InputSelect>
+                                        <ValidationMessage For="() => Input.Estado_civil" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </Content>
+                </Tab>
+
+                <!-- TAB 2: Contacto -->
+                <Tab Title="Contacto">
+                    <Content>
+                        <div class="tab-content-inner">
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label>Pais</label>
+                                    <div class="input-icon">
+                                        <i class="bi bi-globe"></i>
+                                        <select class="form-select" @onchange="CountryChangedAsync">
+                                            <option value="">-- Seleccione --</option>
+                                            @if (countries is not null)
+                                            {
+                                                @foreach (var country in countries)
+                                                {
+                                                    <option value="@country.Id_pais" selected="@(country.Id_pais == user.Ciudades!.Provincias!.Paises!.Id_pais)">@country.Nombre_pais</option>
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label>Provincia</label>
+                                    <div class="input-icon">
+                                        <i class="bi bi-flag"></i>
+                                        <select class="form-select" @onchange="StateChangedAsync">
+                                            <option value="">-- Seleccione --</option>
+                                            @if (states is not null)
+                                            {
+                                                @foreach (var state in states)
+                                                {
+                                                    <option value="@state.Id_provincia" selected="@(state.Id_provincia == user.Ciudades!.Provincias!.Id_provincia)">@state.Nombre_provincia</option>
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label>Ciudad</label>
+                                    <div class="input-icon">
+                                        <i class="bi bi-buildings"></i>
+                                        <select class="form-select" @bind="user.Id_ciudad">
+                                            <option value="">Seleccione Ciudad</option>
+                                            @if (cities is not null)
+                                            {
+                                                @foreach (var city in cities)
+                                                {
+                                                    <option value="@city.Id_ciudad" selected="@(city.Id_ciudad == user.Ciudades!.Id_ciudad)">@city.Nombre_ciudad </option>
+                                                }
+                                            }
+                                        </select>
+                                        <ValidationMessage For="() => Input.Id_ciudad" />
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label>CAP</label>
+                                    <div class="input-icon">
+                                        <i class="bi bi-mailbox"></i>
+                                        <InputText class="form-control" @bind-Value="Input.Cap_persona" />
+                                        <ValidationMessage For="() => Input.Cap_persona" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group mt-3">
+                                <label>Dirección</label>
+                                <div class="input-icon">
+                                    <i class="bi bi-geo-alt"></i>
+                                    <InputText class="form-control" @bind-Value="Input.Direccion_persona" />
+                                    <ValidationMessage For="() => Input.Direccion_persona" />
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label>Teléfono</label>
+                                    <div class="input-icon">
+                                        <i class="bi bi-telephone"></i>
+                                        <InputText class="form-control" @bind-Value="Input.Telefono" />
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label>Email</label>
+                                    <div class="input-icon">
+                                        <i class="bi bi-envelope"></i>
+                                        <InputText   class="form-control" disabled="true" @bind-Value="Input.Email" />
+                                        <ValidationMessage For="() => Input.Email" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </Content>
+                </Tab>
+
+                <!-- TAB 3: Educación -->
+                <Tab Title="Educación">
+                    <Content>
+                        <div class="tab-content-inner">
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label>Nivel Estudio</label>
+                                    <div class="input-icon">
+                                        <i class="bi bi-mortarboard"></i>
+                                        <InputSelect @bind-Value="Input.Nivel_estudio" class="form-control">
+                                            <option value="">-- Seleccione --</option>
+                                            @foreach (var item in NivelEstudio)
+                                            {
+                                                <option value="@item.Id">@item.Nombre</option>
+                                            }
+                                        </InputSelect>
+                                        <ValidationMessage For="() => Input.Nivel_estudio" />
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label>Ocupación</label>
+                                    <div class="input-icon">
+                                        <i class="bi bi-briefcase"></i>
+                                        <InputText class="form-control" @bind-Value="Input.Ocupacion" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group mt-3">
+                                <label>Información Personal</label>
+                                <div class="input-icon">
+                                    <i class="bi bi-chat-text"></i>
+                                    <InputTextArea class="form-control" @bind-Value="Input.Informacion" rows="4" />
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label>Estado</label>
+                                    <div class="input-icon">
+                                        <i class="bi bi-check2-circle"></i>
+                                        <InputSelect @bind-Value="Input.Estado_persona" class="form-control">
+                                            <option value=""> -- Seleccione --</option>
+                                            @foreach (var item in items)
+                                            {
+                                                <option value="@item.Id">@item.Text</option>
+                                            }
+                                        </InputSelect>
+                                        <ValidationMessage For="() => Input.Estado_persona" />
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    @* <label>Ocupación</label>
+                                    <div class="input-icon">
+                                        <i class="bi bi-briefcase"></i>
+                                        <InputText class="form-control" @bind-Value="Input.Ocupacion" />
+                                    </div> *@
+                                </div>
+                            </div>
+                        </div>
+                    </Content>
+                </Tab>
+            </Tabs>
+
+            <!-- Botones -->
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-success btn-custom me-2">
+                    <i class="bi bi-save"></i> Guardar
+                </button>
+                <button type="reset" class="btn btn-outline-secondary btn-custom">
+                    <i class="bi bi-eraser"></i> Limpiar
+                </button>
+            </div>
+        </div>
+    </EditForm>
+</div>
+
+@code {
+    private ConfirmDialog dialog = default!;
+    [Inject] ToastService ToastService { get; set; } = default!;
+    [Inject] protected PreloadService PreloadService { get; set; } = default!;
+    private List<Estado> items = new();
+    private List<Estado_Civil> EstadoCivil = new();
+    private List<Genero> Generos = new();
+    private List<Nivel_Estudio> NivelEstudio = new();
+    private List<Tipo_Documento> TipoDocumento = new();
+    private PersonaDTO Input { set; get; } = new PersonaDTO();
+    private string ImagePrev { set; get; } = string.Empty;
+    private List<PaisDropDTO>? countries;
+    private List<ProvinciaDropDTO>? states;
+    private List<CiudadDropDTO>? cities;
+    private User? user { set; get; } = new User();
+    private string Estados ="A";
+
+    protected override async Task OnInitializedAsync()
+    {
+        items = Estado.GetItems();
+        EstadoCivil = Estado_Civil.GetItems();
+        Generos = Genero.GetItems();
+        NivelEstudio = Nivel_Estudio.GetItems();
+        TipoDocumento = Tipo_Documento.GetItems();
+        await LoadUserAsyc();
+        await LoadCountriesAsync();
+        await LoadStatesAsyn(user!.Ciudades!.Provincias!.Paises!.Id_pais);
+        await LoadCitiesAsyn(user!.Ciudades!.Provincias!.Id_provincia);
+        await LoadPersonaAsync(user.Email!);
+        if (Input != null)
+        {
+            ImagePrev = Input.Foto!= null ? $"data:image/jpeg;base64,{Convert.ToBase64String(Input.Foto)}" : null;
+        }
+    }
+    private async Task LoadUserAsyc()
+    {
+        var responseHTTP = await repository.Get<User>($"/api/Accounts");
+        if (responseHTTP.Error)
+        {
+            if (responseHTTP.HttpResponseMessage.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                navigationManager.NavigateTo("/");
+                return;
+            }
+            var messageError = await responseHTTP.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", messageError, SweetAlertIcon.Error);
+            return;
+        }
+        user = responseHTTP.Response;
+    }
+
+    private async Task LoadCountriesAsync()
+    {
+        var responseHttp = await repository.Get<List<PaisDropDTO>>($"/api/Paises/ComboPais/{Estados}");
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        countries = responseHttp.Response;
+    }
+
+    private async Task LoadStatesAsyn(int countryId)
+    {
+        var responseHttp = await repository.Get<List<ProvinciaDropDTO>>($"/api/Provincias/ComboProvincia/{countryId}/{Estados}");
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        states = responseHttp.Response;
+    }
+
+    private async Task LoadCitiesAsyn(int stateId)
+    {
+        var responseHttp = await repository.Get<List<CiudadDropDTO>>($"/api/Ciudades/ComboCiudades/{stateId}/{Estados}");
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        cities = responseHttp.Response;
+    }
+
+    private async Task LoadPersonaAsync(string email)
+    {
+        var responseHTTP = await repository.Get<PersonaDTO>($"/api/Personas/GetPersonaByUser/{email}");
+        if (responseHTTP.Error)
+        {
+            if (responseHTTP.HttpResponseMessage.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                navigationManager.NavigateTo("/");
+                return;
+            }
+            var messageError = await responseHTTP.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", messageError, SweetAlertIcon.Error);
+            return;
+        }
+        Input = responseHTTP.Response!;
+    }
+
+    private async Task CountryChangedAsync(ChangeEventArgs e)
+    {
+        var selectedCountry = Convert.ToInt32(e.Value!);
+        await LoadStatesAsyn(selectedCountry);
+    }
+
+    private async Task StateChangedAsync(ChangeEventArgs e)
+    {
+        var selectedState = Convert.ToInt32(e.Value!);
+        await LoadCitiesAsyn(selectedState);
+    }
+
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        var buffer = new byte[file.Size];
+        await file.OpenReadStream().ReadAsync(buffer);
+        ImagePrev = $"data:{file.ContentType};base64,{Convert.ToBase64String(buffer)}";
+    }
+
+    private async Task Guardar()
+    {
+        PreloadService.Show(SpinnerColor.Light, "Saving data...");
+        Input.Foto = ObtenerBytes(ImagePrev);
+        var responseHttp = await repository.Put<PersonaDTO>($"/api/Personas/{Input.Id_persona}", Input);
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+        //*agiorno usuario**/
+        user!.FirstName = Input.Nombre;
+        user!.LastName = Input.Apellido;
+        user!.Id_ciudad = Input.Id_ciudad;
+        user!.Address = Input.Direccion_persona;
+        user!.PhoneNumber = Input.Telefono;
+        await SaveUserAsync();
+        //**********************/
+        ToastService.Notify(new(ToastType.Success, $"Record Profile Saved Successfully."));
+        
+        PreloadService.Hide();
+
+    }
+
+    private string? ObtenerImagen(byte[]? bytes)
+    {
+        if (bytes == null || bytes.Length == 0) return null;
+        string base64 = Convert.ToBase64String(bytes);
+        return $"data:image/jpeg;base64,{base64}";
+    }
+
+    private byte[]? ObtenerBytes(string? base64Image)
+    {
+        if (string.IsNullOrWhiteSpace(base64Image)) return null;
+        var parts = base64Image.Split(',');
+        string base64 = parts.Length > 1 ? parts[1] : parts[0];
+        return Convert.FromBase64String(base64);
+    }
+   
+    private async Task SaveUserAsync()
+    {
+        var responseHttp = await repository.Put<User, TokenDTO>("/api/Accounts", user!);
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        await loginService.LoginAsync(responseHttp.Response!.Token);
+        navigationManager.NavigateTo("/");
+    }
+}

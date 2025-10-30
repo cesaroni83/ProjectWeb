@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using ProjectWeb.API.Data;
 using ProjectWeb.Shared.Account;
 using ProjectWeb.Shared.Enums;
+using ProjectWeb.Shared.Modelo.Entidades;
 
 namespace ProjectWeb.API.Helper.Implementacion
 {
@@ -56,9 +57,9 @@ namespace ProjectWeb.API.Helper.Implementacion
         public async Task<User> GetUserAsync(string email)
         {
             var user = await _context.Users
-                .Include(u => u.Ciudades)
-                .ThenInclude(c => c.Provincias!)
-                .ThenInclude(s => s.Paises!)
+                .Include(u => u!.Ciudades)
+                .ThenInclude(c => c!.Provincias!)
+                .ThenInclude(s => s!.Paises!)
                 .FirstOrDefaultAsync(x => x.Email == email);
             return user!;
         }
@@ -106,6 +107,46 @@ namespace ProjectWeb.API.Helper.Implementacion
         public async Task<IdentityResult> ResetPasswordAsync(User user, string token, string password)
         {
             return await _userManager.ResetPasswordAsync(user, token, password);
+        }
+
+        public async Task<IdentityResult> AddOrUpdateUserWithPersonaAsync(User user)
+        {
+            // Buscar Persona existente por email
+            var existingPersona = await _context.Tbl_Persona
+                .FirstOrDefaultAsync(p => p.Email == user.Email);
+
+            if (existingPersona == null)
+            {
+              // Crear Persona asociada solo para usuarios nuevos
+                var persona = new Persona
+                {
+                    Id_user = user.Id,
+                    Nombre = user.FirstName,
+                    Apellido = user.LastName,
+                    Id_ciudad = user.Id_ciudad,
+                    Direccion_persona = user.Address,
+                    Email = user.Email!,
+                    Estado_persona = "A",
+                    Tipo_persona=user.UserType.ToString()
+                };
+
+                _context.Tbl_Persona.Add(persona);
+                var results = await _context.SaveChangesAsync();
+                return IdentityResult.Success;
+            }
+            else
+            {
+                // Actualizar usuario existente
+                existingPersona.Nombre = user.FirstName;
+                existingPersona.Apellido = user.LastName;
+                existingPersona.Direccion_persona = user.Address;
+                existingPersona.Id_ciudad = user.Id_ciudad;
+                existingPersona.Telefono = user.PhoneNumber;
+                existingPersona.Tipo_persona = user.UserType.ToString();
+                _context.Tbl_Persona.Update(existingPersona);
+                await _context.SaveChangesAsync();
+                return IdentityResult.Success;
+            }
         }
     }
 }

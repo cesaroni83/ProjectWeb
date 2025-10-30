@@ -113,7 +113,7 @@ namespace ProjectWeb.API.Controllers
             {
                 var Updated = await _menu.UpdateMenu(RegistroDTO);
 
-                if (Updated == null)
+                if (Updated == false)
                     return NotFound("No se encontró el registro a actualizar");
 
                 return Ok(RegistroDTO);

@@ -7,6 +7,7 @@ using ProjectWeb.API.Helper;
 using ProjectWeb.Shared.Account;
 using ProjectWeb.Shared.Enums;
 using ProjectWeb.Shared.Google;
+using ProjectWeb.Shared.Modelo.Entidades;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -48,6 +49,7 @@ namespace ProjectWeb.API.Controllers
 
             // 3️⃣ Buscar usuario en AspNetUsers
             var user = await _userHelper.GetUserAsync(googleUser.Email);
+            
             if (user == null)
             {
                 // 4️⃣ Crear usuario nuevo
@@ -64,10 +66,11 @@ namespace ProjectWeb.API.Controllers
                 };
 
                 // Guardar usuario con password aleatorio
-                var result = await _userHelper.AddUserAsync(user, Guid.NewGuid().ToString());
+                var pass = Guid.NewGuid().ToString();
+                var result = await _userHelper.AddUserAsync(user, pass);
                 if (!result.Succeeded)
                     return BadRequest(result.Errors.FirstOrDefault());
-
+                
                 // Asignar rol
                 await _userHelper.AddUserToRoleAsync(user, user.UserType.ToString());
             }
@@ -79,9 +82,15 @@ namespace ProjectWeb.API.Controllers
                 user.LastName = names.Length > 1 ? names[1] : user.LastName;
                 user.Photo = googleUser.Picture ?? user.Photo;
                 await _userHelper.UpdateUserAsync(user);
+                
             }
+            // crea persona
+            var confirma = await _userHelper.AddOrUpdateUserWithPersonaAsync(user);
+            if (!confirma.Succeeded)
+                return BadRequest(confirma.Errors.FirstOrDefault());
+
             // 🔹 Llamar al método que elimina credenciales previas
-           await RemoveCredentialByToken(userCredential.Token.AccessToken);
+            await RemoveCredentialByToken(userCredential.Token.AccessToken);
 
             // 6️⃣ Generar JWT propio
             var tokenDto = BuildToken(user);

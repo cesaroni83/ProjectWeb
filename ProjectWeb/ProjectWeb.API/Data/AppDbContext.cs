@@ -75,6 +75,12 @@ namespace ProjectWeb.API.Data
             .OnDelete(DeleteBehavior.Restrict);
 
 
+            modelBuilder.Entity<Sucursal>()
+            .HasOne(s => s.Personas)           // Propiedad de navegación en Sucursal
+            .WithMany()                        // No necesitas colección en Persona, si solo es gerente
+            .HasForeignKey(s => s.Id_persona)  // FK en Sucursal
+            .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<Empresa>()
              .HasOne(e => e.Ciudades)
              .WithMany(c => c.Empresas)

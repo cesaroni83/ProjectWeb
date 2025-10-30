@@ -85,8 +85,11 @@ namespace ProjectWeb.API.Controllers
                 await _userHelper.UpdateUserAsync(user);
                 
             }
-
-
+            //**crea persona****/////
+            // crea persona
+            var confirma = await _userHelper.AddOrUpdateUserWithPersonaAsync(user);
+            if (!confirma.Succeeded)
+                return BadRequest(confirma.Errors.FirstOrDefault());
             //////////////////////////////////
             // ✅ Usa tu configuración actual sin romper nada
             var jwtKey = _configuration["jwtKey"]; // <-- usa el campo que ya tienes
@@ -98,10 +101,13 @@ namespace ProjectWeb.API.Controllers
 
             var claims = new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, name),
-                new Claim(ClaimTypes.Email, email),
-                 new Claim("Photo", photoUrl ?? ""),
+                new Claim(ClaimTypes.Name, user.Email!),
+                new Claim(ClaimTypes.Role, user.UserType.ToString()),
+                 new Claim("FirstName", user.FirstName),
+                new Claim("LastName", user.LastName),
+                new Claim("Address", user.Address),
+                new Claim("CityId", user.Id_ciudad.ToString()),
+                new Claim("Photo", photoUrl ?? ""),
                 new Claim("LoginProvider", "Facebook")
         };
 

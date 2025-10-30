@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using ProjectWeb.API.Data;
 using ProjectWeb.API.Helper;
+using ProjectWeb.API.Servicios;
 using ProjectWeb.Shared.Account;
 using ProjectWeb.Shared.Enums;
 using ProjectWeb.Shared.Modelo.AuthenDTO;
@@ -24,8 +24,9 @@ namespace ProjectWeb.API.Controllers
         private readonly IMailHelper _mailHelper;
         private readonly AppDbContext _context;
         private readonly string _container;
+        private readonly IPersonas _persona;
 
-        public AccountsController(IUserHelper userHelper, IConfiguration configuration, IFileStorage fileStorage, IMailHelper mailHelper, AppDbContext context)
+        public AccountsController(IUserHelper userHelper, IConfiguration configuration, IFileStorage fileStorage, IMailHelper mailHelper, AppDbContext context, IPersonas persona)
         {
             _userHelper = userHelper;
             _configuration = configuration;
@@ -33,6 +34,7 @@ namespace ProjectWeb.API.Controllers
             _mailHelper = mailHelper;
             _context = context;
             _container = "users";
+            _persona = persona;
         }
 
         [HttpPost("RecoverPassword")]
@@ -115,7 +117,7 @@ namespace ProjectWeb.API.Controllers
             {
                 if (!string.IsNullOrEmpty(user.Photo))
                 {
-                    
+
                     var photoUser = await _fileStorage.SaveImageAsync(user.Photo);
                     user.Photo = photoUser;
                 }
@@ -125,7 +127,6 @@ namespace ProjectWeb.API.Controllers
                 {
                     return NotFound();
                 }
-
                 // currentUser.Document = user.Document;
                 currentUser.FirstName = user.FirstName;
                 currentUser.LastName = user.LastName;
@@ -133,7 +134,10 @@ namespace ProjectWeb.API.Controllers
                 currentUser.PhoneNumber = user.PhoneNumber;
                 currentUser.Photo = !string.IsNullOrEmpty(user.Photo) && user.Photo != currentUser.Photo ? user.Photo : currentUser.Photo;
                 currentUser.Id_ciudad = user.Id_ciudad;
-
+                // crea o modifica persona
+                var confirma = await _userHelper.AddOrUpdateUserWithPersonaAsync(currentUser);
+                if (!confirma.Succeeded)
+                    return BadRequest(confirma.Errors.FirstOrDefault());
                 var result = await _userHelper.UpdateUserAsync(currentUser);
                 if (result.Succeeded)
                 {
@@ -155,7 +159,7 @@ namespace ProjectWeb.API.Controllers
             return Ok(await _userHelper.GetUserAsync(User.Identity!.Name!));
         }
 
-       
+
         [AllowAnonymous]
         [HttpPost("CreateUser")]
         public async Task<ActionResult> CreateUser([FromBody] UserDTO model)
@@ -170,6 +174,11 @@ namespace ProjectWeb.API.Controllers
             var result = await _userHelper.AddUserAsync(user, model.Password);
             if (result.Succeeded)
             {
+                ////***CREA LA PERSONA ****//
+                var confirma = await _userHelper.AddOrUpdateUserWithPersonaAsync(user);
+                if (!confirma.Succeeded)
+                    return BadRequest(result.Errors.FirstOrDefault());
+                //**********************************************************************
                 await _userHelper.AddUserToRoleAsync(user, user.UserType.ToString());
                 var myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
                 var tokenLink = Url.Action("ConfirmEmail", "Accounts", new

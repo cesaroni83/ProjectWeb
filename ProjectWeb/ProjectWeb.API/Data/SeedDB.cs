@@ -22,9 +22,9 @@ namespace ProjectWeb.API.Data
             await _context.Database.EnsureCreatedAsync();
             await CheckPaisAsync();
             await CheckRolesAsync();
-            //await CheckUserAsync("Cesar", "Morocho", "cesarmopdev83@gmail.com", "322 311 4620", "Calle Luna Calle Sol", "", UserType.Admin);
-            await CheckUserAsync( "Armando", "Pucuna", "cesarmop83@gmail.com", "322 311 4620", "Calle Luna Calle Sol", "", UserType.User);
-           // await CheckUserAsync( "Cesar Armando", "Morocho Pcuna", "cesarmop83@hotmail.it", "322 311 4620", "Calle Luna Calle Sol", "", UserType.User);
+            await CheckUserAsync("Juana", "Pineda", "juana@hotmail.it", "322 311 4620", "Calle Luna Calle Sol", "", UserType.Employee);
+            await CheckUserAsync( "Cesar Armando", "Morocho Pucuna", "cesarmop83@gmail.com", "3483304971", "Via Mascagni 6", "", UserType.Admin);
+            await CheckUserAsync( "Christian", "Avila", "avila@hotmail.it", "322 311 4620", "Calle Luna Calle Sol", "", UserType.User);
         }
         private async Task CheckPaisAsync()
         {
@@ -66,6 +66,7 @@ namespace ProjectWeb.API.Data
         {
             await _userHelper.CheckRoleAsync(UserType.Admin.ToString());
             await _userHelper.CheckRoleAsync(UserType.User.ToString());
+            await _userHelper.CheckRoleAsync(UserType.Employee.ToString());
         }
         private async Task<User> CheckUserAsync( string firstName, string lastName, string email, string phone, string address, string image, UserType userType)
         {
@@ -104,10 +105,24 @@ namespace ProjectWeb.API.Data
                     UserType = userType,
                     Photo = null,
                 };
-
                 await _userHelper.AddUserAsync(user, "Carolina");
+                //***CREA LA PERSONA ****//
+                var persona = new Persona
+                {
+                    Id_user = user.Id,
+                    Nombre = user.FirstName,
+                    Apellido = user.LastName,
+                    Id_ciudad = user.Id_ciudad,
+                    Direccion_persona = user.Address,
+                    Email = user.Email!,
+                    Tipo_persona= userType.ToString(),
+                    Estado_persona = "A"
+                };
+                _context.Add(persona);
+                var confirma = await _context.SaveChangesAsync();
+                //if (confirma <= 0)
+                //    return BadRequest("No se pudo guardar la persona");
                 await _userHelper.AddUserToRoleAsync(user, userType.ToString());
-
                 var token = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
                 await _userHelper.ConfirmEmailAsync(user, token);
             }
