@@ -75,6 +75,8 @@ namespace ProjectWeb.API.Controllers
 
                 // Asignar rol
                 await _userHelper.AddUserToRoleAsync(user, user.UserType.ToString());
+                var tokens = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+                await _userHelper.ConfirmEmailAsync(user, tokens);
             }
             else
             {

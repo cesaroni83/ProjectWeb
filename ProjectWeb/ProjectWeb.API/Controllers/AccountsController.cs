@@ -128,6 +128,10 @@ namespace ProjectWeb.API.Controllers
                     return NotFound();
                 }
                 // currentUser.Document = user.Document;
+                if (!string.IsNullOrEmpty(currentUser.Photo))
+                {
+                    await _fileStorage.DeleteImageAsync(currentUser.Photo);
+                }
                 currentUser.FirstName = user.FirstName;
                 currentUser.LastName = user.LastName;
                 currentUser.Address = user.Address;
