@@ -126,7 +126,14 @@ builder.Services.AddAuthentication(options =>
 })
 
 //****//
-// google autehnticacion
+.AddGoogle(options =>
+{
+    options.ClientId = builder.Configuration["Google:ClientId"]!;
+    options.ClientSecret = builder.Configuration["Google:ClientSecret"]!;
+    options.CallbackPath = "/signin-google"; // Debe coincidir con Redirect URI en Google Cloud
+    options.SaveTokens = true;
+})
+
 //****//
 .AddFacebook(options =>
 {
