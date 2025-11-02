@@ -1,0 +1,250 @@
+﻿@page "/SolidWorksTemplate"
+@using ProjectWeb.ASM.Repositorio
+@using ProjectWeb.Shared.SolidworkClass
+
+@inject IJSRuntime JS
+@inject SweetAlertService sweetAlertService
+@inject IRepository repository
+
+<PageTitle>Solidworks</PageTitle>
+<ConfirmDialog @ref="dialog" />
+
+<div class="principal">
+    <div class="login-register-container form-card">
+        <div class="form-title">
+            <i class="bi bi-ui-checks-grid"></i> Creacion De Ensamblaje De SolidWorks
+        </div>
+        <div class="tab-content-inner">
+
+            <!-- Fila 1: Path Ensamblaje -->
+            <div class="form-row" style="justify-content: center;">
+                <div class="form-group" style="flex: 1 1 70%;">
+                    <label>Path Ensamblaje</label>
+                    <div class="input-icon">
+                        <i class="bi bi-gear"></i>
+                        <input type="text" class="form-control" placeholder="Ruta De file *.txt"
+                               @bind="Formulario.PathEnsamblaje" />
+                    </div>
+                </div>
+                <div class="form-group" style="flex: 1 1 20%; display: flex; align-items: end;">
+                    <button @onclick="SeleccionarCarpeta" type="button" class="btn-custom" style="width:100%;">
+                        <i class="bi bi-search"></i>Busca File
+                    </button>
+                </div>
+            </div>
+
+            <!-- Fila 2: N° Orden y N° Maquina -->
+            <div class="form-row">
+                <div class="form-group" style="flex: 1 1 45%;">
+                    <label>N° Ordine</label>
+                    <div class="input-icon">
+                        <i class="bi bi-person"></i>
+                        <input type="text" class="form-control" placeholder="N° Ordine"
+                               @bind="Formulario.NumeroOrden" />
+                    </div>
+                </div>
+                <div class="form-group" style="flex: 1 1 45%;">
+                    <label>N° Maquina</label>
+                    <div class="input-icon">
+                        <i class="bi bi-building"></i>
+                        <input type="text" class="form-control" placeholder="N° Maquina"
+                               @bind="Formulario.NumeroMaquina" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fila 3: File textarea -->
+            <div class="form-row">
+                <div class="form-group" style="flex: 1 1 100%;">
+                    <label>File</label>
+                    <div class="input-icon">
+                        <i class="bi bi-chat-left-text"></i>
+                        <textarea id="fileList" class="form-control" rows="10"
+                                  placeholder="Lista De File texto..." readonly
+                                  @bind="Formulario.ListaNombresArchivos"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fila 4: Checkboxes -->
+            <div class="form-row">
+                <div class="form-group" style="flex: 1 1 100%;">
+                    <div class="d-flex flex-wrap gap-4 mt-3 align-items-center">
+                        <CheckboxInput Label="Export Ensamblaje/Diseno" @bind-Value="Formulario.STD" />
+                        <CheckboxInput Label="Export Excel" @bind-Value="Formulario.Excel" />
+                        <CheckboxInput Label="Export Step" @bind-Value="Formulario.Step" />
+                        <CheckboxInput Label="Export Dxf" @bind-Value="Formulario.Dxf" />
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group" style="flex: 1 1 100%;">
+                    <div class="d-flex flex-wrap gap-4 mt-3 align-items-center">
+                        <CheckboxInput Label="Export PDF" @bind-Value="Formulario.PDF" />
+                        <CheckboxInput Label="Export DWG" @bind-Value="Formulario.DWG" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fila 5: Botones -->
+            <div class="form-row buttons-row">
+                <div class="form-group">
+                    <button type="button" @onclick="SolidworksAtomation" class="btn-custom"><i class="bi bi-save"></i> Guardar</button>
+                </div>
+                <div class="form-group">
+                    <button type="button" @onclick="LimpiarFormulario" class="btn-custom" style="background-color:#6c757d">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@code {
+    private ConfirmDialog dialog = default!;
+    [Inject] protected PreloadService PreloadService { get; set; } = default!;
+    [CascadingParameter] IModalService Modal { get; set; } = default!;
+    [Inject] ToastService ToastService { get; set; } = default!;
+
+    // Modelo del formulario
+    private SolidworksFormModel Formulario = new SolidworksFormModel();
+
+    [JSInvokable]
+    public void AgregarArchivo(string nombre, string contenido)
+    {
+        Console.WriteLine("=== Iniciando método AgregarArchivo ===");
+        Console.WriteLine($"Nombre completo recibido: {nombre}");
+
+        // Obtener el nombre sin extensión
+        string nombreArchivo = Path.GetFileNameWithoutExtension(nombre);
+        Console.WriteLine($"Nombre sin extensión: {nombreArchivo}");
+
+        // Separar las partes principales por "_"
+        string[] partesNombre = nombreArchivo.Split('_');
+        Console.WriteLine($"Partes del nombre ({partesNombre.Length}): {string.Join(", ", partesNombre)}");
+
+        string comessa = partesNombre.Length > 0 ? partesNombre[0] : string.Empty;
+        string unidad = partesNombre.Length > 1 ? partesNombre[1] : string.Empty;
+
+        string elemento = string.Empty;
+        string tipo = string.Empty;
+        string categoria = string.Empty;
+
+        // Procesar la tercera parte si existe (ej: "101COI10X0AA")
+        if (partesNombre.Length > 2)
+        {
+            string parte3 = partesNombre[2];
+
+            // Buscar el patrón: números seguidos de letras
+            var match = System.Text.RegularExpressions.Regex.Match(parte3, @"^(\d+)([A-Za-z]+)(.*)");
+            if (match.Success)
+            {
+                elemento = match.Groups[1].Value;                  // 101
+                tipo = match.Groups[2].Value;                      // COI
+                categoria = match.Groups[2].Value + match.Groups[3].Value; // COI10X0AA
+            }
+            else
+            {
+                // Si no cumple el patrón, usar todo como categoría
+                categoria = parte3;
+            }
+        }
+
+        Console.WriteLine($"Comessa: {comessa}");
+        Console.WriteLine($"Unidad: {unidad}");
+        Console.WriteLine($"Elemento: {elemento}");
+        Console.WriteLine($"Tipo: {tipo}");
+        Console.WriteLine($"Categoria: {categoria}");
+
+        // Crear el archivo con datos
+        var file = new FileTxt
+        {
+            Nombre = Path.GetFileName(nombre),
+            Comessa = comessa,
+            unidad = unidad,
+            Elemento = elemento,
+            Tipo = tipo,
+            Cartegoria = categoria
+        };
+
+        // Procesar contenido del archivo
+        Console.WriteLine("Procesando contenido del archivo...");
+        string[] lineas = contenido.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+        int contador = 0;
+        foreach (var linea in lineas)
+        {
+            if (string.IsNullOrWhiteSpace(linea) || !linea.Contains("=")) continue;
+
+            var partes = linea.Split('=', 2);
+            var lineaArchivo = new LineaArchivo
+            {
+                Nombre = partes[0].Trim(),
+                Valor = partes.Length > 1 ? partes[1].Trim() : string.Empty
+            };
+
+            file.Contenido.Add(lineaArchivo);
+            contador++;
+
+            Console.WriteLine($"[{contador}] {lineaArchivo.Nombre} = {lineaArchivo.Valor}");
+        }
+
+        Console.WriteLine($"Total de líneas válidas: {contador}");
+
+        // Agregar a la lista principal
+        Formulario.ArchivosTxt.Add(file);
+        Formulario.ListaNombresArchivos += file.Nombre + "\n";
+    }
+
+
+
+    private async Task SeleccionarCarpeta()
+    {
+        await JS.InvokeVoidAsync("SeleccionarCarpetaJS", DotNetObjectReference.Create(this));
+        Console.WriteLine($"Nombre sin extensión:");
+    }
+
+    private void LimpiarFormulario()
+    {
+        Formulario.Limpiar();
+    }
+
+    public async Task SolidworksAtomation()
+    {
+        var responseHttp = await repository.Post<SolidworksFormModel>("/api/SolidWorks/AutomationSolidWorks/CreateAssembly", Formulario);
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+        ToastService.Notify(new(ToastType.Success, $"Process Successfully!."));
+        await Task.Delay(4000);
+        return;
+    }
+
+}
+<script>
+    async function SeleccionarCarpetaJS(dotNetObj) {
+        try {
+            const folderHandle = await window.showDirectoryPicker();
+
+            async function recorrerCarpeta(folder, path = '') {
+                for await (const entry of folder.values()) {
+                    if (entry.kind === 'file' && entry.name.endsWith('.txt')) {
+                        const file = await entry.getFile();
+                        const contenido = await file.text();
+                        await dotNetObj.invokeMethodAsync('AgregarArchivo', path + entry.name, contenido);
+                    } else if (entry.kind === 'directory') {
+                        await recorrerCarpeta(entry, path + entry.name + '/');
+                    }
+                }
+            }
+
+            await recorrerCarpeta(folderHandle);
+        } catch (err) {
+            console.error('Error al seleccionar carpeta:', err);
+        }
+    }
+</script>

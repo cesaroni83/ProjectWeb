@@ -85,6 +85,8 @@ builder.Services.AddScoped<IMailHelper, MailHelper>();
 builder.Services.AddScoped<IGoogleAuth, GoogleAuth>();
 builder.Services.AddScoped<IGoogleAuthorization, GoogleAuthorization>();
 
+builder.Services.AddScoped<ISolidworks, Solidworks>();
+
 //-------------------- Identity --------------------//
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {

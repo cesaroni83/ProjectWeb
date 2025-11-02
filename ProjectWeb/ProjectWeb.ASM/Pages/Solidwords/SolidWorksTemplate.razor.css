@@ -1,0 +1,198 @@
+﻿/* --- RESET Y BASE --- */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    box-sizing: border-box;
+}
+
+*, *::before, *::after {
+    box-sizing: inherit;
+}
+
+/* --- WRAPPER PRINCIPAL --- */
+.principal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* --- CARD DEL FORMULARIO --- */
+.login-register-container, .form-card {
+    /*background: #fff;
+    border-radius: 20px;
+    width: 900px;
+    max-width: 100%;
+    padding: 40px 30px;
+    box-shadow: 8px 8px 15px #dcdcdc, -8px -8px 15px #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    overflow: hidden;*/
+    background: #fff;
+    border-radius: 20px;
+    width: 900px;
+    max-width: 100%;
+    padding: 40px 30px;
+    /* Sombra más profunda y uniforme */
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15), 0 5px 15px rgba(0, 0, 0, 0.1);
+    /* Borde sutil para separar del fondo */
+    border: 1px solid rgba(0,0,0,0.05);
+    /* Transición suave para efecto flotante */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    overflow: hidden;
+}
+    /* Efecto hover para dar sensación de flotación */
+    .login-register-container:hover, .form-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 25px 50px rgba(0,0,0,0.2), 0 10px 20px rgba(0,0,0,0.15);
+    }
+/* --- TÍTULO DEL FORMULARIO --- */
+.form-title {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 1.8em;
+    font-weight: bold;
+}
+
+/* --- FILAS Y GRUPOS DEL FORMULARIO --- */
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 20px; /* espacio vertical entre filas */
+}
+
+.form-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+/* --- INPUTS, SELECT Y TEXTAREA CON ICONOS --- */
+.input-icon {
+    display: flex;
+    align-items: center;
+    border: 1px solid #28a745;
+    border-radius: 8px;
+    overflow: hidden;
+    width: 100%;
+}
+
+    .input-icon i {
+        background-color: #fff;
+        color: #0d6efd;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .input-icon .form-control,
+    .input-icon .form-select,
+    .input-icon textarea.form-control {
+        border: none;
+        padding: 10px 12px;
+        font-size: 1em;
+        flex-grow: 1;
+        flex-shrink: 1;
+        flex-basis: 0;
+        width: auto !important;
+        min-width: 0;
+        box-sizing: border-box;
+        outline: none;
+        resize: vertical;
+        min-height: 40px;
+        max-height: 150px;
+        font-family: inherit;
+        display: block;
+    }
+
+/* --- BOTONES PERSONALIZADOS --- */
+.btn-custom {
+    padding: 10px 20px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #0d6efd;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s;
+    font-size: 1em;
+}
+
+    .btn-custom i {
+        margin-right: 8px;
+    }
+
+    .btn-custom:hover {
+        background-color: #0b5ed7;
+    }
+
+/* --- FILA DE BOTONES CENTRADA --- */
+.form-row.buttons-row {
+    display: flex;
+    justify-content: center; /* Centrado horizontal */
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+    .form-row.buttons-row .form-group {
+        flex: 0 0 auto;
+    }
+
+    .form-row.buttons-row .btn-custom {
+        width: 150px; /* ancho fijo */
+    }
+
+/* --- MEDIA QUERIES RESPONSIVE --- */
+@media (max-width: 768px) {
+    .form-card, .login-register-container {
+        width: 100%;
+        padding: 30px 20px;
+    }
+
+    .form-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+
+    .input-icon {
+        width: 100%;
+    }
+
+        .input-icon .form-control,
+        .input-icon .form-select,
+        .input-icon textarea.form-control {
+            width: 100% !important;
+            flex: 1 1 100%;
+        }
+
+    .form-row .form-check {
+        flex: 1 1 45%;
+        text-align: center;
+        min-width: 100px;
+    }
+
+    /* --- Botones centrados en móvil --- */
+    .form-row.buttons-row {
+        justify-content: center; /* asegura centrado */
+    }
+
+        .form-row.buttons-row .btn-custom {
+            width: 100% !important; /* ahora sí ocupa todo el ancho */
+            margin-bottom: 10px; /* espacio entre ellos si se apilan */
+        }
+}
