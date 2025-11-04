@@ -91,5 +91,22 @@ namespace ProjectWeb.API.Helper.Implementacion
                 return Task.FromResult(false);
             }
         }
+
+        public async Task<string> SaveImageFromUrlAsync(string imageUrl)
+        {
+            if (string.IsNullOrEmpty(imageUrl))
+                return null;
+
+            using var httpClient = new HttpClient();
+            var imageBytes = await httpClient.GetByteArrayAsync(imageUrl);
+
+            // Convertir a base64
+            string base64Image = Convert.ToBase64String(imageBytes);
+
+            // Guardar usando tu FileStorage
+            var publicUrl = await SaveImageAsync(base64Image);
+
+            return publicUrl;
+        }
     }
 }

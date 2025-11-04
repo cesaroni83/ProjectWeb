@@ -102,10 +102,10 @@
          var url = await GoogleAuth.GetAuthorizationUrlAsync();
         if (!string.IsNullOrEmpty(url))
         {
-            //navigationManager.NavigateTo(url, forceLoad: true); // redirige a Google OAuth
+            navigationManager.NavigateTo(url, forceLoad: true); // redirige a Google OAuth
           // await JS.InvokeVoidAsync("open", url, "_blank");
             //await JS.InvokeVoidAsync("openUrl", url, "_self");
-             await JS.InvokeVoidAsync("MyBlazorJS.openUrl", url, "_self");
+             //await JS.InvokeVoidAsync("MyBlazorJS.openUrl", url, "_self"); o esto
         }
     }
 }

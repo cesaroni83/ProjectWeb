@@ -1,9 +1,10 @@
-﻿<AuthorizeView>
+﻿ <AuthorizeView>
 	<Authorized>
+		
 		<span>Hola, </span>
 		@if (!string.IsNullOrEmpty(photoUser))
 		{
-			<Image src="@photoUser"  Alt="placeholder" width="50" height="50" style="border-radius:50%;" />
+			<Image src="@photoUser" Alt="placeholder" width="50" height="50" style="border-radius:50%;" />
 			
 		}
 		<Dropdown  Size="DropdownSize.Large">
@@ -29,7 +30,7 @@
 	private Task<AuthenticationState> authenticationStateTask { get; set; } = null!;
 
 
-	protected async override Task OnParametersSetAsync()
+	protected async override Task  OnParametersSetAsync()
 	{
 		var authenticationState = await authenticationStateTask;
 		var claims = authenticationState.User.Claims.ToList();
@@ -38,6 +39,10 @@
 		{
 			//photoUser = photoClaim.Value;
 			photoUser = photoClaim.Value;
+			StateHasChanged(); // fuerza renderizado con la foto
 		}
 	}
-}
+	
+} 
+ 
+

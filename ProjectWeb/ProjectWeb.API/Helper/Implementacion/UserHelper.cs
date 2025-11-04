@@ -148,5 +148,43 @@ namespace ProjectWeb.API.Helper.Implementacion
                 return IdentityResult.Success;
             }
         }
+
+        public async Task<ExternalLoginInfo?> GetExternalLoginInfoAsync()
+        {
+            return await _signInManager.GetExternalLoginInfoAsync();
+        }
+
+        public async Task<SignInResult> ExternalLoginSignInAsync(string loginProvider, string providerKey)
+        {
+            return await _signInManager.ExternalLoginSignInAsync(loginProvider, providerKey, isPersistent: false);
+        }
+
+        public async Task<IdentityResult> AddLoginAsync(User user, UserLoginInfo loginInfo)
+        {
+            return await _userManager.AddLoginAsync(user, loginInfo);
+        }
+
+        public async Task<User> CreateUserFromExternalLoginAsync(ExternalLoginInfo info, string email)
+        {
+            var user = new User
+            {
+                UserName = email,
+                Email = email,
+                EmailConfirmed = true
+            };
+
+            var result = await _userManager.CreateAsync(user);
+            if (result.Succeeded)
+            {
+                var loginResult = await _userManager.AddLoginAsync(user, info);
+                if (!loginResult.Succeeded)
+                {
+                    throw new Exception("Error al asociar el login externo al usuario.");
+                }
+            }
+
+            return user;
+        }
+
     }
 }

@@ -36,5 +36,16 @@ namespace ProjectWeb.API.Helper
         Task<IdentityResult> ResetPasswordAsync(User user, string token, string password);
 
         Task<IdentityResult> AddOrUpdateUserWithPersonaAsync(User user);
+
+        // 👇 Nuevos métodos para login externo
+        Task<ExternalLoginInfo?> GetExternalLoginInfoAsync();
+
+        Task<SignInResult> ExternalLoginSignInAsync(string loginProvider, string providerKey);
+
+        Task<IdentityResult> AddLoginAsync(User user, UserLoginInfo loginInfo);
+
+        Task<User> CreateUserFromExternalLoginAsync(ExternalLoginInfo info, string email);
+
     }
 }
+

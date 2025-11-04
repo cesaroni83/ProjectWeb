@@ -100,7 +100,17 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 })
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
+////*************************
+// Servicios de Razor Pages / Blazor
+builder.Services.AddRazorPages();
+builder.Services.AddServerSideBlazor(); // 🔹 esto registra SignalR automáticamente
 
+///************************
+///
+// Agregar servicios
+builder.Services.AddRazorPages();
+builder.Services.AddServerSideBlazor(); // registra SignalR automáticamente
+///*****************
 //-------------------- Authentication --------------------//
 builder.Services.AddAuthentication(options =>
 {
@@ -249,6 +259,7 @@ app.UseStaticFiles(new StaticFileOptions
 
 //-------------------- CORS --------------------//
 app.UseCors(x => x
+    .WithOrigins("https://localhost:7135")// ouerto di blazor
     .AllowAnyMethod()
     .AllowAnyHeader()
     .SetIsOriginAllowed(origin => true)
@@ -256,5 +267,6 @@ app.UseCors(x => x
 
 //-------------------- Controllers --------------------//
 app.MapControllers();
-
+app.MapBlazorHub();               // 🔹 necesario para Blazor Server
+app.MapFallbackToFile("index.html");// página de fallback
 app.Run();

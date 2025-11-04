@@ -1,17 +1,16 @@
 ﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Facebook;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using ProjectWeb.API.Data;
 using ProjectWeb.API.Helper;
+using ProjectWeb.API.Helper.Implementacion;
 using ProjectWeb.Shared.Enums;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using System.Text.Json;
 
 namespace ProjectWeb.API.Controllers
 {
@@ -21,10 +20,14 @@ namespace ProjectWeb.API.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly IUserHelper _userHelper;
-        public ExternalAuthController(IConfiguration configuration, IUserHelper userHelper)
+        private readonly AppDbContext _context;
+        private readonly IFileStorage _fileStorage;
+        public ExternalAuthController(IConfiguration configuration, IUserHelper userHelper, AppDbContext context, IFileStorage fileStorage)
         {
             _configuration = configuration;
             _userHelper = userHelper;
+            _context = context;
+            _fileStorage = fileStorage;
         }
         [HttpGet("facebook-login")]
         public IActionResult FacebookLogin(string? returnUrl = "/")
@@ -33,27 +36,29 @@ namespace ProjectWeb.API.Controllers
             var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
             return Challenge(properties, FacebookDefaults.AuthenticationScheme);
         }
-
         [HttpGet("facebook-response")]
         public async Task<IActionResult> FacebookResponse(string? returnUrl = "https://localhost:7188/")
         {
+            // 1️⃣ Autenticar con Facebook
             var result = await HttpContext.AuthenticateAsync(FacebookDefaults.AuthenticationScheme);
             if (!result.Succeeded)
                 return BadRequest("Error al autenticar con Facebook.");
 
             var name = result.Principal.FindFirst(ClaimTypes.Name)?.Value ?? "";
             var email = result.Principal.FindFirst(ClaimTypes.Email)?.Value ?? "";
+            var providerKey = result.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
             var pictureClaim = result.Principal.FindFirst("urn:facebook:picture")?.Value
-                ?? result.Principal.FindFirst("picture")?.Value;
+                               ?? result.Principal.FindFirst("picture")?.Value;
 
-            string? photoUrl = pictureClaim; // ya es la URL directa
-            //var photo = result.Principal.FindFirst("picture")?.Value;
-            /////*   crear el usuario si no exite**//
-            // 3️⃣ Buscar usuario en AspNetUsers
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(providerKey))
+                return BadRequest("No se pudo obtener el correo o el Id de Facebook.");
+
+            // 2️⃣ Buscar usuario por email
             var user = await _userHelper.GetUserAsync(email);
+
             if (user == null)
             {
-                // 4️⃣ Crear usuario nuevo
+                // Crear usuario nuevo
                 var names = name.Split(' ', 2);
                 user = new User
                 {
@@ -64,37 +69,93 @@ namespace ProjectWeb.API.Controllers
                     Address = "Null",
                     UserType = UserType.User,
                     Id_ciudad = 1,
-                    Photo = photoUrl
-
+                    EmailConfirmed = true
                 };
 
+                // Descargar foto de Facebook si existe
+                if (!string.IsNullOrEmpty(pictureClaim))
+                {
+                    try
+                    {
+                        user.Photo = await _fileStorage.SaveImageFromUrlAsync(pictureClaim);
+                    }
+                    catch
+                    {
+                        user.Photo = pictureClaim; // fallback si falla descarga
+                    }
+                }
+
                 // Guardar usuario con password aleatorio
-                var resultado = await _userHelper.AddUserAsync(user, Guid.NewGuid().ToString());
-                if (!resultado.Succeeded)
-                    return BadRequest(resultado.Errors.FirstOrDefault());
+                var createResult = await _userHelper.AddUserAsync(user, Guid.NewGuid().ToString());
+                if (!createResult.Succeeded)
+                    return BadRequest(createResult.Errors.FirstOrDefault());
+
+                // Recargar usuario para asegurarnos de que tenga Id
+                user = await _userHelper.GetUserAsync(email);
 
                 // Asignar rol
                 await _userHelper.AddUserToRoleAsync(user, user.UserType.ToString());
-                var tokens = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
-                await _userHelper.ConfirmEmailAsync(user, tokens);
             }
             else
             {
-                var names = name.Split(' ', 2);
-                user.FirstName = names.Length > 0 ? names[0] : user.FirstName;
-                user.LastName = names.Length > 1 ? names[1] : user.LastName;
-                user.Photo = photoUrl ?? user.Photo;
-                await _userHelper.UpdateUserAsync(user);
-                
+                // Usuario existente → actualizar datos si cambiaron
+                var updateNeeded = false;
+                var nameParts = name.Split(' ', 2);
+
+                if (user.FirstName != nameParts[0]) { user.FirstName = nameParts[0]; updateNeeded = true; }
+                if (user.LastName != (nameParts.Length > 1 ? nameParts[1] : "")) { user.LastName = nameParts.Length > 1 ? nameParts[1] : ""; updateNeeded = true; }
+
+                if (!string.IsNullOrEmpty(pictureClaim))
+                {
+                    string? newPhoto = null;
+                    try
+                    {
+                        newPhoto = await _fileStorage.SaveImageFromUrlAsync(pictureClaim);
+
+                        // Borrar foto anterior si existe y es diferente
+                        if (!string.IsNullOrEmpty(user.Photo) && user.Photo != newPhoto)
+                            await _fileStorage.DeleteImageAsync(user.Photo);
+
+                        if (newPhoto != user.Photo)
+                        {
+                            user.Photo = newPhoto;
+                            updateNeeded = true;
+                        }
+                    }
+                    catch
+                    {
+                        // Fallback a URL original si falla
+                        if (user.Photo != pictureClaim)
+                        {
+                            user.Photo = pictureClaim;
+                            updateNeeded = true;
+                        }
+                    }
+                }
+
+                if (updateNeeded)
+                    await _userHelper.UpdateUserAsync(user);
             }
-            //**crea persona****/////
-            // crea persona
+
+            // 3️⃣ Asociar login externo en AspNetUserLogins
+            var existingLogin = await _context.UserLogins
+                .FirstOrDefaultAsync(l => l.LoginProvider == FacebookDefaults.AuthenticationScheme && l.ProviderKey == providerKey);
+
+            if (existingLogin == null)
+            {
+                var loginInfo = new UserLoginInfo(FacebookDefaults.AuthenticationScheme, providerKey, "Facebook");
+                var addLoginResult = await _userHelper.AddLoginAsync(user, loginInfo);
+                if (!addLoginResult.Succeeded)
+                    return BadRequest(addLoginResult.Errors.FirstOrDefault());
+            }
+
+            // 4️⃣ Crear o actualizar persona asociada
             var confirma = await _userHelper.AddOrUpdateUserWithPersonaAsync(user);
             if (!confirma.Succeeded)
                 return BadRequest(confirma.Errors.FirstOrDefault());
-            //////////////////////////////////
-            // ✅ Usa tu configuración actual sin romper nada
-            var jwtKey = _configuration["jwtKey"]; // <-- usa el campo que ya tienes
+
+            // 5️⃣ Generar JWT
+            var jwtKey = _configuration["jwtKey"];
             if (string.IsNullOrEmpty(jwtKey))
                 return BadRequest("Falta la configuración jwtKey en appsettings.json");
 
@@ -103,15 +164,15 @@ namespace ProjectWeb.API.Controllers
 
             var claims = new[]
             {
-                new Claim(ClaimTypes.Name, user.Email!),
-                new Claim(ClaimTypes.Role, user.UserType.ToString()),
-                 new Claim("FirstName", user.FirstName),
-                new Claim("LastName", user.LastName),
-                new Claim("Address", user.Address),
-                new Claim("CityId", user.Id_ciudad.ToString()),
-                new Claim("Photo", photoUrl ?? ""),
-                new Claim("LoginProvider", "Facebook")
-        };
+        new Claim(ClaimTypes.Name, user.Email!),
+        new Claim(ClaimTypes.Role, user.UserType.ToString()),
+        new Claim("FirstName", user.FirstName),
+        new Claim("LastName", user.LastName),
+        new Claim("Address", user.Address),
+        new Claim("CityId", user.Id_ciudad.ToString()),
+        new Claim("Photo", user.Photo ?? ""),
+        new Claim("LoginProvider", "Facebook")
+    };
 
             var token = new JwtSecurityToken(
                 claims: claims,
@@ -120,13 +181,11 @@ namespace ProjectWeb.API.Controllers
             );
 
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-            string? Url = "https://localhost:7188/login-facebook";
-            // 🔹 Redirige al frontend con el token
-            //var redirect = $"{Url}?token={jwt}";
-            var redirect = $"{Url}?token={Uri.EscapeDataString(jwt)}";
-            return Redirect(redirect);
+
+            // 6️⃣ Redirigir al frontend con token
+            string redirectUrl = "https://localhost:7188/login-facebook";
+            return Redirect($"{redirectUrl}?token={Uri.EscapeDataString(jwt)}");
         }
 
-        
     }
 }
