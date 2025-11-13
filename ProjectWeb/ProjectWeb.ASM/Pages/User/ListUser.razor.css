@@ -1,7 +1,7 @@
 ﻿
 /* ===== Contenedor principal centrado ===== */
 .centrado-pantalla {
-     display: flex;
+    display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
@@ -9,7 +9,6 @@
     background: white;
     box-sizing: border-box;
     flex-direction: column;
-
 }
 
 /* ===== Contenedor de la tabla ===== */
@@ -156,4 +155,3 @@ button.btn-danger:hover {
         padding: 10px;
     }
 }
-

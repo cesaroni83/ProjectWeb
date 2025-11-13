@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using ProjectWeb.API.Data;
 using ProjectWeb.Shared.Account;
 using ProjectWeb.Shared.Enums;
+using ProjectWeb.Shared.Modelo.DTO.Ciudad;
+using ProjectWeb.Shared.Modelo.DTO.User;
 using ProjectWeb.Shared.Modelo.Entidades;
 
 namespace ProjectWeb.API.Helper.Implementacion
@@ -186,5 +188,36 @@ namespace ProjectWeb.API.Helper.Implementacion
             return user;
         }
 
+        
+
+        public async Task<UsersDTO> GetUser(string Email)
+        {
+            var user = await _context.Users
+                .Include(u => u!.Ciudades)
+                .ThenInclude(c => c!.Provincias!)
+                .ThenInclude(s => s!.Paises!)
+                .FirstOrDefaultAsync(x => x.Email == Email);
+
+            if (user == null)
+                return null;
+            // Mapeo manual de entidad -> DTO
+            var userDto = new UsersDTO
+            {
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Address = user.Address,
+                Email = user.Email,
+                UserType = user.UserType,
+                Ciudades = new CiudadDTO
+                {
+                    Id_ciudad = user.Ciudades.Id_ciudad,
+                    Nombre_ciudad = user.Ciudades.Nombre_ciudad
+                },
+                Id_ciudad = user.Id_ciudad
+            };
+
+            return userDto;
+        }
     }
 }

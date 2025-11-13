@@ -1,15 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using ProjectWeb.Shared.Modelo.Entidades;
-using System;
-using System.Collections.Generic;
+using ProjectWeb.Shared.Enums;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ProjectWeb.Shared.Enums
+using ProjectWeb.Shared.Modelo.DTO.Ciudad;
+namespace ProjectWeb.Shared.Modelo.DTO.User
 {
-    public class User : IdentityUser
+    public class UsersDTO : IdentityUser
     {
         [Display(Name = "Nombres")]
         [MaxLength(50, ErrorMessage = "El campo {0} debe tener máximo {1} caractéres.")]
@@ -32,19 +27,18 @@ namespace ProjectWeb.Shared.Enums
         [Display(Name = "Tipo de usuario")]
         public UserType UserType { get; set; }
 
-        public Ciudad? Ciudades { get; set; }
+        public CiudadDTO? Ciudades { get; set; }
+
+        public string Nombre_Ciudad => Ciudades?.Nombre_ciudad ?? "";
 
         [Display(Name = "Ciudad")]
+       // [Required(ErrorMessage = "El campo {0} es obligatorio.")]
         [Range(1, int.MaxValue, ErrorMessage = "Debes seleccionar una {0}.")]
         public int Id_ciudad { get; set; }
 
         [Display(Name = "Usuario")]
         public string FullName => $"{FirstName} {LastName}";
 
-        /////
-        /////
-        /////**
-        ///
-        public Persona? Personas { get; set; }
+        public string Passwords { get; set; } = null!;
     }
 }

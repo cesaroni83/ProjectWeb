@@ -4,9 +4,8 @@ html, body {
     margin: 0;
     padding: 0;
     font-family: Arial, sans-serif;
-    background-color:transparent !important;
+    background-color: #f8f9fa;
     box-sizing: border-box;
-
 }
 
 *, *::before, *::after {
@@ -20,7 +19,6 @@ html, body {
     justify-content: center;
     min-height: 100vh;
     padding: 20px;
-    background-color: transparent !important;
 }
 
 /* --- CARD DEL FORMULARIO --- */

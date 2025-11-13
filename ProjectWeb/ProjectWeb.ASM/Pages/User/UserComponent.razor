@@ -1,0 +1,366 @@
+﻿@using ProjectWeb.ASM.Repositorio
+@using ProjectWeb.Shared.Enums
+@using ProjectWeb.Shared.Modelo.DTO.Ciudad
+@using ProjectWeb.Shared.Modelo.DTO.Pais
+@using ProjectWeb.Shared.Modelo.DTO.Provincia
+@using ProjectWeb.Shared.Modelo.DTO.User
+@inject ToastService ToastService
+@inject SweetAlertService sweetAlertService
+@inject IRepository repository
+@inject NavigationManager navigationManager
+
+
+<!-- Font Awesome -->
+<div class="principal">
+    <div class="login-register-container">
+        <div class="form-wrapper" id="formWrapper">
+            <div class="form-panel">
+                <div class="form-left-white w-100">
+                    <h2>@Titulo</h2>
+                    <EditForm class="register-form row g-3" Model="Input" OnValidSubmit="SubmitForm">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary></ValidationSummary>
+                        <Tabs EnableFadeEffect="true" id="formTab" class="tab-content active">
+                            <Tab Active="true">
+                                <TitleTemplate>
+                                    <Icon Name="IconName.HouseFill" /> Edit User
+                                </TitleTemplate>
+                                <Content>
+                                    <div class="tab-content active">
+                                        <!-- Contenedor de 2 columnas -->
+                                        <div class="row g-3">
+                                            <!-- Formulario -->
+                                            <div class="col-md-6">
+                                                <label class="form-label">Nombre</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                                    <input class="form-control" @bind-value="Input.FirstName" placeholder="Nombre" />
+                                                    <ValidationMessage For="@(() => Input.FirstName)" />
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Apellido</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                                    <input class="form-control" @bind-value="Input.LastName" placeholder="Apellido" />
+                                                    <ValidationMessage For="@(() => Input.LastName)" />
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Teléfono</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                                    <input type="tel" class="form-control" @bind-value="Input.PhoneNumber" placeholder="Teléfono" />
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Pais</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-globe"></i></span>
+                                                    <select class="form-select" @onchange="CountryChangedAsync">
+                                                        <option value="">Seleccione País</option>
+                                                        @if (countries is not null)
+                                                        {
+                                                            @foreach (var country in countries)
+                                                            {
+                                                                <option value="@country.Id_pais" selected="@(country.Id_pais == user.Ciudades!.Provincias!.Paises!.Id_pais)">@country.Nombre_pais</option>
+                                                            }
+                                                        }
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Provincia</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-map"></i></span>
+                                                    <select class="form-select" @onchange="StateChangedAsync">
+                                                        <option value="">-- Seleccione Provincia --</option>
+                                                        @if (states is not null)
+                                                        {
+                                                            @foreach (var state in states)
+                                                            {
+                                                                <option value="@state.Id_provincia" selected="@(state.Id_provincia == user.Ciudades!.Provincias!.Id_provincia)">@state.Nombre_provincia</option>
+                                                            }
+                                                        }
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Ciudad</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-city"></i></span>
+                                                    <select class="form-select" @bind="Input.Id_ciudad">
+                                                        <option value="">Seleccione Ciudad</option>
+                                                        @if (cities is not null)
+                                                        {
+                                                            @foreach (var city in cities)
+                                                            {
+                                                                <option value="@city.Id_ciudad" selected="@(city.Id_ciudad == user.Ciudades!.Id_ciudad)">@city.Nombre_ciudad </option>
+                                                            }
+                                                        }
+                                                    </select>
+                                                    <ValidationMessage For="@(() => Input.Id_ciudad)" />
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-unir">
+                                                <label class="form-label">Direccion</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-street-view"></i></span>
+                                                    <input type="text" class="form-control" @bind-value="Input.Address" placeholder="Direccion" />
+                                                    <ValidationMessage For="@(() => Input.Address)" />
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="form-label">Email</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                                    <input type="email" class="form-control" @bind-value="Input.Email" placeholder="Email" />
+                                                </div>
+                                            </div>
+                                            @if (SubmitButtonText == "Save")
+                                            {
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Passwords</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text"><i class="fas fa-key"></i></span>
+                                                        <input type="password"  required class="form-control" @bind-value="Input.Passwords" placeholder="Passwords" />
+                                                    </div>
+                                                </div>                        
+                                            }
+                                            <div class="col-md-6">
+                                                <label class="form-label">Tipo</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                                    <select class="form-select" @bind="Input.UserType">
+                                                        <option value="">Seleccione Tipo User</option>
+                                                        @if (Types is not null)
+                                                        {
+                                                            @foreach (var item in Types)
+                                                            {
+                                                                <option value="@item">@item.ToString()</option>
+                                                            }
+                                                        }
+                                                    </select>
+                                                    
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Status</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+
+                                                    <select class="form-select"
+                                                            value="@(Input.LockoutEnabled ? "true" : "false")"
+                                                            @onchange="OnLockoutChange">
+                                                        <option value="true">Unlocked</option>
+                                                        <option value="false">Locked</option>
+                                                    </select>
+
+                                                  
+                                                </div>
+                                            </div>
+                                            <div class="col-12 d-flex justify-content-center gap-2 mt-3">
+                                                <button type="submit" class="btn btn-primary">@SubmitButtonText</button>
+                                                <button type="button" class="btn btn-secondary" @onclick="Cancelar" >Cancel</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Content>
+                            </Tab>
+                            <Tab>
+                                <TitleTemplate>
+                                    <Icon Name="IconName.PersonFill" /> Fotos
+                                </TitleTemplate>
+                                <Content>
+                                    <div class="upload-form text-center mt-3">
+                                        <label for="profileImage" class="form-label fw-bold">Selecciona una imagen para tu perfil:</label>
+                                        <InputImg Label="Foto" ImageSelected="ImageSelected" ImageURL="@imageUrl" />
+                                        @*  <button type="submit" class="btn btn-primary mt-3">Subir Imagen</button> *@
+                                    </div>
+                                </Content>
+                            </Tab>
+                        </Tabs>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    [CascadingParameter] BlazoredModalInstance Modal { get; set; } = default!;
+    [Parameter] public UsersDTO InputDTO { get; set; } = new UsersDTO();
+    [Parameter] public string SubmitButtonText { get; set; } = string.Empty;
+    [Parameter] public string Titulo { get; set; } = string.Empty;
+
+    private List<PaisDropDTO>? countries;
+    private List<ProvinciaDropDTO>? states;
+    private List<CiudadDropDTO>? cities;
+    private UsersDTO Input = new();
+    private List<UserType>? Types;
+    private string Estados = "A";
+    private string? imageUrl;
+    
+
+    private UsersDTO? user { get; set; } = new UsersDTO
+    {
+        Ciudades = new CiudadDTO
+        {
+            Provincias = new ProvinciaDTO
+            {
+                Paises = new PaisDTO()
+            }
+        }
+    };
+    private void OnLockoutChange(ChangeEventArgs e)
+    {
+        Input.LockoutEnabled = e.Value?.ToString() == "true";
+    }
+    private void ImageSelected(string imagenBase64)
+    {
+        user!.Photo = imagenBase64;
+        imageUrl = null;
+    }
+    private async Task LoadUserAsyc()
+    {
+        var responseHTTP = await repository.Get<UsersDTO>($"/api/Accounts/UserView/{InputDTO.Email}");
+        if (responseHTTP.Error)
+        {
+            if (responseHTTP.HttpResponseMessage.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                navigationManager.NavigateTo("/");
+                return;
+            }
+            var messageError = await responseHTTP.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", messageError, SweetAlertIcon.Error);
+            return;
+        }
+        user = responseHTTP.Response;
+    }
+
+
+    private async Task SubmitForm()
+    {
+        if (SubmitButtonText == "Save")
+        {
+            var responseHttp = await repository.Post<UsersDTO>("/api/Accounts/CreateUserByAdmin", Input);
+            if (responseHttp.Error)
+            {
+                var message = await responseHttp.GetErrorMessageAsync();
+                await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                return;
+            }
+            ToastService.Notify(new(ToastType.Success, $"Record Sucursal Saved Successfully."));
+            await Task.Delay(3000);
+            await Modal.CloseAsync(ModalResult.Ok(Input));
+            return;
+        }
+        if (SubmitButtonText == "Update")
+        {
+            // var responseHttp = await repository.Put<UsersDTO>($"/api/Sucursales/{Input.Id_sucursal}", Input);
+            // if (responseHttp.Error)
+            // {
+            //     var message = await responseHttp.GetErrorMessageAsync();
+            //     await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            //     return;
+            // }
+            // ToastService.Notify(new(ToastType.Success, $"Record Sucursal Updated Successfully."));
+            // await Task.Delay(3000);
+            // await Modal.CloseAsync(ModalResult.Ok(Input));
+            return;
+        }
+    }
+
+    private async Task Cancelar()
+    {
+        await Modal.CancelAsync();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+
+        // Carica i paesi
+        await LoadCountriesAsync();
+        Types = Enum.GetValues<UserType>().ToList();
+
+        // Se abbiamo un input con nome
+        if (!string.IsNullOrEmpty(InputDTO.Email))
+        {
+
+            await LoadUserAsyc();
+
+            // Se l'empresa è null o le proprietà annidate sono null, usiamo default
+            var paisId = user?.Ciudades?.Provincias?.Paises?.Id_pais;
+            var provinciaId = user?.Ciudades?.Provincias?.Id_provincia;
+
+            if (paisId.HasValue)
+                await LoadStatesAsyn(paisId.Value);
+
+            if (provinciaId.HasValue)
+                await LoadCitiesAsyn(provinciaId.Value);
+
+            // Copia InputDTO nell'Input usato nel form
+            Input = InputDTO;
+            imageUrl = Input.Photo;
+        }
+        else
+        {
+            Input = new UsersDTO();
+        }
+    }
+
+
+    private async Task LoadCountriesAsync()
+    {
+        var responseHttp = await repository.Get<List<PaisDropDTO>>($"/api/Paises/ComboPais/{Estados}");
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        countries = responseHttp.Response;
+    }
+
+    private async Task LoadStatesAsyn(int countryId)
+    {
+        var responseHttp = await repository.Get<List<ProvinciaDropDTO>>($"/api/Provincias/ComboProvincia/{countryId}/{Estados}");
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        states = responseHttp.Response;
+    }
+
+    private async Task LoadCitiesAsyn(int stateId)
+    {
+        var responseHttp = await repository.Get<List<CiudadDropDTO>>($"/api/Ciudades/ComboCiudades/{stateId}/{Estados}");
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        cities = responseHttp.Response;
+    }
+
+    private async Task CountryChangedAsync(ChangeEventArgs e)
+    {
+        var selectedCountry = Convert.ToInt32(e.Value!);
+        await LoadStatesAsyn(selectedCountry);
+    }
+
+    private async Task StateChangedAsync(ChangeEventArgs e)
+    {
+        var selectedState = Convert.ToInt32(e.Value!);
+        await LoadCitiesAsyn(selectedState);
+    }
+}

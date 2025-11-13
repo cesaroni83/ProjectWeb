@@ -108,5 +108,9 @@ namespace ProjectWeb.Shared.Modelo.Entidades
         [Required(ErrorMessage = "El Campo {0} es Obligatorio!")]
         public string? Tipo_persona { get; set; }
 
+        /// <summary>
+        public User? Users { get; set; }
+        /// </summary>
+
     }
 }

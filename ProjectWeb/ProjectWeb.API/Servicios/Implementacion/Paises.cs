@@ -155,7 +155,7 @@ namespace ProjectWeb.API.Servicios.Implementacion
         {
             try
             {
-                var consulta = _modeloRepositorio.GetAllWithWhere(x => x.Estado_pais == Estado_Activo).OrderBy(m => m.Id_pais);
+                var consulta = _modeloRepositorio.GetAllWithWhere(x => x.Estado_pais == Estado_Activo).OrderBy(m => m.Nombre_pais);
                 List<PaisDropDTO> lista = _mapper.Map<List<PaisDropDTO>>(await consulta.ToListAsync());
                 return lista;
 

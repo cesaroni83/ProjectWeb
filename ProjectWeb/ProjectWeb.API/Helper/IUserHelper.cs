@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using ProjectWeb.Shared.Account;
 using ProjectWeb.Shared.Enums;
+using ProjectWeb.Shared.Modelo.DTO.Pais;
+using ProjectWeb.Shared.Modelo.DTO.User;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ProjectWeb.API.Helper
@@ -45,6 +47,11 @@ namespace ProjectWeb.API.Helper
         Task<IdentityResult> AddLoginAsync(User user, UserLoginInfo loginInfo);
 
         Task<User> CreateUserFromExternalLoginAsync(ExternalLoginInfo info, string email);
+
+        // 👇 Nuevos métodos para Lista de Usuarios
+
+       
+        Task<UsersDTO> GetUser(string Email);
 
     }
 }

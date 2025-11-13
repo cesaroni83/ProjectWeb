@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using ProjectWeb.API.Data;
 using ProjectWeb.API.Helper;
@@ -8,7 +10,11 @@ using ProjectWeb.API.Servicios;
 using ProjectWeb.Shared.Account;
 using ProjectWeb.Shared.Enums;
 using ProjectWeb.Shared.Modelo.AuthenDTO;
+using ProjectWeb.Shared.Modelo.DTO.Pais;
+using ProjectWeb.Shared.Modelo.DTO.User;
+using ProjectWeb.Shared.Modelo.Entidades;
 using System.IdentityModel.Tokens.Jwt;
+using System.Numerics;
 using System.Security.Claims;
 using System.Text;
 
@@ -25,8 +31,9 @@ namespace ProjectWeb.API.Controllers
         private readonly AppDbContext _context;
         private readonly string _container;
         private readonly IPersonas _persona;
+        private readonly IMapper _mapper;
 
-        public AccountsController(IUserHelper userHelper, IConfiguration configuration, IFileStorage fileStorage, IMailHelper mailHelper, AppDbContext context, IPersonas persona)
+        public AccountsController(IUserHelper userHelper, IConfiguration configuration, IFileStorage fileStorage, IMailHelper mailHelper, AppDbContext context, IPersonas persona, IMapper mapper)
         {
             _userHelper = userHelper;
             _configuration = configuration;
@@ -35,6 +42,7 @@ namespace ProjectWeb.API.Controllers
             _context = context;
             _container = "users";
             _persona = persona;
+            _mapper = mapper;
         }
 
         [HttpPost("RecoverPassword")]
@@ -162,7 +170,6 @@ namespace ProjectWeb.API.Controllers
         {
             return Ok(await _userHelper.GetUserAsync(User.Identity!.Name!));
         }
-
 
         [AllowAnonymous]
         [HttpPost("CreateUser")]
@@ -312,5 +319,92 @@ namespace ProjectWeb.API.Controllers
                 Expiration = expiration
             };
         }
+
+        
+        [HttpGet("ListUser")]
+        public async Task<List<UsersDTO>> GetListaAllUsers()
+        {
+
+            var users = await _context.Users
+            .Include(u => u.Ciudades)
+                .ThenInclude(c => c.Provincias)
+                    .ThenInclude(s => s.Paises)
+            .ToListAsync();
+
+            // Mapear con AutoMapper
+            var userDtos = _mapper.Map<List<UsersDTO>>(users);
+
+            return userDtos;
+        }
+
+
+        [HttpGet("UserView/{email}")]
+        public async Task<ActionResult<UsersDTO>> GetViewUser(string email)
+        {
+            var user = await _context.Users
+            .Include(u => u.Ciudades)
+            .ThenInclude(c => c.Provincias)
+            .ThenInclude(s => s.Paises)
+            .FirstOrDefaultAsync(u => u.Email == email);
+
+            if (user == null)
+                return NotFound();
+
+            var userDto = _mapper.Map<UsersDTO>(user);
+            return Ok(userDto);
+
+        }
+
+        [AllowAnonymous]
+        [HttpPost("CreateUserByAdmin")]
+        public async Task<ActionResult<UsersDTO>> CreateUserByAdmin([FromBody] UsersDTO model)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(model.Photo))
+                {
+                    var photoUser = await _fileStorage.SaveImageAsync(model.Photo);
+                    model.Photo = photoUser;
+                }
+
+                var user = _mapper.Map<User>(model);
+                user.UserName = model.Email;
+                user.Email = model.Email;
+
+                var result = await _userHelper.AddUserAsync(user, model.Passwords);
+                if (!result.Succeeded)
+                    return BadRequest(result.Errors);
+
+                var persona = new Persona
+                {
+                    Id_user = user.Id,
+                    Nombre = user.FirstName,
+                    Apellido = user.LastName,
+                    Id_ciudad = user.Id_ciudad,
+                    Direccion_persona = user.Address,
+                    Email = user.Email!,
+                    Tipo_persona = user.UserType.ToString(),
+                    Estado_persona = "A"
+                };
+
+                _context.Tbl_Persona.Add(persona);
+                await _context.SaveChangesAsync();
+
+                await _userHelper.AddUserToRoleAsync(user, user.UserType.ToString());
+                var token = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+                await _userHelper.ConfirmEmailAsync(user, token);
+
+                var userDto = _mapper.Map<UsersDTO>(user);
+                return Ok(userDto);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error interno del servidor: {ex.Message}");
+            }
+        }
+
+
+
+
     }
 }

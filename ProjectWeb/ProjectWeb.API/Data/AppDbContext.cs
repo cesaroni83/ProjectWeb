@@ -28,14 +28,14 @@ namespace ProjectWeb.API.Data
             //claves primarias
             ///indices 
             modelBuilder.Entity<Pais>().HasIndex(x => x.Nombre_pais).IsUnique(); ///Crea  un indece unico en el nombre
-            modelBuilder.Entity<Provincia>().HasIndex(x => x.Nombre_provincia).IsUnique(); ///Crea  un indece unico en el nombre
-            modelBuilder.Entity<Ciudad>().HasIndex(x => x.Nombre_ciudad).IsUnique(); ///Crea  un indece unico en el nombre
+            //modelBuilder.Entity<Provincia>().HasIndex(x => x.Nombre_provincia).IsUnique(); ///Crea  un indece unico en el nombre
+            //modelBuilder.Entity<Ciudad>().HasIndex(x => x.Nombre_ciudad).IsUnique(); ///Crea  un indece unico en el nombre
             modelBuilder.Entity<Empresa>().HasIndex(x => x.Nombre_Empresa).IsUnique(); ///Crea  un indece unico en el nombre
             modelBuilder.Entity<Sucursal>().HasIndex(x => x.Nombre_sucursal).IsUnique(); ///Crea  un indece unico en el nombre
             modelBuilder.Entity<Persona>().HasIndex(x => x.Numero_documento).IsUnique(); ///Crea  un indece unico en el nombre
-            modelBuilder.Entity<Ciudad>().HasIndex(x => x.Nombre_ciudad).IsUnique(); ///Crea  un indece unico en el nombre
+            //modelBuilder.Entity<Ciudad>().HasIndex(x => x.Nombre_ciudad).IsUnique(); ///Crea  un indece unico en el nombre
             //// relacionar de tablas
-            modelBuilder.Entity<Provincia>().HasIndex(p => new { p.Id_pais, p.Nombre_provincia }).IsUnique();
+            //modelBuilder.Entity<Provincia>().HasIndex(p => new { p.Id_pais, p.Nombre_provincia }).IsUnique();
             modelBuilder.Entity<Ciudad>().HasIndex(p => new { p.Id_provincia, p.Nombre_ciudad }).IsUnique();
             modelBuilder.Entity<Sucursal>().HasIndex(p => new { p.Id_empresa, p.Nombre_sucursal }).IsUnique();
 
@@ -94,11 +94,13 @@ namespace ProjectWeb.API.Data
                 .HasForeignKey(p => p.Id_ciudad)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            //modelBuilder.Entity<Persona>()
-            //    .HasOne(p => p.Users)
-            //    .WithOne(u => u.Personas)
-            //    .HasForeignKey<User>(u => u.Id_persona) // FK en User
-            //    .OnDelete(DeleteBehavior.Cascade);
+
+            ///***///////
+            modelBuilder.Entity<Persona>()
+            .HasOne(p => p.Users)
+           .WithOne(u => u.Personas)
+            .HasForeignKey<Persona>(p => p.Id_user)
+           .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

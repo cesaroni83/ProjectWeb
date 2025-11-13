@@ -15,7 +15,7 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Services.AddSingleton(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7135/") });
+builder.Services.AddSingleton(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7135/") }); /// iis_puerto api: https://localhost:44300/  normal puerto api: https://localhost:7135/
 // ?? Aquí puedes agregar la configuración del JSON:
 builder.Services.Configure<JsonSerializerOptions>(options =>
 {
@@ -31,16 +31,5 @@ builder.Services.AddBlazoredModal();
 builder.Services.AddScoped<IRepository, Repository>();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<GoogleAuthService>();
-///***Google**/
-//builder.Services.AddOidcAuthentication(options =>
-//{
-//    builder.Configuration.Bind("Authentication:Google", options.ProviderOptions);
-
-//    options.ProviderOptions.ResponseType = "code";
-//    options.ProviderOptions.DefaultScopes.Add("openid");
-//    options.ProviderOptions.DefaultScopes.Add("profile");
-//    options.ProviderOptions.DefaultScopes.Add("email");
-//});
-
 
 await builder.Build().RunAsync();

@@ -1,0 +1,199 @@
+﻿@page "/ListUsers"
+@using ProjectWeb.ASM.Repositorio
+@using ProjectWeb.Shared.Modelo.DTO.User
+@using ProjectWeb.Shared.Modelo.Estatico
+@inject NavigationManager navigationManager
+@inject SweetAlertService sweetAlertService
+@inject IRepository repository
+
+<PageTitle>Usuarios</PageTitle>
+<ConfirmDialog @ref="dialog" />
+
+<div class="centrado-pantalla">
+    <div class="container-tabla">
+        <Card style="width:93%; height:auto; margin:50px">
+            <CardHeader class="text-center fs-4">
+                Lista De Usuarios
+            </CardHeader>
+            <CardBody>
+                <Grid TItem="UsersDTO"
+                      Class="table table-hover table-bordered"
+                      FiltersRowCssClass="bg-primary text-white bg-opacity-25 border-bottom-0"
+                      HeaderRowCssClass="bg-primary text-white border-bottom-0"
+                      DataProvider="UsersDataProvider"
+                      AllowFiltering="true"
+                      AllowPaging="true"
+                      PageSize="10"
+                      AllowSorting="true"
+                      AllowRowClick="true"
+                      OnRowClick="OnrowClick"
+                      Responsive="true"
+                      @ref="grid">
+                    <GridTemplates Class="gap-2">
+                        <ExportLayout TItem="UsersDTO" GridRef="grid" Items="ListaUsers" />
+                    </GridTemplates>
+                    <GridColumn TItem="UsersDTO" HeaderText="Foto" FilterTextboxWidth="50" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
+                        <div class="text-center">
+                            <Image Src="@context.Photo" Class="rounded" Alt="placeholder" style="width:50px; height:auto;" />
+                        </div>
+                    </GridColumn>
+
+                    <GridColumn  TItem="UsersDTO" HeaderText="Email" HeaderTextAlignment="Alignment.Center" PropertyName="Email" SortString="Email" SortKeySelector="item => item.Email" FilterTextboxWidth="200" TextAlignment="Alignment.Start">
+                        @context.Email
+                    </GridColumn>
+
+                    <GridColumn  TItem="UsersDTO" HeaderText="Name" HeaderTextAlignment="Alignment.Center" PropertyName="FullName" SortString="FullName" SortKeySelector="item => item.FullName" FilterTextboxWidth="300" TextAlignment="Alignment.Start">
+                        @context.FullName
+                    </GridColumn>
+
+                    <GridColumn  TItem="UsersDTO" HeaderText="City" HeaderTextAlignment="Alignment.Center" PropertyName="Nombre_Ciudad" SortString="Nombre_Ciudad" SortKeySelector="item => item.Nombre_Ciudad" FilterTextboxWidth="150" TextAlignment="Alignment.Start">
+                        @context.Nombre_Ciudad
+                    </GridColumn>
+
+                    <GridColumn  TItem="UsersDTO" HeaderText="Address" HeaderTextAlignment="Alignment.Center" PropertyName="Address" SortString="Address" SortKeySelector="item => item.Address" FilterTextboxWidth="250" TextAlignment="Alignment.Start">
+                        @context.Address
+                    </GridColumn>
+                    <GridColumn  TItem="UsersDTO" HeaderText="Phone" HeaderTextAlignment="Alignment.Center" PropertyName="PhoneNumber" SortString="PhoneNumber" SortKeySelector="item => item.PhoneNumber" FilterTextboxWidth="200" TextAlignment="Alignment.Start">
+                        @context.Address
+                    </GridColumn>
+                    <GridColumn  TItem="UsersDTO" HeaderText="User Type" PropertyName="UserType" HeaderTextAlignment="Alignment.Center" SortString="UserType" SortKeySelector="item => item.UserType.ToString()" FilterTextboxWidth="100" TextAlignment="Alignment.Start">
+                        @context.UserType.ToString()
+                    </GridColumn>
+                    <GridColumn  TItem="UsersDTO" HeaderText="Enabled" PropertyName="LockoutEnabled" HeaderTextAlignment="Alignment.Center" SortString="LockoutEnabled" SortKeySelector="item => item.LockoutEnabled" FilterTextboxWidth="200" TextAlignment="Alignment.Start">
+                        @context.LockoutEnabled
+                    </GridColumn>
+                    <GridColumn TItem="UsersDTO" HeaderText="Acción" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" Filterable="false" FilterTextboxWidth="200">
+                        <div class="d-flex justify-content-end gap-2" style="width:150px;">
+                            <button class="btn btn-success btn-sm" @onclick=@(() => ShowModal(context.Email!, true))>Update</button>
+                            <button class="btn btn-danger btn-sm" @onclick="() => DeleteReg(context.Email!, context.FullName)">Lock</button>
+                        </div>
+                    </GridColumn>
+                </Grid>
+            </CardBody>
+            <CardFooter class="d-flex justify-content-end ">
+                <button class="btn btn-success" @onclick=@(() => ShowModal())>New User </button>
+            </CardFooter>
+        </Card>
+    </div>
+</div>
+
+@code {
+    private ConfirmDialog dialog = default!;
+    [Inject] ToastService ToastService { get; set; } = default!;
+
+    [Inject] protected PreloadService PreloadService { get; set; } = default!;
+    public UsersDTO Input = new UsersDTO();
+    private string? previewUrl;
+    private List<UsersDTO> ListaUsers { get; set; } = default!;
+    private BlazorBootstrap.Grid<UsersDTO>? grid;
+    private List<Estado> items = new();
+    [CascadingParameter]
+    IModalService Modal { get; set; } = default!;
+
+    private async Task ShowModal(string id="" , bool isEdit = false)
+
+    {
+        IModalReference modalReference;
+        var options = new ModalOptions
+        {
+            Class = "modal-lg",
+        };
+
+        if (isEdit)
+        {
+
+            var parameters = new ModalParameters();
+            parameters.Add("InputDTO", Input);
+            parameters.Add("SubmitButtonText", "Update");
+            parameters.Add("Titulo", "Modifica Datos Del Usuario");
+            modalReference = Modal.Show<UserComponent>(parameters);
+        }
+        else
+        {
+            var parameters = new ModalParameters();
+            parameters.Add("InputDTO", Input = new());
+            parameters.Add("SubmitButtonText", "Save");
+            parameters.Add("Titulo", "Registro De Usuario");
+            modalReference = Modal.Show<UserComponent>(parameters);
+        }
+        var result = await modalReference.Result;
+        if (result.Confirmed)
+        {
+            await RefrescarGrid();
+        }
+
+    }
+    private async Task LoadUser()
+    {
+        PreloadService.Show(SpinnerColor.Light, "Loading data...");
+        var responseHttp = await repository.Get<List<UsersDTO>>("/api/Accounts/ListUser");
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        ListaUsers = responseHttp.Response?.ToList() ?? new List<UsersDTO>();
+        StateHasChanged();
+        PreloadService.Hide();
+
+
+    }
+    private async Task<GridDataProviderResult<UsersDTO>> UsersDataProvider(GridDataProviderRequest<UsersDTO> request)
+    {
+        if (ListaUsers is null) // pull employees only one time for client-side filtering, sorting, and paging
+            await LoadUser();
+        return await Task.FromResult(request.ApplyTo(ListaUsers!));
+    }
+    private async Task OnrowClick(GridRowEventArgs<UsersDTO> args)
+    {
+        //await ModalService.ShowAsync(new ModalOption { Type = ModalType.Primary, Title = "Event: Row Click", Message = $"Id: {args.Item.Id_user}, Name: {args.Item.User_name}" });
+        Input.Id = args.Item.Id;
+        Input.FirstName = args.Item.FirstName;
+        Input.LastName = args.Item.LastName;
+        Input.Photo = args.Item.Photo;
+        Input.Email = args.Item.Email;
+        Input.Id_ciudad = args.Item.Id_ciudad;
+        Input.Address = args.Item.Address;
+        Input.UserType = args.Item.UserType;
+        Input.LockoutEnabled = args.Item.LockoutEnabled;
+        return;
+    }
+    
+    private async Task RefrescarGrid()
+    {
+        await LoadUser();
+        await grid!.RefreshDataAsync();
+    }
+    private async Task DeleteReg(string id, string nombre)
+    {
+        var options = new ConfirmDialogOptions { IsVerticallyCentered = true, Size= DialogSize.Large };
+        var confirmation = await dialog.ShowAsync(
+            title: "Eliminacion Del Registro",
+            message1: "Desea Eliminar El Usuario?",
+            message2: "ID:" + id + "   Name:" + nombre,
+            confirmDialogOptions: options);
+
+        if (confirmation)
+        {
+            // call API to delete the employee
+            // show acknowledgment to the user
+            var responseHttp = await repository.Delete($"/api/Userses/{Input.Id}");
+            if (responseHttp.Error)
+            {
+                var message = await responseHttp.GetErrorMessageAsync();
+                await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                return;
+            }
+            ToastService.Notify(new ToastMessage(ToastType.Success, $"Users Eliminado con Exito!"));
+            await RefrescarGrid();
+            return;
+        }
+        else
+        {
+            ToastService.Notify(new ToastMessage(ToastType.Secondary, $"Operacion Cancelada!"));
+        }
+
+    }
+}
