@@ -1,4 +1,5 @@
 ﻿@page "/ListPaises"
+@using Microsoft.AspNetCore.Authorization
 @using ProjectWeb.ASM.Repositorio
 @using ProjectWeb.Shared.Modelo.DTO.Pais
 @using ProjectWeb.Shared.Modelo.Estatico
@@ -7,6 +8,7 @@
 @inject NavigationManager navigationManager
 @inject SweetAlertService sweetAlertService
 @inject IRepository repository
+@attribute [Authorize(Roles = "Admin")]
 
 <PageTitle>Paises</PageTitle>
 <ConfirmDialog @ref="dialog" />

@@ -106,7 +106,20 @@
     new Icono { Id = "83", Text = "Amazon" },
     new Icono { Id = "84", Text = "Bag" },
     new Icono { Id = "85", Text = "Fullscreen" },
-    new Icono { Id = "86", Text = "FullscreenExit" }
+    new Icono { Id = "86", Text = "FullscreenExit" },
+
+    // Autenticación / Login / Registro
+    new Icono { Id = "87", Text = "PersonCircle" },        // Usuario genérico
+    new Icono { Id = "88", Text = "BoxArrowInRight" }, // Login / Iniciar sesión
+    new Icono { Id = "89", Text = "PersonPlus" },    // Registro / Crear cuenta
+    new Icono { Id = "90", Text = "Lock" },          // Seguridad / Contraseña
+    new Icono { Id = "91", Text = "Key" } ,           // Autenticación / Llave
+
+
+    new Icono { Id = "92", Text = "Globe" },    // Globo / Internacional
+    new Icono { Id = "93", Text = "List" },     // Menú / Navegación
+    new Icono { Id = "94", Text = "Building" },
+    new Icono { Id = "95", Text = "Grid" } // Dashboard / Panel de control// Empresa / Corporativo
 };
 
 

@@ -25,22 +25,19 @@
     {
         navItems = new List<NavItem>
         {
-            new NavItem { Id = "1", Href = "/", IconName = IconName.HouseDoorFill, Text = "Home" },
+            new NavItem { Id = "1", Href = "/", IconName = IconName.HouseDoorFill, Text = "Home",IconColor = IconColor.Primary },
 
-            new NavItem { Id = "2", Href = "/Dasboard",IconName = IconName.Newspaper, Text = "Dashboad" },
+            new NavItem { Id = "2", Href = "/Dasboard",IconName = IconName.Grid, Text = "Dashboad" ,IconColor = IconColor.Primary},
 
-            new NavItem { Id = "3", Href = "#", IconName = IconName.PersonLock, Text = "Athentication" },
+            new NavItem { Id = "3", Href = "#", IconName = IconName.Lock, Text = "Athentication" ,IconColor = IconColor.Primary},
 
-            new NavItem { Id = "4", Href = "/Login", IconName = IconName.Key, Text = "Login", IconColor = IconColor.Success, ParentId="3" },
+            new NavItem { Id = "4", Href = "/Login", IconName = IconName.BoxArrowInRight, Text = "Login", IconColor = IconColor.Primary, ParentId="3" },
             
-            new NavItem { Id = "5", Href = "/Register", IconName = IconName.PersonVCard , IconColor = IconColor.Success, Text = "Register", ParentId="3" },
+            new NavItem { Id = "5", Href = "/Register", IconName = IconName.PersonPlus , IconColor = IconColor.Primary, Text = "Register", ParentId="3" },
             
-            new NavItem { Id = "6", Href = "/Contact" ,IconName = IconName.PinMapFill, Text = "Contacto" },
-
-             new NavItem { Id = "", Href = "/ListUsers" ,IconName = IconName.PinMapFill, Text = "Usuarios" },
+            new NavItem { Id = "6", Href = "/Contact" ,IconName = IconName.Globe, Text = "Contacto" ,IconColor = IconColor.Primary}
             
         };
-
         return navItems;
     }
 

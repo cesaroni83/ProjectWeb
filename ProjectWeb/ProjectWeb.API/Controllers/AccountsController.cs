@@ -403,7 +403,81 @@ namespace ProjectWeb.API.Controllers
             }
         }
 
+        [HttpPut("UpdateUserByAdmin")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult> PutFull(UsersDTO user)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(user.Photo))
+                {
+                    var photoUser = await _fileStorage.SaveImageAsync(user.Photo);
+                    user.Photo = photoUser;
+                }
 
+                var currentUser = await _userHelper.GetUserAsync(user.Email!);
+                if (currentUser == null)
+                {
+                    return NotFound();
+                }
+
+                // Eliminar foto antigua si existe
+                if (!string.IsNullOrEmpty(currentUser.Photo) && currentUser.Photo != user.Photo)
+                {
+                    await _fileStorage.DeleteImageAsync(currentUser.Photo);
+                }
+
+                // Actualizar datos generales
+                currentUser.FirstName = user.FirstName;
+                currentUser.LastName = user.LastName;
+                currentUser.Address = user.Address;
+                currentUser.PhoneNumber = user.PhoneNumber;
+                currentUser.Photo = !string.IsNullOrEmpty(user.Photo) ? user.Photo : currentUser.Photo;
+                currentUser.Id_ciudad = user.Id_ciudad;
+
+                // 🔒 Actualizar estado de bloqueo
+                if (user.LockoutEnabled)
+                {
+                    currentUser.LockoutEnabled = true;
+                    currentUser.LockoutEnd = DateTimeOffset.UtcNow.AddYears(100); // bloqueado indefinidamente
+                }
+                else
+                {
+                    currentUser.LockoutEnabled = false;
+                    currentUser.LockoutEnd = null; // desbloqueado
+                }
+
+
+                // 👤 Actualizar tipo de usuario
+                currentUser.UserType = user.UserType;
+
+                // 🔑 Actualizar contraseña si viene diferente
+                if (!string.IsNullOrEmpty(user.Passwords))
+                {
+                    var token = await _userHelper.GeneratePasswordResetTokenAsync(currentUser);
+                    var passResult = await _userHelper.ResetPasswordAsync(currentUser, token, user.Passwords);
+                    if (!passResult.Succeeded)
+                        return BadRequest(passResult.Errors.FirstOrDefault());
+                }
+
+                // Crear o modificar persona asociada
+                var confirma = await _userHelper.AddOrUpdateUserWithPersonaAsync(currentUser);
+                if (!confirma.Succeeded)
+                    return BadRequest(confirma.Errors.FirstOrDefault());
+
+                var result = await _userHelper.UpdateUserAsync(currentUser);
+                if (result.Succeeded)
+                {
+                    return Ok(BuildToken(currentUser));
+                }
+
+                return BadRequest(result.Errors.FirstOrDefault());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
 
     }

@@ -1,11 +1,13 @@
 ﻿@page "/ListCiudad/{IdProvincia:int}/{ProvinciaName}"
 
+@using Microsoft.AspNetCore.Authorization
 @using ProjectWeb.ASM.Repositorio
 @using ProjectWeb.Shared.Modelo.DTO.Ciudad
 @using ProjectWeb.Shared.Modelo.Estatico
 @inject IRepository repository
 @inject SweetAlertService sweetAlertService
 @inject NavigationManager NavManager
+@attribute [Authorize(Roles = "Admin")]
 
 <PageTitle>Ciudad</PageTitle>
 <ConfirmDialog @ref="dialog" />

@@ -11,15 +11,17 @@
 @inject IRepository repository
 @inject NavigationManager navigationManager
 
-<div class="page-wrapper">
+<div class="principal">
+    <div class="login-register-container">
+        <div class="page-wrapper">
     <EditForm Model="@Input" OnValidSubmit="SubmitForm">
         <DataAnnotationsValidator />
         <div class="form-card">
             <!-- Título del formulario -->
-            <h4 class="form-title"><i class="bi bi-ui-checks-grid"></i> @Titulo</h4>
+            <h2 class="form-title"><i class="bi bi-ui-checks-grid"></i> @Titulo</h2>
 
             <!-- Tabs -->
-            <Tabs class="custom-tabs">
+             <Tabs EnableFadeEffect="true" id="formTab" class="tab-content active">
                 <!-- TAB 1: Datos Personales -->
                 <Tab Title="Datos Empresa" Active="true">
                     <Content>
@@ -29,7 +31,7 @@
                                     <label>Nombre Sucursal</label>
                                     <div class="input-icon">
                                         <i class="bi bi-building"></i>
-                                        <InputText class="form-control" @bind-Value="Input.Nombre_sucursal" />
+                                        <input class="form-control" @bind="Input.Nombre_sucursal" />
                                         <ValidationMessage For="() => Input.Nombre_sucursal" />
                                     </div>
                                 </div>
@@ -37,7 +39,7 @@
                                     <label>Empresa</label>
                                     <div class="input-icon">
                                         <i class="bi bi-card-text"></i>
-                                        <InputSelect @bind-Value="Input.Id_empresa" class="form-control">
+                                        <select @bind="Input.Id_empresa" class="form-control">
                                             <option value=""> -- Seleccione --</option>
                                             @if (EmpresaCombo is not null)
                                             {
@@ -47,7 +49,7 @@
                                                 }
                                             }
                                             
-                                        </InputSelect>
+                                        </select>
                                         <ValidationMessage For="() => Input.Id_empresa" />
                                     </div>
                                 </div>
@@ -56,8 +58,8 @@
                             <div class="form-group mt-3">
                                 <label>Gerente Sucursal</label>
                                 <div class="input-icon">
-                                    <i class="bi bi-geo-alt"></i>
-                                    <InputSelect @bind-Value="Input.Id_persona" class="form-control">
+                                    <i class="bi bi-person-fill"></i>
+                                    <select @bind="Input.Id_persona" class="form-control">
                                         <option value=""> -- Seleccione --</option>
                                         @if (PersonaCombo is not null)
                                             {
@@ -66,8 +68,8 @@
                                                     <option value="@item.Id_persona"> @($"{item?.Nombre ?? ""} {item?.Apellido ?? ""}") </option>
                                                     }
                                             }
-                                    </InputSelect>
-                                    <ValidationMessage For="() => Input.Estado_sucursal" />
+                                    </select>
+                                    <ValidationMessage For="() => Input.Id_persona" />
 
                                 </div>
                             </div>
@@ -75,8 +77,8 @@
                             <div class="form-group mt-3">
                                 <label>Informacion</label>
                                 <div class="input-icon">
-                                    <i class="bi bi-geo-alt"></i>
-                                    <InputTextArea class="form-control" @bind-Value="Input.Informacion_sucursal" rows="4" />
+                                    <i class="bi bi-info-circle"></i>
+                                    <textarea class="form-control" @bind="Input.Informacion_sucursal" rows="4" />
                                     
                                 </div>
                             </div>
@@ -85,13 +87,13 @@
                                     <label>Estado</label>
                                     <div class="input-icon">
                                         <i class="bi bi-toggle-on"></i>
-                                        <InputSelect @bind-Value="Input.Estado_sucursal" class="form-control">
+                                        <select @bind="Input.Estado_sucursal" class="form-control">
                                             <option value=""> -- Seleccione --</option>
                                             @foreach (var item in items)
                                             {
                                                 <option value="@item.Id">@item.Text</option>
                                             }
-                                        </InputSelect>
+                                        </select>
                                         <ValidationMessage For="() => Input.Estado_sucursal" />
                                     </div>
                                 </div>
@@ -152,7 +154,7 @@
                                     <label>Ciudad</label>
                                     <div class="input-icon">
                                         <i class="bi bi-buildings"></i>
-                                        <select class="form-control" @bind="sucursal.Id_ciudad">
+                                        <select class="form-control" @bind="sucursal!.Id_ciudad">
                                             <option value="">Seleccione Ciudad</option>
                                             @if (cities is not null)
                                             {
@@ -169,7 +171,7 @@
                                     <label>CAP</label>
                                     <div class="input-icon">
                                         <i class="bi bi-mailbox2"></i>
-                                        <InputText class="form-control" @bind-Value="Input.Cap_sucursal" />
+                                        <input class="form-control" @bind="Input.Cap_sucursal" />
                                         <ValidationMessage For="() => Input.Cap_sucursal" />
                                     </div>
                                 </div>
@@ -180,7 +182,7 @@
                                 <label>Dirección</label>
                                 <div class="input-icon">
                                     <i class="bi bi-geo-alt"></i>
-                                    <InputText class="form-control" @bind-Value="Input.Direccion_sucursal" />
+                                    <input class="form-control" @bind="Input.Direccion_sucursal" />
                                     <ValidationMessage For="() => Input.Direccion_sucursal" />
                                 </div>
                             </div>
@@ -190,14 +192,15 @@
                                     <label>Teléfono</label>
                                     <div class="input-icon">
                                         <i class="bi bi-telephone"></i>
-                                        <InputText class="form-control" @bind-Value="Input.Telefono" />
+                                        <input class="form-control" @bind="Input.Telefono" />
+                                                <ValidationMessage For="() => Input.Telefono" />
                                     </div>
                                 </div>
                                 <div class="form-group col-md-6">
                                     <label>Telefono Secundario</label>
                                     <div class="input-icon">
                                         <i class="bi bi-telephone-plus"></i>
-                                        <InputText class="form-control" @bind-Value="Input.Telefono_secundario" />
+                                        <input class="form-control" @bind="Input.Telefono_secundario" />
 
                                     </div>
                                 </div>
@@ -208,14 +211,15 @@
                                     <label>Horario Atencion</label>
                                     <div class="input-icon">
                                         <i class="bi bi-globe2"></i>
-                                        <InputText class="form-control" @bind-Value="Input.Horario_atencion" />
+                                        <input class="form-control" @bind="Input.Horario_atencion" />
                                     </div>
                                 </div>
                                 <div class="form-group col-md-6">
                                     <label>Email</label>
                                     <div class="input-icon">
                                         <i class="bi bi-envelope"></i>
-                                        <InputText class="form-control" @bind-Value="Input.Email" />
+                                        <input class="form-control" @bind="Input.Email" />
+                                       <ValidationMessage For="() => Input.Email" />
                                     </div>
                                 </div>
                             </div>
@@ -229,7 +233,7 @@
 
             <!-- Botones -->
             <div class="text-center mt-4">
-                <button type="submit" class="btn btn-success btn-custom me-2">
+                        <button type="submit" class="btn btn-primary btn-custom me-2">
                     <i class="bi bi-save"></i> @SubmitButtonText
                 </button>
                 <button type="button" class="btn btn-outline-secondary btn-custom" @onclick="Cancelar">
@@ -239,7 +243,8 @@
         </div>
     </EditForm>
 </div>
-
+    </div>
+</div>
 @code {
 
     [CascadingParameter] BlazoredModalInstance Modal { get; set; } = default!;

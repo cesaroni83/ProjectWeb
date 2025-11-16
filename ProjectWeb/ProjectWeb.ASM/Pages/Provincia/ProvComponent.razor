@@ -5,81 +5,84 @@
 @inject ToastService ToastService
 @inject SweetAlertService sweetAlertService
 @inject IRepository repository
-<div class="row justify-content-center">
-    <Card style="width:90%; height:auto; margin:50px">
-        <CardHeader class="text-center fs-4">
-            @Titulo
-        </CardHeader>
-        <CardBody>
-            <EditForm Model="Input" OnValidSubmit="SubmitForm">
-                <DataAnnotationsValidator />
-                <div class="container">
-                    <!-- Pais -->
-                    <div class="form-group row mb-3">
-                        <div class="col-4">
-                            <label>Nombre País:</label>
-                        </div>
-                        <div class="col-7">
-                            <div class="input-group select-with-icon">
-                                <span class="input-group-text">
-                                    <i class="fas fa-globe"></i>
-                                </span>
-                                <select class="form-select" @onchange="CountryChangedAsync"  >
-                                    <option value="">Seleccione un país</option>
-                                    @if (countries is not null)
-                                    {
-                                        @foreach (var country in countries)
-                                        {
-                                            <option value="@country.Id_pais" selected="@(country.Id_pais ==Input!.Id_pais)">@country.Nombre_pais</option>
-                                        }
-                                    }
-                                </select>
-                            </div>
-                        </div>
-                    </div>
+<div class="principal">
+    <div class="formulario">
 
-                    <!-- Nombre -->
-                    <div class="form-group row mb-3">
-                        <div class="col-4"><label>Nombre Provincia :</label></div>
-                        <div class="col-7">
-                            <InputText @bind-Value="Input.Nombre_provincia" class="form-control" placeholder="Nombre Provincia" />
-                            <ValidationMessage For="() => Input.Nombre_provincia" />
-                        </div>
-                    </div>
+        <!-- Título -->
+        <div class="form-panel">
+            <h2 class ="form-title"><i class="bi bi-ui-checks-grid"></i>@Titulo</h2>
+        </div>
 
-                    <!-- Información -->
-                    <div class="form-group row mb-3">
-                        <div class="col-4"><label>Información :</label></div>
-                        <div class="col-7">
-                            <InputTextArea @bind-Value="Input.Informacion_provincia" class="form-control" Rows="4" />
-                        </div>
-                    </div>
-                    <!-- Estado -->
-                    <div class="form-group row mb-3">
-                        <div class="col-4"><label>Estado :</label></div>
-                        <div class="col-7">
-                            <InputSelect @bind-Value="Input.Estado_provincia" class="form-control">
-                                <option value="">Seleccione</option>
-                                @foreach (var item in items)
+        <EditForm Model="Input" OnValidSubmit="SubmitForm">
+            <DataAnnotationsValidator />
+
+            <div class="form-wrapper">
+
+                <!-- País -->
+                <div class="form-group">
+                    <label>Nombre País:</label>
+                    <div class="input-icon">
+                        <span class="icon"><i class="fas fa-globe"></i></span>
+                        <select class="form-control" @onchange="CountryChangedAsync">
+                            <option value="">Seleccione un país</option>
+                            @if (countries is not null)
+                            {
+                                @foreach (var country in countries)
                                 {
-                                    <option value="@item.Id">@item.Text</option>
+                                    <option value="@country.Id_pais">@country.Nombre_pais</option>
                                 }
-                            </InputSelect>
-                        </div>
-                    </div>
-                    <!-- Botones -->
-                    <div class="form-group row">
-                        <div class="col-4"></div>
-                        <div class="col-7 d-flex justify-content-center gap-3">
-                            <button type="submit" class="btn btn-primary">@SubmitButtonText</button>
-                            <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
-                        </div>
+                            }
+                        </select>
                     </div>
                 </div>
-            </EditForm>
 
-        </CardBody>
-    </Card>
+                <!-- Nombre Provincia -->
+                <div class="form-group">
+                    <label>Nombre Provincia:</label>
+                    <div class="input-icon">
+                        <span class="icon"><i class="fas fa-city"></i></span>
+                        <input type="text" class="form-control" placeholder="Nombre Provincia" @bind="Input.Nombre_provincia" />
+                    </div>
+                    <ValidationMessage For="() => Input.Nombre_provincia" />
+                </div>
+
+                <!-- Información -->
+                <div class="form-group" style="flex:1 1 100%">
+                    <label>Información:</label>
+                    <div class="input-icon">
+                        <span class="icon"><i class="fas fa-info-circle"></i></span>
+                        <textarea class="form-control"
+                                  rows="4"
+                                  placeholder="Ingrese información"
+                                  @bind="Input.Informacion_provincia"></textarea>
+                    </div>
+                </div>
+
+                <!-- Estado -->
+                <div class="form-group">
+                    <label>Estado:</label>
+                    <div class="input-icon">
+                        <span class="icon"><i class="fas fa-list"></i></span>
+                        <select class="form-control" @bind="Input.Estado_provincia">
+                            <option value="">Seleccione</option>
+                            @foreach (var item in items)
+                            {
+                                <option value="@item.Id">@item.Text</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <div class="buttons-container">
+                    <button type="submit" class="btn btn-primary">@SubmitButtonText</button>
+                    <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+                </div>
+
+            </div>
+        </EditForm>
+
+    </div>
 </div>
 
 @code {

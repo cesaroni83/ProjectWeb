@@ -1,10 +1,12 @@
 ﻿@page "/ListUsers"
+@using Microsoft.AspNetCore.Authorization
 @using ProjectWeb.ASM.Repositorio
 @using ProjectWeb.Shared.Modelo.DTO.User
 @using ProjectWeb.Shared.Modelo.Estatico
 @inject NavigationManager navigationManager
 @inject SweetAlertService sweetAlertService
 @inject IRepository repository
+@attribute [Authorize(Roles = "Admin")]
 
 <PageTitle>Usuarios</PageTitle>
 <ConfirmDialog @ref="dialog" />
@@ -54,7 +56,7 @@
                         @context.Address
                     </GridColumn>
                     <GridColumn  TItem="UsersDTO" HeaderText="Phone" HeaderTextAlignment="Alignment.Center" PropertyName="PhoneNumber" SortString="PhoneNumber" SortKeySelector="item => item.PhoneNumber" FilterTextboxWidth="200" TextAlignment="Alignment.Start">
-                        @context.Address
+                        @context.PhoneNumber
                     </GridColumn>
                     <GridColumn  TItem="UsersDTO" HeaderText="User Type" PropertyName="UserType" HeaderTextAlignment="Alignment.Center" SortString="UserType" SortKeySelector="item => item.UserType.ToString()" FilterTextboxWidth="100" TextAlignment="Alignment.Start">
                         @context.UserType.ToString()
@@ -158,6 +160,8 @@
         Input.Address = args.Item.Address;
         Input.UserType = args.Item.UserType;
         Input.LockoutEnabled = args.Item.LockoutEnabled;
+        Input.PhoneNumber = args.Item.PhoneNumber;
+
         return;
     }
     

@@ -1,4 +1,5 @@
 ﻿@page "/ListSucursal/{IdEmpresa:int}/{EmpresaName}"
+@using Microsoft.AspNetCore.Authorization
 @using ProjectWeb.ASM.Repositorio
 @using ProjectWeb.Shared.Modelo.DTO.Sucursal
 @using ProjectWeb.Shared.Modelo.Estatico
@@ -7,6 +8,8 @@
 @inject NavigationManager navigationManager
 @inject SweetAlertService sweetAlertService
 @inject IRepository repository
+@attribute [Authorize(Roles = "Admin")]
+
 <PageTitle>Sucursal</PageTitle>
 <ConfirmDialog @ref="dialog" />
 

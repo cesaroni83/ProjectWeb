@@ -187,9 +187,6 @@ namespace ProjectWeb.API.Helper.Implementacion
 
             return user;
         }
-
-        
-
         public async Task<UsersDTO> GetUser(string Email)
         {
             var user = await _context.Users

@@ -43,7 +43,7 @@ namespace ProjectWeb.Shared.Modelo.Entidades
 
         [Display(Name = "Telefono Secundario")]
         [MaxLength(20, ErrorMessage = "El Campo {0} no puede mas de {2} Caracteres")]
-        public string Telefono_secundario { get; set; } = string.Empty;
+        public string? Telefono_secundario { get; set; } = string.Empty;
 
         [Display(Name = "Email")]
         [Required(ErrorMessage = "El Campo {0} es Obligatorio!")]
@@ -58,12 +58,12 @@ namespace ProjectWeb.Shared.Modelo.Entidades
 
         [Display(Name = "Horario Atencion")]
         [MaxLength(100, ErrorMessage = "El Campo {0} no puede mas de {1} Caracteres")]
-        public string Horario_atencion { get; set; } = null!;
+        public string? Horario_atencion { get; set; } = null!;
 
 
         [Display(Name = "Informacion Sucursal")]
         [MaxLength(100, ErrorMessage = "El Campo {0} no puede mas de {1} Caracteres")]
-        public string Informacion_sucursal { get; set; } = string.Empty;
+        public string? Informacion_sucursal { get; set; } = string.Empty;
 
         [Display(Name = "Fecha De Registro")]
         public DateTime Date_reg { get; set; } = DateTime.Now;

@@ -32,6 +32,30 @@ namespace ProjectWeb.API.Data
             await CheckUserAsync("Juana", "Pineda", "juana@hotmail.it", "322 311 4620", "Calle Luna Calle Sol", "", "Milagro", UserType.Employee);
             await CheckUserAsync( "Cesar Armando", "Morocho Pucuna", "cesarmop83@gmail.com", "3483304971", "Via Mascagni 6", "", "Milan",UserType.Admin);
             //await CheckUserAsync( "Christian", "Avila", "avila@hotmail.it", "322 311 4620", "Calle Luna Calle Sol", "", UserType.User);
+            await CreateMenu();
+        }
+        private async Task CreateMenu()
+        {
+            if (!_context.Tbl_Menu.Any())
+            {
+                // 1. Menús padres
+                var menuHome = new Menu { Descripcion = "Home", Referencia = "/", Icono_name = "1", Icono_color = "1", Estado_menu = "A" };
+                var menuDashboard = new Menu { Descripcion = "DashBoard", Referencia = "/DashBoard", Icono_name = "95", Icono_color = "1", Estado_menu = "A" };
+                var menuMantenimiento = new Menu { Descripcion = "Mantenimiento", Referencia = "#", Icono_name = "5", Icono_color = "1", Estado_menu = "A" };
+                var menuAdmin = new Menu { Descripcion = "Admin", Referencia = "#", Icono_name = "2", Icono_color = "1", Estado_menu = "A" };
+                var menuAuthentication = new Menu { Descripcion = "Authentication", Referencia = "#", Icono_name = "18", Icono_color = "1", Estado_menu = "A" };
+                _context.Tbl_Menu.AddRange(menuHome, menuDashboard, menuMantenimiento, menuAdmin, menuAuthentication);
+                await _context.SaveChangesAsync(); // Aquí se generan los IDs
+
+                // 2. Menús hijos usando los IDs generados
+                var menuPaises = new Menu { Descripcion = "Paises", Referencia = "/ListPaises",  Icono_name="92",Icono_color = "1", Id_parend = menuMantenimiento.Id_menu.ToString(), Estado_menu = "A" };
+                var menuEmpresa = new Menu { Descripcion = "Empresa", Referencia = "/ListEmpresa", Icono_name = "94",Icono_color = "1", Id_parend = menuMantenimiento.Id_menu.ToString(), Estado_menu = "A" };
+                var menuMenu = new Menu { Descripcion = "Menu", Referencia = "/ListMenu", Icono_name = "93", Icono_color = "1", Id_parend = menuMantenimiento.Id_menu.ToString(), Estado_menu = "A" };
+                var menuUser = new Menu { Descripcion = "User", Referencia = "/ListUsers", Icono_name = "87", Icono_color = "1", Id_parend = menuAdmin.Id_menu.ToString(), Estado_menu = "A" };
+                var menuLogout = new Menu { Descripcion = "Logout", Referencia = "/logout", Icono_name = "19", Icono_color = "1", Id_parend = menuAuthentication.Id_menu.ToString(), Estado_menu = "A" };
+                _context.Tbl_Menu.AddRange(menuPaises, menuEmpresa, menuMenu, menuUser, menuLogout);
+                await _context.SaveChangesAsync();
+            }
         }
         private async Task CheckPaisAsync()
         {
@@ -122,111 +146,6 @@ namespace ProjectWeb.API.Data
 
             return user;
         }
-
-        //private async Task CheckCountriesAsync()
-        //{
-        //    if (!_context.Tbl_Pais.Any())
-        //    {
-        //        Response responseCountries = await _apiService.GetListAsync<CountryResponse>("/v1", "/countries");
-        //        if (responseCountries.IsSuccess)
-        //        {
-        //            List<CountryResponse> countries = (List<CountryResponse>)responseCountries.Result!;
-        //            foreach (CountryResponse countryResponse in countries)
-        //            {
-        //                // Verifica si el país ya existe en la base de datos
-        //                var existingCountry = await _context.Tbl_Pais
-        //                    .Include(p => p.Provincias!)
-        //                    .ThenInclude(pr => pr.Ciudades)
-        //                    .FirstOrDefaultAsync(c => c.Nombre_pais == countryResponse.Name);
-
-        //                if (existingCountry == null)
-        //                {
-        //                    var country = new Pais
-        //                    {
-        //                        Nombre_pais = countryResponse.Name!,
-        //                        Informacion = "",
-        //                        Foto_pais = null,
-        //                        Estado_pais = "A",
-        //                        Provincias = new List<Provincia>()
-        //                    };
-
-        //                    Response responseStates = await _apiService.GetListAsync<StateResponse>("/v1", $"/countries/{countryResponse.Iso2}/states");
-        //                    if (responseStates.IsSuccess)
-        //                    {
-        //                        List<StateResponse> states = (List<StateResponse>)responseStates.Result!;
-        //                        foreach (StateResponse stateResponse in states)
-        //                        {
-        //                            // Verifica si la provincia ya existe
-        //                            var existingState = await _context.Tbl_Provincia
-        //                                .FirstOrDefaultAsync(s => s.Nombre_provincia == stateResponse.Name && s.Id_pais == country.Id_pais);
-
-        //                            if (existingState == null)
-        //                            {
-        //                                var state = new Provincia
-        //                                {
-        //                                    Nombre_provincia = stateResponse.Name!,
-        //                                    Informacion_provincia = "",
-        //                                    Estado_provincia = "A",
-        //                                    Ciudades = new List<Ciudad>()
-        //                                };
-
-        //                                Response responseCities = await _apiService.GetListAsync<CityResponse>("/v1", $"/countries/{countryResponse.Iso2}/states/{stateResponse.Iso2}/cities");
-        //                                if (responseCities.IsSuccess)
-        //                                {
-        //                                    List<CityResponse> cities = (List<CityResponse>)responseCities.Result!;
-        //                                    foreach (CityResponse cityResponse in cities)
-        //                                    {
-        //                                        if (cityResponse.Name == "Mosfellsbær" || cityResponse.Name == "Șăulița")
-        //                                            continue;
-
-        //                                        // Verifica si la ciudad ya existe en la BD
-        //                                        var existingCity = await _context.Tbl_Ciudad
-        //                                            .AsNoTracking()
-        //                                            .FirstOrDefaultAsync(c => c.Nombre_ciudad == cityResponse.Name);
-
-        //                                        if (existingCity == null)
-        //                                        {
-        //                                            state.Ciudades.Add(new Ciudad
-        //                                            {
-        //                                                Nombre_ciudad = cityResponse.Name!,
-        //                                                Informacion_ciudad = "",
-        //                                                Estado_ciudad = "A"
-        //                                            });
-        //                                        }
-        //                                    }
-        //                                }
-
-        //                                // Solo agrega la provincia si tiene ciudades
-        //                                if (state.Ciudades.Any())
-        //                                {
-        //                                    country.Provincias.Add(state);
-        //                                }
-        //                            }
-        //                        }
-        //                    }
-
-        //                    // Solo agrega el país si tiene provincias
-        //                    if (country.Provincias.Any())
-        //                    {
-        //                        _context.Tbl_Pais.Add(country);
-        //                    }
-        //                }
-        //            }
-
-        //            // ✅ Guardamos todos los cambios una sola vez, fuera del bucle
-        //            try
-        //            {
-        //                await _context.SaveChangesAsync();
-        //            }
-        //            catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx && sqlEx.Number == 2601)
-        //            {
-        //                // 2601 = Violación de índice único
-        //                Console.WriteLine($"⚠️ Ciudad duplicada ignorada: {sqlEx.Message}");
-        //            }
-        //        }
-        //    }
-        //}
-
         public async Task SeedPaisesAsync()
         {
             // 1️⃣ Verificar si ya hay datos

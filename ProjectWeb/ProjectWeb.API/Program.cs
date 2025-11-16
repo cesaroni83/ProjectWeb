@@ -200,6 +200,18 @@ builder.Services.AddAuthentication(options =>
 .AddScheme<AuthenticationSchemeOptions, GoogleAccessTokenAuthenticationHandler>(
     Constant.Scheme, "GoogleAccessToken",null);
 
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowBlazor",
+        policy =>
+        {
+            policy.WithOrigins("https://localhost:7188")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials(); // necesario si usas cookies o JWT
+        });
+});
 //-------------------- Build App --------------------//
 var app = builder.Build();
 
@@ -238,7 +250,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseCors("AllowBlazor"); // ✅ antes de auth
 app.UseAuthentication(); // Debe ir antes de Authorization
 app.UseAuthorization();
 
@@ -257,13 +269,13 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = "/UserImagen"
 });
 
-//-------------------- CORS --------------------//
-app.UseCors(x => x
-    .WithOrigins("https://localhost:7135")// ouerto di blazor
-    .AllowAnyMethod()
-    .AllowAnyHeader()
-    .SetIsOriginAllowed(origin => true)
-    .AllowCredentials());
+////-------------------- CORS --------------------//
+//app.UseCors(x => x
+//    .WithOrigins("https://localhost:7188")// puerto di blazor
+//    .AllowAnyMethod()
+//    .AllowAnyHeader()
+//    .SetIsOriginAllowed(origin => true)
+//    .AllowCredentials());
 
 //-------------------- Controllers --------------------//
 app.MapControllers();

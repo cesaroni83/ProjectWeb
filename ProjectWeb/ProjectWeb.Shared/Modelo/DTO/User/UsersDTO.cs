@@ -39,6 +39,6 @@ namespace ProjectWeb.Shared.Modelo.DTO.User
         [Display(Name = "Usuario")]
         public string FullName => $"{FirstName} {LastName}";
 
-        public string Passwords { get; set; } = null!;
+        public string? Passwords { get; set; } = null!;
     }
 }

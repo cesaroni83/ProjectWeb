@@ -4,70 +4,82 @@
 @inject ToastService ToastService
 @inject SweetAlertService sweetAlertService
 @inject IRepository repository
-<div class="row justify-content-center">
-    <Card style="width:90%; height:auto; margin:50px">
-        <CardHeader class="text-center fs-4">
-            @Titulo
-        </CardHeader>
-        <CardBody>
-            <EditForm Model="Input" OnValidSubmit="SubmitForm">
-                <DataAnnotationsValidator />
-                    <div class="container">
-                    <!-- Nombre -->
-                    <div class="form-group row mb-3">
-                        <div class="col-4"><label>Nombre Del Pais :</label></div>
-                        <div class="col-7">
-                            <InputText @bind-Value="Input.Nombre_pais" class="form-control" placeholder="Nombre del país" />
-                            <ValidationMessage For="() => Input.Nombre_pais" />
-                        </div>
-                    </div>
+<div class="principal">
+    <div class="formulario">
 
-                    <!-- Información -->
-                    <div class="form-group row mb-3">
-                        <div class="col-4"><label>Información :</label></div>
-                        <div class="col-7">
-                            <InputTextArea @bind-Value="Input.Informacion" class="form-control" Rows="4" />
-                        </div>
-                    </div>
+        <!-- Título -->
+        <div class="form-panel">
+            <h2 class="form-title"><i class="bi bi-ui-checks-grid"></i>@Titulo</h2>
+        </div>
 
-                    <!-- Foto -->
-                    <div class="form-group row mb-3">
-                        <div class="col-4"><label>Foto :</label></div>
-                        <div class="col-7">
-                            <Image Src="@previewUrl" IsThumbnail="true" Alt="placeholder" style="max-width:200px; border:1px solid #ccc;" />
-                            <br />
-                            <InputFile OnChange="CargarImagen" accept=".jpg,.jpeg,.png" />
-                        </div>
-                    </div>
+        <EditForm Model="Input" OnValidSubmit="SubmitForm">
+            <DataAnnotationsValidator />
 
-                    <!-- Estado -->
-                    <div class="form-group row mb-3">
-                        <div class="col-4"><label>Estado :</label></div>
-                        <div class="col-7">
-                            <InputSelect @bind-Value="Input.Estado_pais" class="form-control">
-                                <option value="">Seleccione</option>
-                                @foreach (var item in items)
-                                {
-                                    <option value="@item.Id">@item.Text</option>
-                                }
-                            </InputSelect>
-                        </div>
-                    </div>
+            <div class="form-wrapper">
 
-                    <!-- Botones -->
-                    <div class="form-group row">
-                        <div class="col-4"></div>
-                        <div class="col-7 d-flex justify-content-center gap-3">
-                            <button type="submit" class="btn btn-primary">@SubmitButtonText</button>
-                            <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
-                        </div>
+                <!-- Nombre del país -->
+                <div class="form-group">
+                    <label>Nombre del País:</label>
+                    <div class="input-icon">
+                        <span class="icon"><i class="fas fa-globe"></i></span>
+                        <input type="text"
+                               @bind="Input.Nombre_pais"
+                               class="form-control"
+                               placeholder="Ingrese nombre del país" />
+                    </div>
+                    <ValidationMessage For="() => Input.Nombre_pais" />
+                </div>
+
+                <!-- Información -->
+                <div class="form-group" style="flex:1 1 100%">
+                    <label>Información:</label>
+                    <div class="input-icon">
+                        <span class="icon"><i class="fas fa-info-circle"></i></span>
+                        <textarea @bind="Input.Informacion"
+                                  class="form-control"
+                                  rows="4"
+                                  placeholder="Ingrese información"></textarea>
                     </div>
                 </div>
-            </EditForm>
 
-        </CardBody>
-    </Card>
+                <!-- Imagen -->
+                <div class="form-group">
+                    <label>Foto:</label>
+                    <Image Src="@previewUrl"
+                           IsThumbnail="true"
+                           Alt="placeholder"
+                           style="max-width:200px; border:1px solid #ccc; border-radius:8px;" />
+                    <br />
+                    <InputFile OnChange="CargarImagen" accept=".jpg,.jpeg,.png" />
+                </div>
+
+                <!-- Estado -->
+                <div class="form-group">
+                    <label>Estado:</label>
+                    <div class="input-icon">
+                        <span class="icon"><i class="fas fa-list"></i></span>
+                        <select @bind="Input.Estado_pais" class="form-control">
+                            <option value="">Seleccione</option>
+                            @foreach (var item in items)
+                            {
+                                <option value="@item.Id">@item.Text</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <div class="buttons-container">
+                    <button type="submit" class="btn btn-primary">@SubmitButtonText</button>
+                    <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+                </div>
+
+            </div>
+        </EditForm>
+
+    </div>
 </div>
+
 
 @code {
     [CascadingParameter] BlazoredModalInstance Modal { get; set; } = default!;

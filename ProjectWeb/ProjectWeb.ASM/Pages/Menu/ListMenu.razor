@@ -2,6 +2,7 @@
 
 
 @using ClosedXML.Excel
+@using Microsoft.AspNetCore.Authorization
 @using ProjectWeb.ASM.Helper
 @using ProjectWeb.ASM.Repositorio
 @using ProjectWeb.Shared.Modelo.DTO.Menu
@@ -13,6 +14,7 @@
 @inject SweetAlertService sweetAlertService
 @inject IRepository repository
 @inject IJSRuntime JS
+@attribute [Authorize(Roles = "Admin")]
 
 <PageTitle>Menu</PageTitle>
 <ConfirmDialog @ref="dialog" />
@@ -54,7 +56,7 @@
                         @context.Informacion_menu
                     </GridColumn>
 
-                    <GridColumn TItem="MenuDTO" HeaderText="Icono">
+					<GridColumn TItem="MenuDTO" HeaderText="Icono" TextAlignment="Alignment.Center" HeaderTextAlignment="Alignment.Center">
                         <Icon Name="@IconColorHelper.ParseToIconName(Icono.GetTextIcono(context.Icono_name ?? string.Empty))"
                               Size="IconSize.x1"
                               Color="@IconColorHelper.ParseToIconColor(IconoColor.GetTextIconoColor(context.Icono_color ?? string.Empty))" />

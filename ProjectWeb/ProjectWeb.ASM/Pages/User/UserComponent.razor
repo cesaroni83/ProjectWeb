@@ -16,7 +16,7 @@
         <div class="form-wrapper" id="formWrapper">
             <div class="form-panel">
                 <div class="form-left-white w-100">
-                    <h2>@Titulo</h2>
+                    <h2 class="form-title"><i class="bi bi-ui-checks-grid"></i>@Titulo</h2>
                     <EditForm class="register-form row g-3" Model="Input" OnValidSubmit="SubmitForm">
                         <DataAnnotationsValidator />
                         <ValidationSummary></ValidationSummary>
@@ -124,10 +124,20 @@
                                                     <label class="form-label">Passwords</label>
                                                     <div class="input-group">
                                                         <span class="input-group-text"><i class="fas fa-key"></i></span>
-                                                        <input type="password"  required class="form-control" @bind-value="Input.Passwords" placeholder="Passwords" />
+                                                        <input type="password"  required class="form-control" @bind-value="Input.Passwords" placeholder="New Passwords" />
                                                     </div>
                                                 </div>                        
+                                            }else
+                                            {
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Passwords</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text"><i class="fas fa-key"></i></span>
+                                                        <input type="password" class="form-control" @bind-value="Input.Passwords" placeholder="Update Passwords" />
+                                                    </div>
+                                                </div>
                                             }
+
                                             <div class="col-md-6">
                                                 <label class="form-label">Tipo</label>
                                                 <div class="input-group">
@@ -160,10 +170,7 @@
                                                   
                                                 </div>
                                             </div>
-                                            <div class="col-12 d-flex justify-content-center gap-2 mt-3">
-                                                <button type="submit" class="btn btn-primary">@SubmitButtonText</button>
-                                                <button type="button" class="btn btn-secondary" @onclick="Cancelar" >Cancel</button>
-                                            </div>
+                                            
                                         </div>
                                     </div>
                                 </Content>
@@ -176,11 +183,14 @@
                                     <div class="upload-form text-center mt-3">
                                         <label for="profileImage" class="form-label fw-bold">Selecciona una imagen para tu perfil:</label>
                                         <InputImg Label="Foto" ImageSelected="ImageSelected" ImageURL="@imageUrl" />
-                                        @*  <button type="submit" class="btn btn-primary mt-3">Subir Imagen</button> *@
                                     </div>
                                 </Content>
                             </Tab>
                         </Tabs>
+                        <div class="col-12 d-flex justify-content-center gap-2 mt-3">
+                            <button type="submit" class="btn btn-primary">@SubmitButtonText</button>
+                            <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancel</button>
+                        </div>
                     </EditForm>
                 </div>
             </div>
@@ -202,7 +212,7 @@
     private List<UserType>? Types;
     private string Estados = "A";
     private string? imageUrl;
-    
+
 
     private UsersDTO? user { get; set; } = new UsersDTO
     {
@@ -243,6 +253,7 @@
 
     private async Task SubmitForm()
     {
+        Input.Photo = user!.Photo;
         if (SubmitButtonText == "Save")
         {
             var responseHttp = await repository.Post<UsersDTO>("/api/Accounts/CreateUserByAdmin", Input);
@@ -252,23 +263,23 @@
                 await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
                 return;
             }
-            ToastService.Notify(new(ToastType.Success, $"Record Sucursal Saved Successfully."));
+            ToastService.Notify(new(ToastType.Success, $"Record User Saved Successfully."));
             await Task.Delay(3000);
             await Modal.CloseAsync(ModalResult.Ok(Input));
             return;
         }
         if (SubmitButtonText == "Update")
         {
-            // var responseHttp = await repository.Put<UsersDTO>($"/api/Sucursales/{Input.Id_sucursal}", Input);
-            // if (responseHttp.Error)
-            // {
-            //     var message = await responseHttp.GetErrorMessageAsync();
-            //     await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
-            //     return;
-            // }
-            // ToastService.Notify(new(ToastType.Success, $"Record Sucursal Updated Successfully."));
-            // await Task.Delay(3000);
-            // await Modal.CloseAsync(ModalResult.Ok(Input));
+            var responseHttp = await repository.Put<UsersDTO>($"/api/Accounts/UpdateUserByAdmin", Input);
+            if (responseHttp.Error)
+            {
+                var message = await responseHttp.GetErrorMessageAsync();
+                await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                return;
+            }
+            ToastService.Notify(new(ToastType.Success, $"Record User Updated Successfully."));
+            await Task.Delay(3000);
+            await Modal.CloseAsync(ModalResult.Ok(Input));
             return;
         }
     }
@@ -303,8 +314,9 @@
                 await LoadCitiesAsyn(provinciaId.Value);
 
             // Copia InputDTO nell'Input usato nel form
+           
+            imageUrl = InputDTO.Photo;
             Input = InputDTO;
-            imageUrl = Input.Photo;
         }
         else
         {
