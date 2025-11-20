@@ -20,7 +20,7 @@
 <PageTitle>Profile Persona</PageTitle>
 <ConfirmDialog @ref="dialog" />
 
-<div class="page-wrapper">
+@* <div class="page-wrapper">
     <EditForm Model="@Input" OnValidSubmit="Guardar">
         <DataAnnotationsValidator />
         <div class="form-card">
@@ -290,11 +290,11 @@
                                     </div>
                                 </div>
                                 <div class="form-group col-md-6">
-                                    @* <label>Ocupación</label>
+                                     <label>Ocupación</label>
                                     <div class="input-icon">
                                         <i class="bi bi-briefcase"></i>
                                         <InputText class="form-control" @bind-Value="Input.Ocupacion" />
-                                    </div> *@
+                                    </div> 
                                 </div>
                             </div>
                         </div>
@@ -314,6 +314,300 @@
         </div>
     </EditForm>
 </div>
+ *@
+ <div class="principal">
+    <div class="login-register-container">
+        <div class="page-wrapper">
+            <EditForm Model="@Input" OnValidSubmit="Guardar">
+                <DataAnnotationsValidator />
+                <ValidationSummary></ValidationSummary>
+                <div class="form-card">
+                    <!-- Título del formulario -->
+                    <h2 class="form-title"><i class="bi bi-ui-checks-grid"></i> Profile Del Usuario</h2>
+
+                    <!-- Tabs -->
+                    <Tabs EnableFadeEffect="true" id="formTab" class="tab-content active">
+                        <!-- TAB 1: Datos Personales -->
+                        <Tab Title="Datos Personales" Active="true">
+                            <Content>
+                                <div class="tab-content-inner">
+                                    <!-- Previsualización Imagen -->
+                                    <div class="img-preview-container">
+                                        <img src="@ImagePrev" class="img-preview" />
+                                        <i class="bi bi-camera icon-overlay"></i>
+                                    </div>
+                                    <InputFile OnChange="OnInputFileChange" class="mb-3" />
+
+                                    <!-- Fila 1: Nombre y Apellido -->
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label>Nombre</label>
+                                            <div class="input-icon">
+                                                <i class="bi bi-person"></i>
+                                                <input class="form-control" @bind="Input.Nombre" />
+                                            </div>
+                                            <ValidationMessage For="() => Input.Nombre" />
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label>Apellido</label>
+                                            <div class="input-icon">
+                                                <i class="bi bi-person"></i>
+                                                <input class="form-control" @bind="Input.Apellido" />
+                                            </div>
+                                            <ValidationMessage For="() => Input.Apellido" />
+                                        </div>
+                                    </div>
+
+                                    <!-- Fila 2: Tipo y Número Documento -->
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label>Tipo Documento</label>
+                                            <div class="input-icon">
+                                                <i class="bi bi-person-vcard"></i>
+                                                <select @bind="Input.Tipo_documento" class="form-control">
+                                                    <option value="">-- Seleccione --</option>
+                                                    @foreach (var item in TipoDocumento)
+                                                    {
+                                                        <option value="@item.Id">@item.Nombre</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <ValidationMessage For="() => Input.Tipo_documento" />
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label>Numero Documento</label>
+                                            <div class="input-icon">
+                                                <i class="bi bi-person-badge"></i>
+                                                <input class="form-control" @bind="Input.Numero_documento" />
+                                            </div>
+                                            <ValidationMessage For="() => Input.Numero_documento" />
+                                        </div>
+                                    </div>
+
+                                    <!-- Fila 3: Nacionalidad y Fecha Nacimiento -->
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label>Nacionalidad</label>
+                                            <div class="input-icon">
+                                                <i class="bi bi-flag"></i>
+                                                <input class="form-control" @bind="Input.Nacionalidad" />
+                                            </div>
+                                            <ValidationMessage For="() => Input.Nacionalidad" />
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label>Fecha Nacimiento</label>
+                                            <div class="input-icon">
+                                                <i class="bi bi-calendar"></i>
+                                                <input type="date" class="form-control" @bind="Input.Date_nacimiento" />
+                                            </div>
+                                            <ValidationMessage For="() => Input.Date_nacimiento" />
+                                        </div>
+                                    </div>
+
+                                    <!-- Fila 4: Género y Estado Civil -->
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>Género</label>
+                                            <div class="input-icon">
+                                                <i class="bi bi-gender-ambiguous"></i>
+                                                <select @bind="Input.Genero" class="form-control">
+                                                    <option value="">-- Seleccione --</option>
+                                                    @foreach (var item in Generos)
+                                                    {
+                                                        <option value="@item.Id">@item.Text</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <ValidationMessage For="() => Input.Genero" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Estado Civil</label>
+                                            <div class="input-icon">
+                                                <i class="bi bi-person-lines-fill"></i>
+                                                <select @bind="Input.Estado_civil" class="form-control">
+                                                    <option value="">-- Seleccione --</option>
+                                                    @foreach (var item in EstadoCivil)
+                                                    {
+                                                        <option value="@item.Id">@item.Text</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <ValidationMessage For="() => Input.Estado_civil" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </Content>
+                        </Tab>
+
+                        <!-- TAB 2: Contacto -->
+                        <Tab Title="Contacto">
+                            <Content>
+                                <div class="tab-content-inner">
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label>Pais</label>
+                                            <div class="input-icon">
+                                                <i class="bi bi-globe"></i>
+                                                <select class="form-select" @onchange="CountryChangedAsync">
+                                                    <option value="">-- Seleccione --</option>
+                                                    @if (countries is not null)
+                                                    {
+                                                        @foreach (var country in countries)
+                                                        {
+                                                            <option value="@country.Id_pais" selected="@(country.Id_pais == user.Ciudades!.Provincias!.Paises!.Id_pais)">@country.Nombre_pais</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label>Provincia</label>
+                                            <div class="input-icon">
+                                                <i class="bi bi-flag"></i>
+                                                <select class="form-select" @onchange="StateChangedAsync">
+                                                    <option value="">-- Seleccione --</option>
+                                                    @if (states is not null)
+                                                    {
+                                                        @foreach (var state in states)
+                                                        {
+                                                            <option value="@state.Id_provincia" selected="@(state.Id_provincia == user.Ciudades!.Provincias!.Id_provincia)">@state.Nombre_provincia</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label>Ciudad</label>
+                                            <div class="input-icon">
+                                                <i class="bi bi-buildings"></i>
+                                                <select class="form-select" @bind="user.Id_ciudad">
+                                                    <option value="">Seleccione Ciudad</option>
+                                                    @if (cities is not null)
+                                                    {
+                                                        @foreach (var city in cities)
+                                                        {
+                                                            <option value="@city.Id_ciudad" selected="@(city.Id_ciudad == user.Ciudades!.Id_ciudad)">@city.Nombre_ciudad </option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                            <ValidationMessage For="() => Input.Id_ciudad" />
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label>CAP</label>
+                                            <div class="input-icon">
+                                                <i class="bi bi-mailbox"></i>
+                                                <input class="form-control" @binde="Input.Cap_persona" />
+                                            </div>
+                                            <ValidationMessage For="() => Input.Cap_persona" />
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group mt-3">
+                                        <label>Dirección</label>
+                                        <div class="input-icon">
+                                            <i class="bi bi-geo-alt"></i>
+                                            <input class="form-control" @bind="Input.Direccion_persona" />
+                                        </div>
+                                        <ValidationMessage For="() => Input.Direccion_persona" />
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label>Teléfono</label>
+                                            <div class="input-icon">
+                                                <i class="bi bi-telephone"></i>
+                                                <input class="form-control" @bind="Input.Telefono" />
+                                            </div>
+                                            <ValidationMessage For="() => Input.Telefono" />
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label>Email</label>
+                                            <div class="input-icon">
+                                                <i class="bi bi-envelope"></i>
+                                                <input class="form-control" disabled="disabled" @bind="Input.Email" />
+                                            </div>
+                                            <ValidationMessage For="() => Input.Email" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </Content>
+                        </Tab>
+
+                        <!-- TAB 3: Educación -->
+                        <Tab Title="Educación">
+                            <Content>
+                                <div class="tab-content-inner">
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label>Nivel Estudio</label>
+                                            <div class="input-icon">
+                                                <i class="bi bi-mortarboard"></i>
+                                                <select @bind="Input.Nivel_estudio" class="form-control">
+                                                    <option value="">-- Seleccione --</option>
+                                                    @foreach (var item in NivelEstudio)
+                                                    {
+                                                        <option value="@item.Id">@item.Nombre</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <ValidationMessage For="() => Input.Nivel_estudio" />
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label>Ocupación</label>
+                                            <div class="input-icon">
+                                                <i class="bi bi-briefcase"></i>
+                                                <input class="form-control" @bind="Input.Ocupacion" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group mt-3">
+                                        <label>Información Personal</label>
+                                        <div class="input-icon">
+                                            <i class="bi bi-chat-text"></i>
+                                            <textarea class="form-control" @bind="Input.Informacion" rows="4" />
+                                        </div>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label>Estado</label>
+                                            <div class="input-icon">
+                                                <i class="bi bi-check2-circle"></i>
+                                                <select @bind="Input.Estado_persona" class="form-control">
+                                                    <option value=""> -- Seleccione --</option>
+                                                    @foreach (var item in items)
+                                                    {
+                                                        <option value="@item.Id">@item.Text</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <ValidationMessage For="() => Input.Estado_persona" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </Content>
+                        </Tab>
+                    </Tabs>
+
+                    <!-- Botones -->
+                    <div class="buttons-container">
+                        <button type="submit" class="btn btn-success btn-custom">
+                            Save
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-custom" @onclick="Cancelar">
+                             Cancel
+                        </button>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+ </div>
 
 @code {
     private ConfirmDialog dialog = default!;
@@ -331,6 +625,7 @@
     private List<CiudadDropDTO>? cities;
     private User? user { set; get; } = new User();
     private string Estados ="A";
+    [CascadingParameter] BlazoredModalInstance Modal { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -462,9 +757,10 @@
         await SaveUserAsync();
         //**********************/
         ToastService.Notify(new(ToastType.Success, $"Record Profile Saved Successfully."));
-        
+        await Task.Delay(3000);
         PreloadService.Hide();
-
+        await Modal.CloseAsync(ModalResult.Ok());
+        navigationManager.NavigateTo("/");
     }
 
     private string? ObtenerImagen(byte[]? bytes)
@@ -494,5 +790,10 @@
 
         await loginService.LoginAsync(responseHttp.Response!.Token);
         navigationManager.NavigateTo("/");
+    }
+
+    private async Task Cancelar()
+    {
+        await Modal.CancelAsync();
     }
 }

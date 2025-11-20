@@ -80,7 +80,7 @@ namespace ProjectWeb.Shared.Modelo.DTO.Persona
         public string Direccion_persona { get; set; } = null!;
 
         [Display(Name = "Telefono")]
-        //[Required(ErrorMessage = "El Campo {0} es Obligatorio!")]
+        [Required(ErrorMessage = "El Campo {0} es Obligatorio!")]
         [MaxLength(20, ErrorMessage = "El Campo {0} no puede mas de {2} Caracteres")]
         public string Telefono { get; set; } = null!;
 

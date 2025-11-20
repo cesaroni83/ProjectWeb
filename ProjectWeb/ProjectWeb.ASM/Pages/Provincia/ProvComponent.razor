@@ -5,6 +5,7 @@
 @inject ToastService ToastService
 @inject SweetAlertService sweetAlertService
 @inject IRepository repository
+
 <div class="principal">
     <div class="formulario">
 
@@ -15,7 +16,7 @@
 
         <EditForm Model="Input" OnValidSubmit="SubmitForm">
             <DataAnnotationsValidator />
-
+            <ValidationSummary></ValidationSummary>
             <div class="form-wrapper">
 
                 <!-- País -->
@@ -34,6 +35,7 @@
                             }
                         </select>
                     </div>
+                    <ValidationMessage For="() => Input.Id_pais" />
                 </div>
 
                 <!-- Nombre Provincia -->
@@ -71,6 +73,7 @@
                             }
                         </select>
                     </div>
+                    <ValidationMessage For="() => Input.Estado_provincia" />
                 </div>
 
                 <!-- Botones -->

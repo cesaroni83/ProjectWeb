@@ -1,23 +1,22 @@
-﻿ <AuthorizeView>
+﻿@using Pages.Auth;
+@using Pages.Persona;
+<AuthorizeView>
 	<Authorized>
-		
-		<span>Hola, </span>
+		<span>Hola,</span>
 		@if (!string.IsNullOrEmpty(photoUser))
 		{
-			<Image src="@photoUser" Alt="placeholder" width="50" height="50" style="border-radius:50%;" />
-			
+			<Image src="@photoUser" Alt="placeholder" Class="img-pequena"/>
 		}
-		<Dropdown  Size="DropdownSize.Large">
-			<DropdownToggleButton><span>@context.User.Identity!.Name</span></DropdownToggleButton>
+		<Dropdown Size="DropdownSize.Large">
+			<DropdownToggleButton><span style="font-size:1.2rem">@context.User.Identity!.Name</span></DropdownToggleButton>
 			<DropdownMenu>
-				<DropdownItem To="/EditUser" Type="DropdownItemType.Link">Setting</DropdownItem>
-				<DropdownItem To="/Profilo" Type="DropdownItemType.Link">Profile</DropdownItem>
+				<DropdownItem To="/EditUser" Type="DropdownItemType.Link" @onclick=@(() => ShowModal(true))>Setting</DropdownItem>
+				<DropdownItem To="/Profilo" Type="DropdownItemType.Link" @onclick=@(() => ShowModal(false))>Profile</DropdownItem>
 				<DropdownItem To="/ChangePassword" Type="DropdownItemType.Link">Cambio Password</DropdownItem>
 				<DropdownDivider>Dropdown header</DropdownDivider>
 				<DropdownItem To="/Logout" Type="DropdownItemType.Link">Logout</DropdownItem>
 			</DropdownMenu>
-		</Dropdown>
-				<a href="/Logout" class="nav-link btn btn-link">Logout</a>
+		</Dropdown> 
 	</Authorized>
 	<NotAuthorized>
 		<a href="/Login" class="nav-link btn btn-link">Login</a>
@@ -25,6 +24,9 @@
 </AuthorizeView>
 @code {
 	private string? photoUser;
+
+	[CascadingParameter]
+	IModalService Modal { get; set; } = default!;
 
 	[CascadingParameter]
 	private Task<AuthenticationState> authenticationStateTask { get; set; } = null!;
@@ -37,12 +39,32 @@
 		var photoClaim = claims.FirstOrDefault(x => x.Type == "Photo");
 		if (photoClaim is not null)
 		{
-			//photoUser = photoClaim.Value;
 			photoUser = photoClaim.Value;
 			StateHasChanged(); // fuerza renderizado con la foto
 		}
 	}
-	
-} 
- 
 
+	private async Task ShowModal(bool isEdit = true)
+
+	{
+		IModalReference modalReference;
+
+		var options = new ModalOptions
+		{
+			Class = "modal-lg",
+		};
+		if (isEdit)
+		{
+
+			var parameters = new ModalParameters();
+			modalReference = Modal.Show<EditUser>(parameters, options);
+		}
+		else
+		{
+			var parameters = new ModalParameters();
+			modalReference = Modal.Show<Persona>(parameters, options);
+		}
+		
+	}
+	
+}

@@ -19,7 +19,7 @@
             </CardHeader>
             <CardBody>
                 <Grid TItem="UsersDTO"
-                      Class="table table-hover table-bordered"
+                      Class="table table-hover table-bordered grid-table"
                       FiltersRowCssClass="bg-primary text-white bg-opacity-25 border-bottom-0"
                       HeaderRowCssClass="bg-primary text-white border-bottom-0"
                       DataProvider="UsersDataProvider"
@@ -36,7 +36,7 @@
                     </GridTemplates>
                     <GridColumn TItem="UsersDTO" HeaderText="Foto" FilterTextboxWidth="50" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
                         <div class="text-center">
-                            <Image Src="@context.Photo" Class="rounded" Alt="placeholder" style="width:50px; height:auto;" />
+                            <Image Src="@context.Photo" Class="rounded img-pequena" Alt="placeholder" />
                         </div>
                     </GridColumn>
 
@@ -64,8 +64,8 @@
                     <GridColumn  TItem="UsersDTO" HeaderText="Enabled" PropertyName="LockoutEnabled" HeaderTextAlignment="Alignment.Center" SortString="LockoutEnabled" SortKeySelector="item => item.LockoutEnabled" FilterTextboxWidth="200" TextAlignment="Alignment.Start">
                         @context.LockoutEnabled
                     </GridColumn>
-                    <GridColumn TItem="UsersDTO" HeaderText="Acción" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" Filterable="false" FilterTextboxWidth="200">
-                        <div class="d-flex justify-content-end gap-2" style="width:150px;">
+                    <GridColumn TItem="UsersDTO" HeaderText="Acción" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" Filterable="false" FilterTextboxWidth="250">
+                        <div class="btn-action-column">
                             <button class="btn btn-success btn-sm" @onclick=@(() => ShowModal(context.Email!, true))>Update</button>
                             <button class="btn btn-danger btn-sm" @onclick="() => DeleteReg(context.Email!, context.FullName)">Lock</button>
                         </div>
@@ -73,7 +73,7 @@
                 </Grid>
             </CardBody>
             <CardFooter class="d-flex justify-content-end ">
-                <button class="btn btn-success" @onclick=@(() => ShowModal())>New User </button>
+                <button class="btn btn-primary" @onclick=@(() => ShowModal())>New User </button>
             </CardFooter>
         </Card>
     </div>

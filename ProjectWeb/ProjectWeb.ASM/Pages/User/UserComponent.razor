@@ -10,193 +10,429 @@
 @inject NavigationManager navigationManager
 
 
-<!-- Font Awesome -->
+@* <div class="principal">
+    <div class="login-register-container">
+        <div class="page-wrapper">
+            <EditForm class="register-form row g-3" Model="Input" OnValidSubmit="SubmitForm">
+                <DataAnnotationsValidator />
+                <div class="form-card">
+                    <h2 class="form-title"><i class="bi bi-ui-checks-grid"></i>@Titulo</h2>
+                    <Tabs EnableFadeEffect="true" id="formTab" class="tab-content active">
+                        <Tab Active="true">
+                            <TitleTemplate>
+                                <Icon Name="IconName.HouseFill" /> Edit User
+                            </TitleTemplate>
+                            <Content>
+                                <div class="tab-content active">
+                                    <!-- Contenedor de 2 columnas -->
+                                    <div class="form-row">
+                                        <!-- Formulario -->
+                                        <div class="form-group col-md-6">
+                                            <label class="form-label">Nombre</label>
+                                            <div class="input-icon">
+                                                <i class="fas fa-user"></i>
+                                                <input class="form-control" @bind-value="Input.FirstName" placeholder="Nombre" />
+                                                <ValidationMessage For="@(() => Input.FirstName)" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label class="form-label">Apellido</label>
+                                            <div class="input-icon">
+                                                <i class="fas fa-user"></i>
+                                                <input class="form-control" @bind-value="Input.LastName" placeholder="Apellido" />
+                                                <ValidationMessage For="@(() => Input.LastName)" />
+                                            </div>
+                                        </div>
+                                     </div> 
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label class="form-label">Teléfono</label>
+                                            <div class="input-icon">
+                                                <i class="fas fa-phone"></i>
+                                                <input type="tel" class="form-control" @bind-value="Input.PhoneNumber" placeholder="Teléfono" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label class="form-label">Pais</label>
+                                            <div class="input-icon">
+                                                <i class="fas fa-globe"></i>
+                                                <select class="form-select" @onchange="CountryChangedAsync">
+                                                    <option value="">Seleccione País</option>
+                                                    @if (countries is not null)
+                                                    {
+                                                        @foreach (var country in countries)
+                                                        {
+                                                            <option value="@country.Id_pais" selected="@(country.Id_pais == user.Ciudades!.Provincias!.Paises!.Id_pais)">@country.Nombre_pais</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label class="form-label">Provincia</label>
+                                            <div class="input-icon">
+                                                <i class="fas fa-map"></i>
+                                                <select class="form-select" @onchange="StateChangedAsync">
+                                                    <option value="">-- Seleccione Provincia --</option>
+                                                    @if (states is not null)
+                                                    {
+                                                        @foreach (var state in states)
+                                                        {
+                                                            <option value="@state.Id_provincia" selected="@(state.Id_provincia == user.Ciudades!.Provincias!.Id_provincia)">@state.Nombre_provincia</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label class="form-label">Ciudad</label>
+                                            <div class="input-icon">
+                                                <i class="fas fa-city"></i>
+                                                <select class="form-select" @bind="Input.Id_ciudad">
+                                                    <option value="">Seleccione Ciudad</option>
+                                                    @if (cities is not null)
+                                                    {
+                                                        @foreach (var city in cities)
+                                                        {
+                                                            <option value="@city.Id_ciudad" selected="@(city.Id_ciudad == user.Ciudades!.Id_ciudad)">@city.Nombre_ciudad </option>
+                                                        }
+                                                    }
+                                                </select>
+                                                <ValidationMessage For="@(() => Input.Id_ciudad)" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Direccion</label>
+                                        <div class="input-icon">
+                                                <i class="fas fa-street-view"></i>
+                                                <input type="text" class="form-control" @bind-value="Input.Address" placeholder="Direccion" />
+                                                <ValidationMessage For="@(() => Input.Address)" />
+                                            </div>
+                                    </div>    
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label class="form-label">Email</label>
+                                            <div class="input-icon">
+                                                <i class="fas fa-envelope"></i>
+                                                <input type="email" class="form-control" @bind-value="Input.Email" placeholder="Email" />
+                                            </div>
+                                        </div>
+                                        @if (SubmitButtonText == "Save")
+                                        {
+                                            <div class="form-group col-md-6">
+                                                <label class="form-label">Passwords</label>
+                                                <div class="input-icon">
+                                                    <i class="fas fa-key"></i>
+                                                    <input type="password" required class="form-control" @bind-value="Input.Passwords" placeholder="New Passwords" />
+                                                </div>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="form-group col-md-6">
+                                                <label class="form-label">Passwords</label>
+                                                <div class="input-icon">
+                                                    <span class="input-icon-text"><i class="fas fa-key"></i></span>
+                                                    <input type="password" class="form-control" @bind-value="Input.Passwords" placeholder="Update Passwords" />
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label class="form-label">Tipo</label>
+                                            <div class="input-icon">
+                                                <i class="fas fa-lock"></i>
+                                                <select class="form-select" @bind="Input.UserType">
+                                                    <option value="">Seleccione Tipo User</option>
+                                                    @if (Types is not null)
+                                                    {
+                                                        @foreach (var item in Types)
+                                                        {
+                                                            <option value="@item">@item.ToString()</option>
+                                                        }
+                                                    }
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label class="form-label">Status</label>
+                                            <div class="input-icon">
+                                                <i class="fas fa-lock"></i>
+
+                                                <select class="form-select"
+                                                        value="@(Input.LockoutEnabled ? "true" : "false")"
+                                                        @onchange="OnLockoutChange">
+                                                    <option value="true">Unlocked</option>
+                                                    <option value="false">Locked</option>
+                                                </select>
+
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </Content>
+                        </Tab>
+                        <Tab>
+                            <TitleTemplate>
+                                <Icon Name="IconName.PersonFill" /> Fotos
+                            </TitleTemplate>
+                            <Content>
+                                <div class="upload-form text-center mt-3">
+                                    <label for="profileImage" class="form-label fw-bold">Selecciona una imagen para tu perfil:</label>
+                                    <InputImg Label="Foto" ImageSelected="ImageSelected" ImageURL="@imageUrl" />
+                                </div>
+                            </Content>
+                        </Tab>
+                    </Tabs>
+                    <div class="col-12 d-flex justify-content-center gap-2 mt-3">
+                        <button type="submit" class="btn btn-primary">@SubmitButtonText</button>
+                        <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancel</button>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div> *@
+
 <div class="principal">
     <div class="login-register-container">
-        <div class="form-wrapper" id="formWrapper">
-            <div class="form-panel">
-                <div class="form-left-white w-100">
-                    <h2 class="form-title"><i class="bi bi-ui-checks-grid"></i>@Titulo</h2>
-                    <EditForm class="register-form row g-3" Model="Input" OnValidSubmit="SubmitForm">
-                        <DataAnnotationsValidator />
-                        <ValidationSummary></ValidationSummary>
-                        <Tabs EnableFadeEffect="true" id="formTab" class="tab-content active">
-                            <Tab Active="true">
-                                <TitleTemplate>
-                                    <Icon Name="IconName.HouseFill" /> Edit User
-                                </TitleTemplate>
-                                <Content>
-                                    <div class="tab-content active">
-                                        <!-- Contenedor de 2 columnas -->
-                                        <div class="row g-3">
-                                            <!-- Formulario -->
-                                            <div class="col-md-6">
-                                                <label class="form-label">Nombre</label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                                    <input class="form-control" @bind-value="Input.FirstName" placeholder="Nombre" />
-                                                    <ValidationMessage For="@(() => Input.FirstName)" />
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label">Apellido</label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                                    <input class="form-control" @bind-value="Input.LastName" placeholder="Apellido" />
-                                                    <ValidationMessage For="@(() => Input.LastName)" />
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label">Teléfono</label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text"><i class="fas fa-phone"></i></span>
-                                                    <input type="tel" class="form-control" @bind-value="Input.PhoneNumber" placeholder="Teléfono" />
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label">Pais</label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text"><i class="fas fa-globe"></i></span>
-                                                    <select class="form-select" @onchange="CountryChangedAsync">
-                                                        <option value="">Seleccione País</option>
-                                                        @if (countries is not null)
-                                                        {
-                                                            @foreach (var country in countries)
-                                                            {
-                                                                <option value="@country.Id_pais" selected="@(country.Id_pais == user.Ciudades!.Provincias!.Paises!.Id_pais)">@country.Nombre_pais</option>
-                                                            }
-                                                        }
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label">Provincia</label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text"><i class="fas fa-map"></i></span>
-                                                    <select class="form-select" @onchange="StateChangedAsync">
-                                                        <option value="">-- Seleccione Provincia --</option>
-                                                        @if (states is not null)
-                                                        {
-                                                            @foreach (var state in states)
-                                                            {
-                                                                <option value="@state.Id_provincia" selected="@(state.Id_provincia == user.Ciudades!.Provincias!.Id_provincia)">@state.Nombre_provincia</option>
-                                                            }
-                                                        }
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label">Ciudad</label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text"><i class="fas fa-city"></i></span>
-                                                    <select class="form-select" @bind="Input.Id_ciudad">
-                                                        <option value="">Seleccione Ciudad</option>
-                                                        @if (cities is not null)
-                                                        {
-                                                            @foreach (var city in cities)
-                                                            {
-                                                                <option value="@city.Id_ciudad" selected="@(city.Id_ciudad == user.Ciudades!.Id_ciudad)">@city.Nombre_ciudad </option>
-                                                            }
-                                                        }
-                                                    </select>
-                                                    <ValidationMessage For="@(() => Input.Id_ciudad)" />
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 col-unir">
-                                                <label class="form-label">Direccion</label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text"><i class="fas fa-street-view"></i></span>
-                                                    <input type="text" class="form-control" @bind-value="Input.Address" placeholder="Direccion" />
-                                                    <ValidationMessage For="@(() => Input.Address)" />
-                                                </div>
-                                            </div>
+        <div class="page-wrapper">
 
-                                            <div class="col-md-6">
-                                                <label class="form-label">Email</label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                                                    <input type="email" class="form-control" @bind-value="Input.Email" placeholder="Email" />
-                                                </div>
-                                            </div>
-                                            @if (SubmitButtonText == "Save")
-                                            {
-                                                <div class="col-md-6">
-                                                    <label class="form-label">Passwords</label>
-                                                    <div class="input-group">
-                                                        <span class="input-group-text"><i class="fas fa-key"></i></span>
-                                                        <input type="password"  required class="form-control" @bind-value="Input.Passwords" placeholder="New Passwords" />
-                                                    </div>
-                                                </div>                        
-                                            }else
-                                            {
-                                                <div class="col-md-6">
-                                                    <label class="form-label">Passwords</label>
-                                                    <div class="input-group">
-                                                        <span class="input-group-text"><i class="fas fa-key"></i></span>
-                                                        <input type="password" class="form-control" @bind-value="Input.Passwords" placeholder="Update Passwords" />
-                                                    </div>
-                                                </div>
-                                            }
+            <EditForm class="register-form row g-3" Model="Input" OnValidSubmit="SubmitForm">
+                <DataAnnotationsValidator />
+                <ValidationSummary></ValidationSummary>
+                <div class="form-card">
 
-                                            <div class="col-md-6">
-                                                <label class="form-label">Tipo</label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                                                    <select class="form-select" @bind="Input.UserType">
-                                                        <option value="">Seleccione Tipo User</option>
-                                                        @if (Types is not null)
+                    <h2 class="form-title">
+                        <i class="bi bi-ui-checks-grid"></i> @Titulo
+                    </h2>
+                    <Tabs EnableFadeEffect="true" id="formTab" class="tab-content active">
+
+                        <!-- ========================= TAB #1 ========================= -->
+                        <Tab Active="true">
+                            <TitleTemplate>
+                                <Icon Name="IconName.HouseFill" /> Edit User
+                            </TitleTemplate>
+
+                            <Content>
+
+                                <div class="tab-content active">
+
+                                    <!-- ======== FILA: Nombre / Apellido ======== -->
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label class="form-label">Nombre</label>
+                                            <div class="input-icon">
+                                                <i class="bi bi-person"></i>
+                                                <input class="form-control" @bind="Input.FirstName" placeholder="Nombre" />
+                                            </div>
+                                            <ValidationMessage For="@(() => Input.FirstName)" />
+                                        </div>
+
+                                        <div class="form-group col-md-6">
+                                            <label class="form-label">Apellido</label>
+                                            <div class="input-icon">
+                                                <i class="bi bi-person-badge"></i>
+                                                <input class="form-control" @bind="Input.LastName" placeholder="Apellido" />
+                                            </div>
+                                            <ValidationMessage For="@(() => Input.LastName)" />
+                                        </div>
+                                    </div>
+
+                                    <!-- ======== FILA: Teléfono / País ======== -->
+                                    <div class="form-row">
+
+                                        <div class="form-group col-md-6">
+                                            <label class="form-label">Teléfono</label>
+                                            <div class="input-icon">
+                                                <i class="bi bi-telephone"></i>
+                                                <input type="tel" class="form-control" @bind="Input.PhoneNumber" placeholder="Teléfono" />
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group col-md-6">
+                                            <label class="form-label">País</label>
+                                            <div class="input-icon">
+                                                <i class="bi bi-globe"></i>
+                                                <select class="form-select" @onchange="CountryChangedAsync">
+                                                    <option value="">Seleccione País</option>
+                                                    @if (countries is not null)
+                                                    {
+                                                        @foreach (var country in countries)
                                                         {
-                                                            @foreach (var item in Types)
-                                                            {
-                                                                <option value="@item">@item.ToString()</option>
-                                                            }
+                                                            <option value="@country.Id_pais"
+                                                                    selected="@(country.Id_pais == user.Ciudades!.Provincias!.Paises!.Id_pais)">
+                                                                @country.Nombre_pais
+                                                            </option>
                                                         }
-                                                    </select>
-                                                    
-                                                </div>
+                                                    }
+                                                </select>
                                             </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label">Status</label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                        </div>
 
-                                                    <select class="form-select"
-                                                            value="@(Input.LockoutEnabled ? "true" : "false")"
-                                                            @onchange="OnLockoutChange">
-                                                        <option value="true">Unlocked</option>
-                                                        <option value="false">Locked</option>
-                                                    </select>
+                                    </div>
 
-                                                  
-                                                </div>
+                                    <!-- ======== FILA: Provincia / Ciudad ======== -->
+                                    <div class="form-row">
+
+                                        <div class="form-group col-md-6">
+                                            <label class="form-label">Provincia</label>
+                                            <div class="input-icon">
+                                                <i class="bi bi-signpost"></i>
+                                                <select class="form-select" @onchange="StateChangedAsync">
+                                                    <option value="">Seleccione Provincia</option>
+                                                    @if (states is not null)
+                                                    {
+                                                        @foreach (var state in states)
+                                                        {
+                                                            <option value="@state.Id_provincia"
+                                                                    selected="@(state.Id_provincia == user.Ciudades!.Provincias!.Id_provincia)">
+                                                                @state.Nombre_provincia
+                                                            </option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group col-md-6">
+                                            <label class="form-label">Ciudad</label>
+                                            <div class="input-icon">
+                                                <i class="bi bi-building"></i>
+                                                <select class="form-select" @bind="Input.Id_ciudad">
+                                                    <option value="">Seleccione Ciudad</option>
+                                                    @if (cities is not null)
+                                                    {
+                                                        @foreach (var city in cities)
+                                                        {
+                                                            <option value="@city.Id_ciudad"
+                                                                    selected="@(city.Id_ciudad == user.Ciudades!.Id_ciudad)">
+                                                                @city.Nombre_ciudad
+                                                            </option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                            <ValidationMessage For="@(() => Input.Id_ciudad)" />
+                                        </div>
+
+                                    </div>
+
+                                    <!-- ======== Dirección ======== -->
+                                    <div class="form-group">
+                                        <label class="form-label">Dirección</label>
+                                        <div class="input-icon">
+                                            <i class="bi bi-geo-alt"></i>
+                                            <input type="text" class="form-control" @bind="Input.Address" placeholder="Dirección" />
+                                        </div>
+                                        <ValidationMessage For="@(() => Input.Address)" />
+                                    </div>
+
+                                    <!-- ======== FILA: Email / Password ======== -->
+                                    <div class="form-row">
+
+                                        <div class="form-group col-md-6">
+                                            <label class="form-label">Email</label>
+                                            <div class="input-icon">
+                                                <i class="bi bi-envelope"></i>
+                                                <input type="email" class="form-control" @bind="Input.Email" placeholder="Email"  required/>
                                             </div>
                                             
                                         </div>
+
+                                        <div class="form-group col-md-6">
+                                            <label class="form-label">Passwords</label>
+                                            <div class="input-icon">
+                                                <i class="bi bi-key"></i>
+                                                <input type="password"
+                                                       class="form-control"
+                                                       required="@((SubmitButtonText == "Save"))"
+                                                       @bind="Input.Passwords"
+                                                       placeholder="@(SubmitButtonText == "Save" ? "New Password" : "Update Password")" />
+                                            </div>
+
+                                        </div>
+
                                     </div>
-                                </Content>
-                            </Tab>
-                            <Tab>
-                                <TitleTemplate>
-                                    <Icon Name="IconName.PersonFill" /> Fotos
-                                </TitleTemplate>
-                                <Content>
-                                    <div class="upload-form text-center mt-3">
-                                        <label for="profileImage" class="form-label fw-bold">Selecciona una imagen para tu perfil:</label>
-                                        <InputImg Label="Foto" ImageSelected="ImageSelected" ImageURL="@imageUrl" />
+
+                                    <!-- ======== FILA: Tipo / Status ======== -->
+                                    <div class="form-row">
+
+                                        <div class="form-group col-md-6">
+                                            <label class="form-label">Tipo</label>
+                                            <div class="input-icon">
+                                                <i class="bi bi-person-gear"></i>
+                                                <select class="form-select" @bind="Input.UserType">
+                                                    <option value="">Seleccione Tipo User</option>
+                                                    @if (Types is not null)
+                                                    {
+                                                        @foreach (var item in Types)
+                                                        {
+                                                            <option value="@item">@item.ToString()</option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group col-md-6">
+                                            <label class="form-label">Status</label>
+                                            <div class="input-icon">
+                                                <i class="bi bi-shield-lock"></i>
+                                                <select class="form-select"
+                                                        value="@(Input.LockoutEnabled ? "true" : "false")"
+                                                        @onchange="OnLockoutChange">
+                                                    <option value="true">Unlocked</option>
+                                                    <option value="false">Locked</option>
+                                                </select>
+                                            </div>
+                                            <ValidationMessage For="@(() => Input.LockoutEnabled)"/>
+                                        </div>
+
                                     </div>
-                                </Content>
-                            </Tab>
-                        </Tabs>
-                        <div class="col-12 d-flex justify-content-center gap-2 mt-3">
-                            <button type="submit" class="btn btn-primary">@SubmitButtonText</button>
-                            <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancel</button>
-                        </div>
-                    </EditForm>
+
+                                </div>
+
+                            </Content>
+                        </Tab>
+
+                        <!-- ========================= TAB #2 ========================= -->
+                        <Tab>
+                            <TitleTemplate>
+                                <Icon Name="IconName.PersonFill" /> Fotos
+                            </TitleTemplate>
+
+                            <Content>
+                                <div class="upload-form text-center mt-3">
+                                    <label class="form-label fw-bold">Selecciona una imagen para tu perfil:</label>
+                                    <InputImg Label="Foto" ImageSelected="ImageSelected" ImageURL="@imageUrl" />
+                                </div>
+                            </Content>
+                        </Tab>
+
+                    </Tabs>
+
+                    <!-- ======== BOTONES ======== -->
+                    <div class="col-12 d-flex justify-content-center gap-2 mt-3">
+                        <button type="submit" class="btn btn-primary">@SubmitButtonText</button>
+                        <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancel</button>
+                    </div>
+
                 </div>
-            </div>
+
+            </EditForm>
+
         </div>
     </div>
 </div>
+
 
 @code {
 
@@ -215,15 +451,16 @@
 
 
     private UsersDTO? user { get; set; } = new UsersDTO
-    {
-        Ciudades = new CiudadDTO
         {
-            Provincias = new ProvinciaDTO
+            Ciudades = new CiudadDTO
             {
-                Paises = new PaisDTO()
+                Provincias = new ProvinciaDTO
+                {
+                    Paises = new PaisDTO()
+                }
             }
-        }
-    };
+        };
+
     private void OnLockoutChange(ChangeEventArgs e)
     {
         Input.LockoutEnabled = e.Value?.ToString() == "true";

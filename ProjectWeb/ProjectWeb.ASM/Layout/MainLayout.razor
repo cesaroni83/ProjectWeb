@@ -17,9 +17,9 @@
         <!-- Top bar -->
         <div class="bb-top-row px-4 d-flex justify-content-between">
             <Icon Name="IconName.List" role="button" @onclick="ToggleSidebar" />
-            <div class="bb-top-row bb-top-row-sticky px-4 d-flex justify-content-end">
+            <div class="bb-top-row bb-top-row-sticky px-4 d-flex justify-content-end gap-2">
                 <AuthLinks></AuthLinks>
-                <ThemeSwitcher Position="DropdownMenuPosition.End" />
+                <ThemeSwitcher Position="DropdownMenuPosition.End" Style="font-size:1.2rem;"/>
                 <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
             </div>
         </div>
@@ -36,7 +36,7 @@
 @code {
     private SidebarMenu appSidebar = default!;
     private MenuDinamico SideMenuDinamic = default!;
-
+  
     private async Task ToggleSidebar()
     {
         // Intenta cerrar el Sidebar autorizado si existe y está visible
@@ -52,6 +52,5 @@
             appSidebar.ToggleSidebar();
         }
     }
-
    
 }

@@ -1,0 +1,230 @@
+﻿/* ===== Contenedor principal centrado ===== */
+.centrado-pantalla {
+    display: flex;
+    justify-content: center !important;
+    align-items: center !important;
+    min-height: 100vh;
+    padding: 20px;
+    background: white;
+    box-sizing: border-box;
+    flex-direction: column;
+    z-index: 1050; /* Asegura que este contenedor esté encima de otros si es necesario */
+}
+
+/* ===== Contenedor de la tabla ===== */
+.container-tabla {
+    width: 100%;
+    max-width: 1500px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    box-sizing: border-box;
+    transition: all 0.3s ease-in-out;
+    border: solid;
+    margin-left: auto; /* Centrado horizontal */
+    margin-right: auto; /* Centrado horizontal */
+    align-self: stretch; /* Asegura que ocupe el ancho máximo disponible */
+}
+
+    /* ===== Estilo para la tarjeta ===== */
+    .container-tabla card {
+        width: 100%;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+/* ===== Cabecera de la tarjeta ===== */
+.card-header {
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+    padding: 15px 10px;
+    background-color: #007bff;
+    color: #fff;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+/* ===== Cuerpo de la tarjeta ===== */
+.card-body {
+    padding: 20px;
+}
+
+/* ===== Tabla ===== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+
+    table th, table td {
+        padding: 10px 15px; /* Ajuste del padding para evitar filas grandes */
+        text-align: left;
+        vertical-align: middle;
+        max-height: 40px; /* Limita la altura máxima de las filas */
+        overflow: hidden; /* Asegura que el contenido no desborde la fila */
+    }
+
+    table th {
+        background-color: #007bff;
+        color: #fff;
+        font-weight: 500;
+    }
+    /* Limitar la altura de las filas */
+    table tr {
+        max-height: 50px; /* Limita la altura máxima de cada fila */
+        overflow: hidden; /* Asegura que el contenido no desborde la fila */
+    }
+
+
+    /* ===== Imágenes dentro de la tabla ===== */
+    table img {
+        max-width: 40px; /* Controla el tamaño de las imágenes */
+        height: 40px; /* Asegura que la imagen tenga una altura fija */
+        width: auto; /* Mantiene la proporción de la imagen */
+        object-fit: cover; /* Asegura que la imagen no se distorsione */
+        border-radius: 50%; /* Para imágenes circulares */
+    }
+
+/* ===== Estilo específico para la columna "Foto" ===== */
+.grid-column-foto {
+    width: 100px; /* Define un ancho fijo para la columna de foto */
+    max-width: 100px;
+    text-align: center;
+    height: 30px; /* Limita la altura de la celda */
+}
+
+/* ===== Estilo para las columnas de acción (botones) ===== */
+.grid-column-accion {
+    width: 250px; /* Asegura un ancho fijo para la columna de acción */
+    text-align: start;
+}
+
+    .grid-column-accion .btn-action-column {
+        display: flex;
+        justify-content: space-between;
+        gap: 5px; /* Espaciado entre los botones */
+    }
+
+    .grid-column-accion .btn {
+        padding: 5px 10px; /* Ajuste de padding para que los botones no se expandan */
+        font-size: 12px; /* Tamaño de la fuente más pequeño */
+        width: auto; /* Evita que los botones tengan un ancho mayor al necesario */
+        white-space: nowrap; /* Evita que los textos se envuelvan */
+    }
+
+/* ===== Estilos adicionales para las columnas ===== */
+
+/* La columna de "Acción" con botones */
+table td .btn-action-column {
+    display: flex;
+    gap: 8px; /* Espaciado entre botones */
+}
+
+/* ===== Botones ===== */
+button.btn {
+    padding: 5px 12px;
+    font-size: 0.85rem;
+    border-radius: 5px;
+    transition: all 0.2s ease-in-out;
+    border-radius: 50px; /* hace el botón “pastilla” */
+}
+
+button.btn-success:hover {
+    background-color: #28a745cc;
+}
+
+button.btn-danger:hover {
+    background-color: #dc3545cc;
+}
+
+/* ===== Responsividad ===== */
+@media (max-width: 1200px) {
+    .container-tabla {
+        padding: 15px;
+        gap: 15px;
+    }
+
+    .card-header {
+        font-size: 1.3rem;
+    }
+}
+
+@media (max-width: 992px) {
+    table th, table td {
+        padding: 8px 10px;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .centrado-pantalla {
+        padding: 10px;
+    }
+
+    table th, table td {
+        padding: 6px 8px;
+        font-size: 0.8rem;
+    }
+
+    .d-flex.justify-content-end.gap-2 {
+        flex-direction: column;
+        gap: 5px;
+        width: 100%;
+    }
+
+    .card-header {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+        table th, table td {
+            padding: 6px 5px;
+        }
+
+    .card-body {
+        padding: 10px;
+    }
+}
+
+/* ===== Botón "Primary" en la columna de acción ===== */
+.btn-action-column .btn-primary {
+    background-color: #007bff; /* color azul */
+    color: white; /* texto blanco */
+    font-size: 0.9rem; /* tamaño de fuente */
+    padding: 6px 16px; /* espacio interno */
+    border-radius: 50px; /* botón tipo “pastilla” */
+    border: none; /* sin borde */
+    cursor: pointer; /* cursor de puntero */
+    transition: background-color 0.3s ease; /* transición suave al hover */
+}
+
+    .btn-action-column .btn-primary:hover {
+        background-color: #0056b3; /* azul más oscuro al pasar el cursor */
+    }
+
+    /* Botón "Update" */
+    .btn-action-column .btn-success {
+        background-color: #28a745;
+        color: white;
+        font-size: 0.9rem;
+        padding: 6px 16px;
+        border-radius: 6px;
+        transition: background-color 0.3s ease;
+        border-radius: 50px; /* hace el botón “pastilla” */
+    }
+
+        .btn-action-column .btn-success:hover {
+            background-color: #218838;
+        }

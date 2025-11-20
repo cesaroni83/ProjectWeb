@@ -16,6 +16,7 @@
 
         <EditForm Model="Input" OnValidSubmit="SubmitForm">
             <DataAnnotationsValidator />
+            <ValidationSummary></ValidationSummary>
 
             <div class="form-wrapper">
 
@@ -81,9 +82,11 @@
                 <div class="form-group">
                     <label>Imagen Previa:</label>
                     <div class="input-icon">
+                        <br />
                         <Icon Name="@(nombre ?? IconName.Question)"
                               Size="IconSize.x1"
                               Color="@(color ?? IconColor.Primary)" />
+                        <br />
                     </div>
                 </div>
 
@@ -115,6 +118,7 @@
                             }
                         </select>
                     </div>
+                    <ValidationMessage For="() => Input.Estado_menu" />
                 </div>
 
                 <!-- Botones -->

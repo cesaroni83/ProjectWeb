@@ -16,6 +16,7 @@
         <div class="page-wrapper">
     <EditForm Model="@Input" OnValidSubmit="SubmitForm">
         <DataAnnotationsValidator />
+        <ValidationSummary></ValidationSummary>
         <div class="form-card">
             <!-- Título del formulario -->
             <h2 class="form-title"><i class="bi bi-ui-checks-grid"></i> @Titulo</h2>
@@ -32,8 +33,8 @@
                                     <div class="input-icon">
                                         <i class="bi bi-building"></i>
                                         <input class="form-control" @bind="Input.Nombre_sucursal" />
-                                        <ValidationMessage For="() => Input.Nombre_sucursal" />
                                     </div>
+                                            <ValidationMessage For="() => Input.Nombre_sucursal" />
                                 </div>
                                 <div class="form-group col-md-6">
                                     <label>Empresa</label>
@@ -50,8 +51,8 @@
                                             }
                                             
                                         </select>
-                                        <ValidationMessage For="() => Input.Id_empresa" />
                                     </div>
+                                    <ValidationMessage For="() => Input.Id_empresa" />
                                 </div>
                             </div>
                             <!-- Fila 2:  -->
@@ -69,9 +70,8 @@
                                                     }
                                             }
                                     </select>
-                                    <ValidationMessage For="() => Input.Id_persona" />
-
                                 </div>
+                                <ValidationMessage For="() => Input.Id_persona" />
                             </div>
 
                             <div class="form-group mt-3">
@@ -79,7 +79,6 @@
                                 <div class="input-icon">
                                     <i class="bi bi-info-circle"></i>
                                     <textarea class="form-control" @bind="Input.Informacion_sucursal" rows="4" />
-                                    
                                 </div>
                             </div>
                             <div class="form-row">
@@ -94,15 +93,11 @@
                                                 <option value="@item.Id">@item.Text</option>
                                             }
                                         </select>
-                                        <ValidationMessage For="() => Input.Estado_sucursal" />
                                     </div>
+                                            <ValidationMessage For="() => Input.Estado_sucursal" />
                                 </div>
                                 <div class="form-group col-md-6">
-                                    @* <label>Ocupación</label>
-                                    <div class="input-icon">
-                                        <i class="bi bi-briefcase"></i>
-                                        <InputText class="form-control" @bind-Value="Input.Ocupacion" />
-                                    </div> *@
+                                    
                                 </div>
                             </div>
 
@@ -164,16 +159,16 @@
                                                 }
                                             }
                                         </select>
-                                        <ValidationMessage For="() => Input.Id_ciudad" />
                                     </div>
+                                    <ValidationMessage For="() => Input.Id_ciudad" />
                                 </div>
                                 <div class="form-group col-md-6">
                                     <label>CAP</label>
                                     <div class="input-icon">
                                         <i class="bi bi-mailbox2"></i>
                                         <input class="form-control" @bind="Input.Cap_sucursal" />
-                                        <ValidationMessage For="() => Input.Cap_sucursal" />
                                     </div>
+                                    <ValidationMessage For="() => Input.Cap_sucursal" />
                                 </div>
                             </div>
 
@@ -183,8 +178,8 @@
                                 <div class="input-icon">
                                     <i class="bi bi-geo-alt"></i>
                                     <input class="form-control" @bind="Input.Direccion_sucursal" />
-                                    <ValidationMessage For="() => Input.Direccion_sucursal" />
                                 </div>
+                                <ValidationMessage For="() => Input.Direccion_sucursal" />
                             </div>
 
                             <div class="form-row">
@@ -193,15 +188,14 @@
                                     <div class="input-icon">
                                         <i class="bi bi-telephone"></i>
                                         <input class="form-control" @bind="Input.Telefono" />
-                                                <ValidationMessage For="() => Input.Telefono" />
                                     </div>
+                                    <ValidationMessage For="() => Input.Telefono" />
                                 </div>
                                 <div class="form-group col-md-6">
                                     <label>Telefono Secundario</label>
                                     <div class="input-icon">
                                         <i class="bi bi-telephone-plus"></i>
                                         <input class="form-control" @bind="Input.Telefono_secundario" />
-
                                     </div>
                                 </div>
                             </div>
@@ -219,8 +213,8 @@
                                     <div class="input-icon">
                                         <i class="bi bi-envelope"></i>
                                         <input class="form-control" @bind="Input.Email" />
-                                       <ValidationMessage For="() => Input.Email" />
                                     </div>
+                                   <ValidationMessage For="() => Input.Email" />
                                 </div>
                             </div>
                         </div>

@@ -18,7 +18,7 @@
 
         <EditForm Model="Input" OnValidSubmit="SubmitForm">
             <DataAnnotationsValidator />
-
+            <ValidationSummary></ValidationSummary>
             <div class="form-wrapper">
 
                 <!-- País -->
@@ -39,6 +39,7 @@
                             }
                         </select>
                     </div>
+                    
                 </div>
 
                 <!-- Provincia -->
@@ -59,6 +60,7 @@
                             }
                         </select>
                     </div>
+                    <ValidationMessage For="() => Input.Id_provincia" />
                 </div>
 
                 <!-- Ciudad -->
@@ -93,6 +95,7 @@
                             }
                         </select>
                     </div>
+                    <ValidationMessage For="() => Input.Estado_ciudad" />
                 </div>
 
                 <!-- Botones -->

@@ -14,8 +14,8 @@
 
         <EditForm Model="Input" OnValidSubmit="SubmitForm">
             <DataAnnotationsValidator />
-
-            <div class="form-wrapper">
+            <ValidationSummary></ValidationSummary>
+                <div class="form-wrapper">
 
                 <!-- Nombre del país -->
                 <div class="form-group">
@@ -25,7 +25,7 @@
                         <input type="text"
                                @bind="Input.Nombre_pais"
                                class="form-control"
-                               placeholder="Ingrese nombre del país" />
+                               placeholder="Ingrese nombre del país" />                    
                     </div>
                     <ValidationMessage For="() => Input.Nombre_pais" />
                 </div>
@@ -48,7 +48,7 @@
                     <Image Src="@previewUrl"
                            IsThumbnail="true"
                            Alt="placeholder"
-                           style="max-width:200px; border:1px solid #ccc; border-radius:8px;" />
+                           style="max-width:250px; border:1px solid #ccc; border-radius:8px;" />
                     <br />
                     <InputFile OnChange="CargarImagen" accept=".jpg,.jpeg,.png" />
                 </div>
@@ -66,6 +66,7 @@
                             }
                         </select>
                     </div>
+                    <ValidationMessage For="() => Input.Estado_pais" />
                 </div>
 
                 <!-- Botones -->

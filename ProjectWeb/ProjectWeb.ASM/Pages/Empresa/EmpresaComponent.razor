@@ -14,6 +14,7 @@
         <div class="page-wrapper">
             <EditForm Model="@Input" OnValidSubmit="SubmitForm">
                 <DataAnnotationsValidator />
+                <ValidationSummary></ValidationSummary>
                 <div class="form-card">
                     <!-- Título del formulario -->
                     <h2 class="form-title"><i class="bi bi-ui-checks-grid"></i> @Titulo</h2>
@@ -38,16 +39,16 @@
                                             <div class="input-icon">
                                                 <i class="bi bi-building"></i>
                                                 <input class="form-control" @bind="Input.Nombre_Empresa" />
-                                                <ValidationMessage For="() => Input.Nombre_Empresa" />
                                             </div>
+                                            <ValidationMessage For="() => Input.Nombre_Empresa" />
                                         </div>
                                         <div class="form-group col-md-6">
                                             <label>Razon Social</label>
                                             <div class="input-icon">
                                                 <i class="bi bi-card-text"></i>
                                                 <input class="form-control" @bind="Input.Razon_social" />
-                                                <ValidationMessage For="() => Input.Razon_social" />
                                             </div>
+                                            <ValidationMessage For="() => Input.Razon_social" />
                                         </div>
                                     </div>
 
@@ -56,17 +57,17 @@
                                             <label>R.U.C.</label>
                                             <div class="input-icon">
                                                 <i class="bi bi-file-earmark-text"></i>
-                                                <input class="form-control" @bind="Input.Ruc" />
-                                                <ValidationMessage For="() => Input.Ruc" />
+                                                <input class="form-control" @bind="Input.Ruc" /> 
                                             </div>
+                                            <ValidationMessage For="() => Input.Ruc" />
                                         </div>
                                         <div class="form-group col-md-6">
                                             <label>Tipo empresa</label>
                                             <div class="input-icon">
                                                 <i class="bi bi-briefcase"></i>
                                                 <input class="form-control" @bind="Input.Tipo_empresa" />
-                                                <ValidationMessage For="() => Input.Tipo_empresa" />
                                             </div>
+                                            <ValidationMessage For="() => Input.Tipo_empresa" />
                                         </div>
                                     </div>
 
@@ -76,7 +77,6 @@
                                             <div class="input-icon">
                                                 <i class="bi bi-person-badge"></i>
                                                 <input class="form-control" @bind="Input.Representante_legal" />
-                                                
                                             </div>
                                         </div>
                                         <div class="form-group col-md-6">
@@ -84,8 +84,8 @@
                                             <div class="input-icon">
                                                 <i class="bi bi-currency-dollar"></i>
                                                 <input type="number" class="form-control" @bind="Input.Capital_social" />
-                                                <ValidationMessage For="() => Input.Capital_social" />
                                             </div>
+                                            <ValidationMessage For="() => Input.Capital_social" />
                                         </div>
                                     </div>
                                 </div>
@@ -147,16 +147,16 @@
                                                         }
                                                     }
                                                 </select>
-                                                <ValidationMessage For="() => Input.Id_ciudad" />
                                             </div>
+                                            <ValidationMessage For="() => Input.Id_ciudad" />
                                         </div>
                                         <div class="form-group col-md-6">
                                             <label>CAP</label>
                                             <div class="input-icon">
                                                 <i class="bi bi-mailbox2"></i>
                                                 <input class="form-control" @bind="Input.Cap" />
-                                                <ValidationMessage For="() => Input.Cap" />
                                             </div>
+                                            <ValidationMessage For="() => Input.Cap" />
                                         </div>
                                     </div>
 
@@ -165,8 +165,8 @@
                                         <div class="input-icon">
                                             <i class="bi bi-geo-alt"></i>
                                             <input class="form-control" @bind="Input.Direccion" />
-                                            <ValidationMessage For="() => Input.Direccion" />
                                         </div>
+                                        <ValidationMessage For="() => Input.Direccion" />
                                     </div>
 
                                     <div class="form-row">
@@ -175,8 +175,8 @@
                                             <div class="input-icon">
                                                 <i class="bi bi-telephone"></i>
                                                 <input class="form-control" @bind="Input.Telefono" />
-                                                <ValidationMessage For="() => Input.Telefono" />
                                             </div>
+                                            <ValidationMessage For="() => Input.Telefono" />
                                         </div>
                                         <div class="form-group col-md-6">
                                             <label>Telefono Secundario</label>
@@ -200,8 +200,8 @@
                                             <div class="input-icon">
                                                 <i class="bi bi-envelope"></i>
                                                 <input class="form-control" @bind="Input.Email" />
-                                                <ValidationMessage For="() => Input.Email" />
                                             </div>
+                                            <ValidationMessage For="() => Input.Email" />
                                         </div>
                                     </div>
 
@@ -217,8 +217,8 @@
                                                         <option value="@item.Id">@item.Text</option>
                                                     }
                                                 </select>
-                                                <ValidationMessage For="() => Input.Estado_empresa" />
-                                            </div>
+                                                </div>
+                                            <ValidationMessage For="() => Input.Estado_empresa" />
                                         </div>
                                         <div class="form-group col-md-6">
                                            
@@ -232,10 +232,10 @@
                     <!-- Botones -->
                     <div class="text-center mt-4">
                         <button type="submit" class="btn btn-primary btn-custom me-2">
-                            <i class="bi bi-save"></i> @SubmitButtonText
+                            @SubmitButtonText
                         </button>
                         <button type="button" class="btn btn-outline-secondary btn-custom" @onclick="Cancelar">
-                            <i class="bi bi-eraser"></i> Cancelar
+                            Cancelar
                         </button>
                     </div>
                 </div>

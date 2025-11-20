@@ -22,11 +22,11 @@
     <div class="container-tabla">
         <Card style="width:93%; height:auto; margin:50px">
             <CardHeader class="text-center fs-4">
-                Lista De Paises
+                Lista Del Menu
             </CardHeader>
             <CardBody>
                 <Grid TItem="MenuDTO"
-                      Class="table table-hover table-bordered align-middle"
+					  Class="table table-hover table-bordered align-middle grid-table"
                       FiltersRowCssClass="bg-primary text-white bg-opacity-25 border-bottom-0"
                       HeaderRowCssClass="bg-primary text-white border-bottom-0"
                       DataProvider="PaisDataProvider"
@@ -77,8 +77,8 @@
                         @Estado.GetTextEstado(@context.Estado_menu)
                     </GridColumn>
 
-                    <GridColumn TItem="MenuDTO" HeaderText="Acción" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Start" Filterable="false" FilterTextboxWidth="150">
-                        <div class="d-flex justify-content-end gap-2" style="width:150px;">
+                    <GridColumn TItem="MenuDTO" HeaderText="Acción" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Start" Filterable="false" FilterTextboxWidth="250">
+                          <div class="btn-action-column">
                             <button class="btn btn-success btn-sm" @onclick=@(() => ShowModal(context.Id_menu, true))>Update</button>
                             <button class="btn btn-danger btn-sm" @onclick="() => DeleteReg(context.Id_menu, context.Descripcion)">Delete</button>
                         </div>
@@ -86,7 +86,7 @@
                 </Grid>
             </CardBody>
             <CardFooter class="d-flex justify-content-end ">
-                <button class="btn btn-success" @onclick=@(() => ShowModal())>Nuevo Registro</button>
+				<button class="btn btn-primary" @onclick=@(() => ShowModal())>Nuevo Registro</button>
             </CardFooter>
         </Card>
     </div>

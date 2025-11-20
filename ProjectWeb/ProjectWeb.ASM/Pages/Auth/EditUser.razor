@@ -10,6 +10,7 @@
 @inject SweetAlertService sweetAlertService
 @inject NavigationManager navigationManager
 @inject ILoginService loginService
+@inject ToastService ToastService
 
 @if (user is null)
 {
@@ -19,12 +20,15 @@ else
 {
 
     <!-- Font Awesome -->
-    <div class="principal">
+   @*  <div class="principal">
         <div class="login-register-container">
             <div class="form-wrapper" id="formWrapper">
                 <div class="form-panel">
                     <div class="form-left-white w-100">
-                        <h2>Edit User</h2>
+                        <!-- Título -->
+                        <div class="form-panel">
+                            <h2 class="form-title"><i class="bi bi-ui-checks-grid"></i>Edit User</h2>
+                        </div>
                         <EditForm class="register-form row g-3" Model="user" OnValidSubmit="SaveUserAsync" FormName="EditUser">
                             <DataAnnotationsValidator />
                             <Tabs EnableFadeEffect="true" id="formTab" class="tab-content active">
@@ -107,16 +111,12 @@ else
                                                         <ValidationMessage For="@(() => user.Id_ciudad)" />
                                                     </div>
                                                 </div>
-                                                <div class="col-md-6 col-unir">
+                                                <div class="col-md-6 form-group">
                                                     <label class="form-label">Direccion</label>
                                                     <div class="input-group">
                                                         <span class="input-group-text"><i class="fas fa-street-view"></i></span>
                                                         <input type="text" class="form-control" @bind-value="user.Address" placeholder="Direccion" />
                                                     </div>
-                                                </div>
-                                                <div class="col-12 d-flex justify-content-center gap-2 mt-3">
-                                                    <button type="submit" class="btn btn-primary">Save</button>
-                                                    <button type="reset" class="btn btn-secondary">Reset</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -130,17 +130,156 @@ else
                                         <div class="upload-form text-center mt-3">
                                             <label for="profileImage" class="form-label fw-bold">Selecciona una imagen para tu perfil:</label>
                                             <InputImg Label="Foto" ImageSelected="ImageSelected" ImageURL="@imageUrl" />
-                                           @*  <button type="submit" class="btn btn-primary mt-3">Subir Imagen</button> *@
+                                          
                                         </div>
                                     </Content>
                                 </Tab>
                             </Tabs>
+                            <div class="col-12 d-flex justify-content-center gap-2 mt-3">
+                                <button type="submit" class="btn btn-primary">Save</button>
+                                <button type="reset" class="btn btn-secondary">Reset</button>
+                            </div>
                         </EditForm>
                     </div>
                 </div>
             </div>
         </div>
+    </div> *@
+    <div class="principal">
+        <div class="login-register-container">
+            <div class="page-wrapper">
+                <EditForm Model="user" OnValidSubmit="SaveUserAsync" FormName="EditUser">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary></ValidationSummary>
+                    <div class="form-card">
+                        <h2 class="form-title"><i class="bi bi-ui-checks-grid"></i> Edit User</h2>
+                        <Tabs EnableFadeEffect="true" id="formTab" class="tab-content active">
+                            <Tab Active="true">
+                                <TitleTemplate>
+                                    <Icon Name="IconName.HouseFill" /> Edit User
+                                </TitleTemplate>
+                                <Content>
+                                    <div class="tab-content-inner">
+                                        <!-- Contenedor de 2 columnas -->
+                                        <div class="form-row">
+                                            <!-- Formulario -->
+                                            <div class="form-group col-md-6">
+                                                <label class="form-label">Nombre</label>
+                                                <div class="input-icon">
+                                                    <i class="bi bi-person"></i>
+                                                    <input class="form-control" @bind="user.FirstName" placeholder="Nombre" />
+                                                </div>
+                                                <ValidationMessage For="@(() => user.FirstName)" />
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <label class="form-label">Apellido</label>
+                                                <div class="input-icon">
+                                                    <i class="bi bi-person"></i>
+                                                    <input class="form-control" @bind="user.LastName" placeholder="Apellido" />
+                                                </div>
+                                                <ValidationMessage For="@(() => user.LastName)" />
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-6">
+                                                <label class="form-label">Teléfono</label>
+                                                <div class="input-icon">
+                                                    <i class="bi bi-phone"></i>
+                                                    <input type="tel" class="form-control" @bind="user.PhoneNumber" placeholder="Teléfono" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <label class="form-label">Pais</label>
+                                                <div class="input-icon">
+                                                    <i class="bi bi-globe"></i>
+                                                    <select class="form-select" @onchange="CountryChangedAsync">
+                                                        <option value="">-- Seleccione --</option>
+                                                        @if (countries is not null)
+                                                        {
+                                                            @foreach (var country in countries)
+                                                            {
+                                                                <option value="@country.Id_pais" selected="@(country.Id_pais == user.Ciudades!.Provincias!.Paises!.Id_pais)">@country.Nombre_pais</option>
+                                                            }
+                                                        }
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-6">
+                                                <label class="form-label">Provincia</label>
+                                                <div class="input-icon">
+                                                    <i class="bi bi-map"></i>
+                                                    <select class="form-select" @onchange="StateChangedAsync">
+                                                        <option value="">-- Seleccione --</option>
+                                                        @if (states is not null)
+                                                        {
+                                                            @foreach (var state in states)
+                                                            {
+                                                                <option value="@state.Id_provincia" selected="@(state.Id_provincia == user.Ciudades!.Provincias!.Id_provincia)">@state.Nombre_provincia</option>
+                                                            }
+                                                        }
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <label class="form-label">Ciudad</label>
+                                                <div class="input-icon">
+                                                    <i class="bi bi-building"></i>
+                                                    <select class="form-select" @bind="user.Id_ciudad">
+                                                        <option value="">-- Seleccione --</option>
+                                                        @if (cities is not null)
+                                                        {
+                                                            @foreach (var city in cities)
+                                                            {
+                                                                <option value="@city.Id_ciudad" selected="@(city.Id_ciudad == user.Ciudades!.Id_ciudad)">@city.Nombre_ciudad </option>
+                                                            }
+                                                        }
+                                                    </select>
+                                                    <ValidationMessage For="@(() => user.Id_ciudad)" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col-md-6">
+                                                <label class="form-label">Dirección</label>
+                                                <div class="input-icon">
+                                                    <i class="bi bi-house-door"></i>
+                                                    <input type="text" class="form-control" @bind="user.Address" placeholder="Dirección" />
+                                                </div>
+                                                <ValidationMessage For="@(() => user.Address)" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Content>
+                            </Tab>
+                            <Tab>
+                                <TitleTemplate>
+                                    <Icon Name="IconName.PersonFill" /> Fotos
+                                </TitleTemplate>
+                                <Content>
+                                    <div class="upload-form text-center mt-3">
+                                        <label for="profileImage" class="form-label fw-bold">Selecciona una imagen para tu perfil:</label>
+                                        <InputImg Label="Foto" ImageSelected="ImageSelected" ImageURL="@imageUrl" />
+                                    </div>
+                                </Content>
+                            </Tab>
+                        </Tabs>
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-primary btn-custom me-2">
+                                Save
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-custom" @onclick="Cancelar">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
     </div>
+
+
 
 }
 
@@ -153,6 +292,7 @@ else
     private List<CiudadDropDTO>? cities;
     private string? imageUrl;
     string Estado = "A";
+    [CascadingParameter] BlazoredModalInstance Modal { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -254,6 +394,14 @@ else
         }
 
         await loginService.LoginAsync(responseHttp.Response!.Token);
+        ToastService.Notify(new(ToastType.Success, $"Record Saved Successfully."));
+        await Task.Delay(3000);
+        await Modal.CloseAsync(ModalResult.Ok());
         navigationManager.NavigateTo("/");
+    }
+
+    private async Task Cancelar()
+    {
+        await Modal.CancelAsync();
     }
 }

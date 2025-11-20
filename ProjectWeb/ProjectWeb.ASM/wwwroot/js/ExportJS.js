@@ -1,4 +1,6 @@
-﻿ window.exportDynamicPdf = (data, columns) => {
+﻿
+
+window.exportDynamicPdf = (data, columns) => {
             const {jsPDF} = window.jspdf;
     const doc = new jsPDF();
 
@@ -50,3 +52,4 @@ window.printGrid = (columns, data) => {
     printWindow.print();
     printWindow.close();
 };
+

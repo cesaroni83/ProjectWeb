@@ -24,7 +24,7 @@
             </CardHeader>
             <CardBody>
                 <Grid TItem="SucursalDTO"
-                      Class="table table-hover table-bordered"
+                      Class="table table-hover table-bordered grid-table"
                       FiltersRowCssClass="bg-primary text-white bg-opacity-25 border-bottom-0"
                       HeaderRowCssClass="bg-primary text-white border-bottom-0"
                       DataProvider="SucursalDataProvider"
@@ -71,8 +71,8 @@
                         @Estado.GetTextEstado(@context.Estado_sucursal)
                     </GridColumn>
 
-                    <GridColumn TItem="SucursalDTO" HeaderText="Acción" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Start" Filterable="false" FilterTextboxWidth="150">
-                        <div class="d-flex justify-content-end gap-2" style="width:150px;">
+                    <GridColumn TItem="SucursalDTO" HeaderText="Acción" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Start" Filterable="false" FilterTextboxWidth="250">
+                        <div class="btn-action-column">
                             <button class="btn btn-success btn-sm" @onclick=@(() => ShowModal(context.Id_sucursal, true))>Update</button>
                             <button class="btn btn-danger btn-sm" @onclick="() => DeleteReg(context.Id_sucursal, context.Nombre_sucursal)">Delete</button>
                         </div>
@@ -80,7 +80,7 @@
                 </Grid>
             </CardBody>
             <CardFooter class="d-flex justify-content-end ">
-                <button class="btn btn-success" @onclick=@(() => ShowModal())>Nuevo Registro</button>
+                <button class="btn btn-primary" @onclick=@(() => ShowModal())>Nuevo Registro</button>
             </CardFooter>
         </Card>
     </div>

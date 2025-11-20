@@ -1,0 +1,377 @@
+﻿
+
+/* ================================
+   OVERLAY DEL MODAL
+================================ */
+.principal {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.55);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050;
+    padding: 20px;
+}
+
+/* ================================
+   FORMULARIO CONTENEDOR
+================================ */
+.formulario, .login-register-container {
+    background: white;
+    border-radius: 20px;
+    width: 900px;
+    max-width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 30px 40px;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    color: #222;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Título */
+.form-title {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.5rem;
+}
+
+/* Wrapper */
+.form-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Panel */
+.form-panel {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+    .form-panel h2 {
+        margin-bottom: 25px;
+        font-weight: 600;
+        font-size: 1.5rem;
+        color: #222;
+        text-align: center;
+    }
+
+/* Contenido */
+.form-card {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Filas */
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    margin-bottom: 5px;
+
+}
+
+/* Grupos */
+.form-group {
+    flex: 1 1 48%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 15px; /*estapacion entre las filas*/
+}
+
+    .form-group[style*="flex:1 1 100%"] {
+        flex: 1 1 100%;
+    }
+
+    .form-group label {
+        font-size: 0.9rem;
+        color: #333;
+    }
+
+/* ================================
+   INPUTS / SELECTS
+================================ */
+.form-control,
+.input-icon select {
+    border: 1px solid #bbb;
+    border-radius: 8px;
+    padding: 8px 12px 8px 38px;
+    font-size: 1rem;
+    outline-offset: 2px;
+    font-family: inherit;
+    color: #222;
+    background-color: #fff;
+    transition: border-color 0.3s ease;
+}
+
+    .form-control:focus,
+    .input-icon select:focus {
+        border-color: #0047b3;
+    }
+
+/* ================================
+   INPUTS CON ICONO — FIJO
+================================ */
+.input-icon {
+    position: relative;
+    width: 100%;
+}
+
+    .input-icon input,
+    .input-icon select {
+        width: 100%;
+        padding-left: 45px !important;
+        padding-right: 10px;
+        border: 1px solid #bbb;
+        border-radius: 8px;
+        font-size: 1rem;
+        outline-offset: 2px;
+        transition: border-color 0.3s ease;
+    }
+
+    /* Ícono fijo */
+    .input-icon .icon,
+    .input-icon .bi {
+        position: absolute;
+        top: 50%;
+        left: 12px;
+        transform: translateY(-50%);
+        color: #666;
+        font-size: 1.25rem;
+        pointer-events: none;
+    }
+
+    /* ================================
+   CORRECCIÓN DEL ERROR (NO MOVER ÍCONOS)
+================================ */
+    .input-icon input.is-invalid,
+    .input-icon select.is-invalid,
+    .input-icon input.error,
+    .input-icon select.error,
+    .was-validated .input-icon .form-control:invalid,
+    .was-validated .input-icon select:invalid {
+        padding-left: 45px !important;
+        border-width: 1px !important;
+    }
+
+/* ================================
+   BOTONES
+================================ */
+.buttons-container {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 30px;
+    flex: 1 1 100%;
+}
+
+.btn-custom, .btn {
+    font-weight: 600;
+    padding: 8px 22px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    min-width: 100px;
+    min-height: 40px;
+    border: none;
+    user-select: none;
+    transition: background-color 0.3s ease;
+}
+
+/* Botón Primary */
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+    .btn-primary:active {
+        background-color: #004085;
+    }
+
+    .btn-primary:focus {
+        outline: none;
+        box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+    }
+
+/* Botón Secondary */
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+    .btn-secondary:hover {
+        background-color: #545b62;
+    }
+
+/* Botón Success */
+.btn-success {
+    background-color: #28a745;
+    color: white;
+}
+
+    .btn-success:hover {
+        background-color: #218838;
+    }
+
+/* Outline Secondary */
+.btn-outline-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+    .btn-outline-secondary:hover {
+        background-color: #545b62;
+    }
+
+/* ================================
+   SCROLLBAR
+================================ */
+.login-register-container::-webkit-scrollbar,
+.formulario::-webkit-scrollbar {
+    width: 8px;
+}
+
+.login-register-container::-webkit-scrollbar-track,
+.formulario::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 8px;
+}
+
+.login-register-container::-webkit-scrollbar-thumb,
+.formulario::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 8px;
+}
+
+    .login-register-container::-webkit-scrollbar-thumb:hover,
+    .formulario::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+/* ================================
+   TABS
+================================ */
+.tabs {
+    display: flex;
+    gap: 15px;
+    border-bottom: 1px solid #d6d9db;
+    margin-bottom: 25px;
+}
+
+.tab {
+    padding: 7px 18px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-radius: 6px 6px 0 0;
+    color: #5a5a5a;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid transparent;
+    border-bottom: none;
+    transition: all 0.3s ease;
+}
+
+    .tab .icon {
+        font-size: 1.1rem;
+    }
+
+    .tab.active {
+        background-color: #f0f4ff;
+        color: #0047b3;
+        border-color: #c4d1ff;
+        border-bottom: 3px solid #0047b3;
+        font-weight: 700;
+    }
+
+.tab-content {
+    padding: 20px 0;
+}
+
+/* ================================
+   RESPONSIVE
+================================ */
+@media (max-width: 768px) {
+    .login-register-container, .formulario {
+        width: 95vw;
+        padding: 20px;
+    }
+
+    .form-group {
+        flex: 1 1 100%;
+    }
+
+    .input-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .input-group-text {
+        border-radius: 8px;
+        width: 100%;
+        text-align: left;
+    }
+
+    .form-title {
+        font-size: 1.1rem;
+    }
+
+    .btn-custom, .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 500px) {
+    .login-register-container, .formulario {
+        width: 95vw;
+        padding: 20px;
+    }
+
+    .form-group {
+        flex: 1 1 100%;
+    }
+
+    .buttons-container {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+    }
+}
+
+/* ================================
+   IMÁGENES
+================================ */
+img {
+    max-width: 250px;
+    width: 100%;
+    height: auto;
+    margin: 20px auto;
+    display: block;
+}
+
+.img-pequena {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+    margin: 10px auto;
+}

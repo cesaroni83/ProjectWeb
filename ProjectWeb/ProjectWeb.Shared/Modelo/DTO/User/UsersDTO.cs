@@ -32,7 +32,7 @@ namespace ProjectWeb.Shared.Modelo.DTO.User
         public string Nombre_Ciudad => Ciudades?.Nombre_ciudad ?? "";
 
         [Display(Name = "Ciudad")]
-       // [Required(ErrorMessage = "El campo {0} es obligatorio.")]
+        [Required(ErrorMessage = "El campo {0} es obligatorio.")]
         [Range(1, int.MaxValue, ErrorMessage = "Debes seleccionar una {0}.")]
         public int Id_ciudad { get; set; }
 

@@ -21,7 +21,7 @@
         </CardHeader>
              <CardBody>
                  <Grid TItem="PaisDTO"
-                      Class="table table-hover table-bordered"
+                      Class="table table-hover table-bordered align-middle grid-table"
                       FiltersRowCssClass="bg-primary text-white bg-opacity-25 border-bottom-0"
                       HeaderRowCssClass="bg-primary text-white border-bottom-0"
                       DataProvider="PaisDataProvider"
@@ -38,7 +38,7 @@
                     </GridTemplates>
                     <GridColumn TItem="PaisDTO" HeaderText="Foto" FilterTextboxWidth="50" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
                         <div class="text-center">
-                            <Image Src="@ObtenerImagen(@context.Foto_pais)" Class="rounded" Alt="placeholder" style="width:50px; height:auto;" />
+                            <Image Src="@ObtenerImagen(@context.Foto_pais)" Class="rounded img-pequena" Alt="placeholder" />
                         </div>
                     </GridColumn>
 
@@ -50,7 +50,7 @@
                         @context.Nombre_pais
                     </GridColumn>
 
-                    <GridColumn TItem="PaisDTO" HeaderText="Información" PropertyName="Informacion" SortString="Informacion" SortKeySelector="item => item.Informacion" FilterTextboxWidth="200">
+                    <GridColumn TItem="PaisDTO" HeaderText="Información" PropertyName="Informacion" SortString="Informacion" SortKeySelector="item => item.Informacion" FilterTextboxWidth="100">
                         @context.Informacion
                     </GridColumn>
 
@@ -58,8 +58,8 @@
                         @Estado.GetTextEstado(@context.Estado_pais)
                     </GridColumn>
 
-                    <GridColumn TItem="PaisDTO" HeaderText="Acción" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Start" Filterable="false" FilterTextboxWidth="150">
-                        <div class="d-flex justify-content-end gap-2" style="width:150px;">
+                    <GridColumn TItem="PaisDTO" HeaderText="Acción" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Start" Filterable="false" FilterTextboxWidth="250">
+                        <div class="btn-action-column">
                             <button class="btn btn-success btn-sm" @onclick=@(() => ShowModal(context.Id_pais, true))>Update</button>
                             <button class="btn btn-danger btn-sm" @onclick="() => DeleteReg(context.Id_pais, context.Nombre_pais)">Delete</button>
                         </div>
@@ -67,7 +67,7 @@
                 </Grid>
             </CardBody>
             <CardFooter class="d-flex justify-content-end ">
-                <button class="btn btn-success"  @onclick=@(() => ShowModal())>Nuevo Registro</button>
+                <button class="btn btn-primary"  @onclick=@(() => ShowModal())>Nuevo Registro</button>
             </CardFooter>
         </Card>
     </div>
