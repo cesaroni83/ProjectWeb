@@ -11,166 +11,215 @@
 @inject NavigationManager navigationManager
 @inject ILoginService loginService
 
+<div class="registerpage-principal">
+    <div class="registerpage-container">
+        <div class="registerpage-wrapper" >
+               <!-- PANEL IZQUIERDO (FORMULARIO) -->
+                <div class="registerpage-left-white registerpage-panel">
+                    <h2>Registro De Usuarios</h2>
 
-<!-- Font Awesome -->
-<div class="principal">
-    <div class="login-register-container">
-        <div class="form-wrapper" id="formWrapper">
-            <div class="form-panel">
-                <div class="form-left-white w-100">
-                    <h2>Registro</h2>
-                    <EditForm class="register-form row g-3" Model="userDTO" OnValidSubmit="CreteUserAsync" FormName="Register">
-                        <Tabs EnableFadeEffect="true" id="formTab" class="tab-content active">
+                    <EditForm class="register-form row g-3"
+                              Model="userDTO"
+                              OnValidSubmit="CreteUserAsync"
+                              FormName="Register">
+                        <DataAnnotationsValidator />
+                        
+                        <Tabs EnableFadeEffect="true" id="formTab">
+
+                            <!-- TAB 1: FORMULARIO PRINCIPAL -->
                             <Tab Active="true">
                                 <TitleTemplate>
                                     <Icon Name="IconName.HouseFill" /> Register
                                 </TitleTemplate>
+
                                 <Content>
-                                    <div class="tab-content active">
-                                        <!-- Contenedor de 2 columnas -->
-                                        <div class="row g-3">
-                                            <!-- Formulario -->
-                                            <div class="col-md-6">
-                                                <label class="form-label">Nombre</label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                                    <InputText class="form-control" @bind-Value="userDTO.FirstName" placeholder="Nombre" />
-                                                </div>
+                                    <div class="row g-3">
+
+                                        <!-- NOMBRE -->
+                                        <div class="col-md-6">
+                                            <label class="form-label">Nombre</label>
+                                            <div class="input-wrapper">
+                                                <span class="input-icon"><i class="fas fa-user"></i></span>
+                                                <input class="form-control"
+                                                           @bind="userDTO.FirstName"
+                                                           placeholder="Nombre" />
                                             </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label">Apellido</label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                                    <InputText class="form-control" @bind-Value="userDTO.LastName" placeholder="Apellido" />
-                                                </div>
-                                            </div>                     
-                                            <div class="col-md-6">
-                                                <label class="form-label">Pais</label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text"><i class="fas fa-globe"></i></span>
-                                                    <select class="form-select" @onchange="CountryChangedAsync">
-                                                        <option value="0">-- Seleccione un país --</option>
-                                                        @if (countries is not null)
+                                            <ValidationMessage For="@(() => userDTO.FirstName)" />
+                                        </div>
+
+                                        <!-- APELLIDO -->
+                                        <div class="col-md-6">
+                                            <label class="form-label">Apellido</label>
+                                            <div class="input-wrapper">
+                                                <span class="input-icon"><i class="fas fa-user"></i></span>
+                                                <input class="form-control"
+                                                           @bind="userDTO.LastName"
+                                                           placeholder="Apellido" />
+                                            </div>
+                                            <ValidationMessage For="@(() => userDTO.LastName)" />
+                                        </div>
+
+                                        <!-- PAIS -->
+                                        <div class="col-md-6">
+                                            <label class="form-label">País</label>
+                                            <div class="input-wrapper">
+                                                <span class="input-icon"><i class="fas fa-globe"></i></span>
+                                                <select class="form-select" @onchange="CountryChangedAsync">
+                                                    <option value="0">Seleccione un País</option>
+                                                    @if (countries is not null)
+                                                    {
+                                                        foreach (var country in countries)
                                                         {
-                                                            @foreach (var country in countries)
-                                                            {
-                                                                <option value="@country.Id_pais">@country.Nombre_pais</option>
-                                                            }
+                                                            <option value="@country.Id_pais">@country.Nombre_pais</option>
                                                         }
-                                                    </select>
-                                                </div>
+                                                    }
+                                                </select>
                                             </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label">Provincia</label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text"><i class="fas fa-map"></i></span>
-                                                    <select class="form-select" @onchange="StateChangedAsync">
-                                                        <option value="0">-- Seleccione un estado/departamento --</option>
-                                                        @if (states is not null)
+                                        </div>
+
+                                        <!-- PROVINCIA -->
+                                        <div class="col-md-6">
+                                            <label class="form-label">Provincia</label>
+                                            <div class="input-wrapper">
+                                                <span class="input-icon"><i class="fas fa-map"></i></span>
+                                                <select class="form-select" @onchange="StateChangedAsync">
+                                                    <option value="0">Seleccione un Estado</option>
+                                                    @if (states is not null)
+                                                    {
+                                                        foreach (var state in states)
                                                         {
-                                                            @foreach (var state in states)
-                                                            {
-                                                                <option value="@state.Id_provincia">@state.Nombre_provincia</option>
-                                                            }
+                                                            <option value="@state.Id_provincia">@state.Nombre_provincia</option>
                                                         }
-                                                    </select>
-                                                </div>
+                                                    }
+                                                </select>
                                             </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label">Ciudad</label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text"><i class="fas fa-city"></i></span>
-                                                    <select class="form-select" @bind="userDTO.Id_ciudad">
-                                                        <option value="0">-- Seleccione una ciudad --</option>
-                                                        @if (cities is not null)
+                                        </div>
+
+                                        <!-- CIUDAD -->
+                                        <div class="col-md-6">
+                                            <label class="form-label">Ciudad</label>
+                                            <div class="input-wrapper">
+                                                <span class="input-icon"><i class="fas fa-city"></i></span>
+                                                <select class="form-select" @bind="userDTO.Id_ciudad">
+                                                    <option value="0">Seleccione una Ciudad</option>
+                                                    @if (cities is not null)
+                                                    {
+                                                        foreach (var city in cities)
                                                         {
-                                                            @foreach (var city in cities)
-                                                            {
-                                                                <option value="@city.Id_ciudad">@city.Nombre_ciudad</option>
-                                                            }
+                                                            <option value="@city.Id_ciudad">@city.Nombre_ciudad</option>
                                                         }
-                                                    </select>
-                                                    <ValidationMessage For="@(() => userDTO.Id_ciudad)" />
-                                                </div>
+                                                    }
+                                                </select>
                                             </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label">Direccion</label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text"><i class="fas fa-street-view"></i></span>
-                                                    <InputText type="text" class="form-control" @bind-Value="userDTO.Address" placeholder="Direccion" />
-                                                </div>
+                                            <ValidationMessage For="@(() => userDTO.Id_ciudad)" />
+                                        </div>
+
+                                        <!-- DIRECCION -->
+                                        <div class="col-md-6">
+                                            <label class="form-label">Dirección</label>
+                                            <div class="input-wrapper">
+                                                <span class="input-icon"><i class="fas fa-street-view"></i></span>
+                                                <input class="form-control"
+                                                           @bind="userDTO.Address"
+                                                           placeholder="Dirección" />
                                             </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label">Teléfono</label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text"><i class="fas fa-phone"></i></span>
-                                                    <InputText type="tel" class="form-control" @bind-Value="userDTO.PhoneNumber" placeholder="Teléfono" />
-                                                </div>
+                                            <ValidationMessage For="@(() => userDTO.Address)" />
+                                        </div>
+
+                                        <!-- TELÉFONO -->
+                                        <div class="col-md-6">
+                                            <label class="form-label">Teléfono</label>
+                                            <div class="input-wrapper">
+                                                <span class="input-icon"><i class="fas fa-phone"></i></span>
+                                                <input type="tel" class="form-control"
+                                                           @bind="userDTO.PhoneNumber"
+                                                           placeholder="Teléfono" />
                                             </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label">Email</label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text"><i class="fas fa-user-envelope"></i></span>
-                                                    <InputText type="email" class="form-control" @bind-Value="userDTO.Email" placeholder="Email" />
-                                                </div>
+                                        </div>
+
+                                        <!-- EMAIL -->
+                                        <div class="col-md-6">
+                                            <label class="form-label">Email</label>
+                                            <div class="input-wrapper">
+                                                <span class="input-icon"><i class="fas fa-envelope"></i></span>
+                                                <input type="email" class="form-control" required
+                                                           @bind="userDTO.Email"
+                                                           placeholder="Email" />
                                             </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label">Contraseña</label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                                                    <InputText type="password" class="form-control" @bind-Value="userDTO.Password" placeholder="Contraseña" />
-                                                </div>
+                                            
+                                        </div>
+
+                                        <!-- PASSWORD -->
+                                        <div class="col-md-6">
+                                            <label class="form-label">Contraseña</label>
+                                            <div class="input-wrapper">
+                                                <span class="input-icon"><i class="fas fa-lock"></i></span>
+                                                <input type="password" class="form-control"
+                                                           @bind="userDTO.Password"
+                                                           placeholder="Contraseña" />
                                             </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label">Confirmar Contraseña</label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                                                    <InputText type="password" class="form-control" @bind-Value="userDTO.PasswordConfirm" placeholder="Confirmar Contraseña" />
-                                                </div>
+                                            <ValidationMessage For="@(() => userDTO.Password)" />
+                                        </div>
+
+                                        <!-- CONFIRM PASSWORD -->
+                                        <div class="col-md-6">
+                                            <label class="form-label">Confirmar Contraseña</label>
+                                            <div class="input-wrapper">
+                                                <span class="input-icon"><i class="fas fa-lock"></i></span>
+                                                <input type="password" class="form-control" re
+                                                           @bind="userDTO.PasswordConfirm"
+                                                           placeholder="Confirmar Contraseña" />
                                             </div>
-                                            <div class="col-12 d-flex justify-content-center gap-2 mt-3">
-                                                <button type="submit" class="btn btn-primary">Registrar</button>
-                                                <button type="reset" class="btn btn-secondary">Reset</button>
-                                            </div>
+                                            <ValidationMessage For="@(() => userDTO.PasswordConfirm)" />
+                                        </div>
+
+                                        <!-- BOTONES -->
+                                        <div class="col-12 d-flex justify-content-center gap-2 mt-3">
+                                            <button type="submit" class="btn btn-primary">Registrar</button>
+                                        <button type="button" class="btn btn-secondary" @onclick="ResetForm">Reset</button>
                                         </div>
                                     </div>
 
                                     <p class="text-center mt-4">O regístrate con</p>
-                                    <div class="social-icons">
+
+                                    <div class="registerpage-social-icons">
                                         <button><i class="fab fa-google"></i></button>
                                         <button><i class="fab fa-facebook-f"></i></button>
                                         <button><i class="fab fa-pinterest"></i></button>
                                         <button><i class="fab fa-linkedin-in"></i></button>
                                     </div>
+
                                 </Content>
                             </Tab>
+
+                            <!-- TAB 2: IMAGEN -->
                             <Tab>
                                 <TitleTemplate>
                                     <Icon Name="IconName.PersonFill" /> Imagen
                                 </TitleTemplate>
+
                                 <Content>
                                     <div class="upload-form text-center mt-3">
-                                        <label for="profileImage" class="form-label fw-bold">Selecciona una imagen para tu perfil:</label>
-                                        <InputImg Label="Foto" ImageSelected="ImageSelected" ImageURL="@imageUrl" />
-                                       @*  <button type="button" class="btn btn-primary mt-3">Subir Imagen</button> *@
+                                        <label class="form-label fw-bold">Selecciona una imagen para tu perfil:</label>
+                                        <InputImg ImageSelected="ImageSelected"
+                                                  ImageURL="@imageUrl"
+                                                  Label="Foto" />
                                     </div>
                                 </Content>
                             </Tab>
+
                         </Tabs>
                     </EditForm>
                 </div>
-
-
-                <div class="form-right-blue">
+                <!-- PANEL DERECHO (LOGIN) -->
+                <div class="registerpage-right-blue registerpage-panel">
                     <h2>¡Bienvenido de nuevo!</h2>
                     <p>¿Ya tienes una cuenta?</p>
                     <button class="btn btn-light mt-2" @onclick="Login">Iniciar Sesión</button>
                 </div>
-            </div>
-        </div>
+         </div>
     </div>
 </div>
-
 
 
 @code {
@@ -275,5 +324,10 @@
     private void Login()
     {
         navigationManager.NavigateTo("/Login");
+    }
+
+    private void ResetForm()
+    {
+        userDTO = new UserDTO(); // Crea un nuevo objeto vacío
     }
 }

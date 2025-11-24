@@ -1,0 +1,45 @@
+﻿using ProjectWeb.Shared.Enums;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ProjectWeb.Shared.Modelo.Entidades
+{
+    public class Sale
+    {
+        [Key]
+        public int Id_sale { get; set; }
+
+        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd hh:mm tt}")]
+        [Display(Name = "Fecha/Hora")]
+        [Required(ErrorMessage = "El campo {0} es obligatorio.")]
+        public DateTime Date { get; set; }
+
+        public User? User { get; set; }
+
+        public string? UserId { get; set; }
+
+        [DataType(DataType.MultilineText)]
+        [Display(Name = "Comentarios")]
+        public string? Remarks { get; set; }
+
+        public OrderStatus OrderStatus { get; set; }
+
+        public ICollection<SaleDetail>? SaleDetails { get; set; }
+
+        [DisplayFormat(DataFormatString = "{0:N0}")]
+        [Display(Name = "Líneas")]
+        public int Lines => SaleDetails == null ? 0 : SaleDetails.Count;
+
+        [DisplayFormat(DataFormatString = "{0:N2}")]
+        [Display(Name = "Cantidad")]
+        public float Quantity => SaleDetails == null ? 0 : SaleDetails.Sum(sd => sd.Quantity);
+
+        [DisplayFormat(DataFormatString = "{0:C2}")]
+        [Display(Name = "Valor")]
+        public decimal Value => SaleDetails == null ? 0 : SaleDetails.Sum(sd => sd.Value);
+    }
+}

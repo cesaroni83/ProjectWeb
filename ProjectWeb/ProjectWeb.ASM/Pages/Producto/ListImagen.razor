@@ -1,0 +1,303 @@
+﻿@page "/ListImgProduc/{IdProducto:int}/{ProductoName}"
+@using Microsoft.AspNetCore.Authorization
+@using ProjectWeb.ASM.Repositorio
+@using ProjectWeb.Shared.Modelo.DTO.ProductImage
+@using ProjectWeb.Shared.Modelo.DTO.Producto
+@using ProjectWeb.Shared.Modelo.Estatico
+@inject NavigationManager navigationManager
+@inject SweetAlertService sweetAlertService
+@inject IRepository repository
+@inject NavigationManager NavManager
+@attribute [Authorize(Roles = "Admin,Employee")]
+
+<PageTitle>Producto</PageTitle>
+<ConfirmDialog @ref="dialog" />
+
+<div class="centrado-pantalla">
+    <div class="container-tabla">
+        <div class="d-flex justify-content-lg-start">
+            <button class="btn btn-link text-decoration-none" @onclick="NavigateBack">
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+        </div>
+        <Card >
+            <CardHeader class="text-center fs-4">
+                Lista de Imaganes De @ProductoName
+            </CardHeader>
+            <CardBody>
+                <Accordion>
+                    <AccordionItem Active="true">
+                        <TitleTemplate>
+                            <Icon Name="IconName.HouseFill" Class="me-1" />Lista De Imagenes Del Producto @ProductoName
+                        </TitleTemplate>
+                        <Content>
+                            <Grid TItem="ImagenProdDTO"
+                                  Class="table table-hover table-bordered grid-table"
+                                  FiltersRowCssClass="bg-primary text-white bg-opacity-25 border-bottom-0"
+                                  HeaderRowCssClass="bg-primary text-white border-bottom-0"
+                                  DataProvider="ImagenesDataProvider"
+                                  AllowFiltering="true"
+                                  AllowPaging="true"
+                                  PageSize="10"
+                                  AllowSorting="true"
+                                  AllowRowClick="true"
+                                  OnRowClick="OnrowClick"
+                                  Responsive="true"
+                                  @ref="grid">
+                                <GridTemplates Class="gap-2">
+                                    <ExportLayout TItem="ImagenProdDTO" GridRef="grid" Items="ListaImag" />
+                                </GridTemplates>
+                                <GridColumn TItem="ImagenProdDTO" HeaderText="Foto" FilterTextboxWidth="50" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
+                                    <div class="text-center">
+                                        <Image Src="@ObtenerImagen(@context.Foto_Producto)" Class="rounded img-pequena" Alt="placeholder" />
+                                    </div>
+                                </GridColumn>
+                                <GridColumn TItem="ImagenProdDTO" HeaderText="ID Imagen" PropertyName="Id_imagen" SortString="Id_imagen" SortKeySelector="item => item.Id_imagen" FilterTextboxWidth="100" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
+                                    @context.Id_imagen
+                                </GridColumn>
+                                <GridColumn TItem="ImagenProdDTO" HeaderText="Name" PropertyName="Name_imagen" SortString="Name_imagen" SortKeySelector="item => item.Name_imagen" FilterTextboxWidth="100" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
+                                    @context.Name_imagen
+                                </GridColumn>
+                                <GridColumn TItem="ImagenProdDTO" HeaderText="Descripcion" PropertyName="Descripcion_imagen" SortString="Descripcion_imagen" SortKeySelector="item => item.Descripcion_imagen" FilterTextboxWidth="100" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
+                                    @context.Descripcion_imagen
+                                </GridColumn>
+                                <GridColumn TItem="ImagenProdDTO" HeaderText="Imagen Principal" FilterTextboxWidth="50" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
+                                    @* <div class="text-center">
+                                        <input type="checkbox"
+                                               checked="@IsChecked(context.Tipo_Imagen!)"
+                                               @onchange="(e) => context.Tipo_Imagen = ConvertToString(e)" />
+                                    </div> *@
+                                    @context.Tipo_Imagen
+                                </GridColumn>
+
+                                <GridColumn TItem="ImagenProdDTO" HeaderText="Estado" PropertyName="Estado_Imagen" HeaderTextAlignment="Alignment.Center" SortString="Estado_Imagen" SortKeySelector="item => item.Estado_Imagen" FilterTextboxWidth="100">
+                                    @Estado.GetTextEstado(@context.Estado_Imagen)
+                                </GridColumn>
+
+                                <GridColumn TItem="ImagenProdDTO" HeaderText="Acción" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Start" Filterable="false" FilterTextboxWidth="250">
+                                    <div class="btn-action-column">
+                                        <button class="btn btn-success btn-sm" @onclick=@(() => ShowModal(context.Id_imagen, true))>Update</button>
+                                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteReg(context.Id_imagen, context.Descripcion_imagen)">Delete</button>
+                                    </div>
+                                </GridColumn>
+                            </Grid>
+                        </Content>
+                    </AccordionItem>
+                    <AccordionItem>
+                        <TitleTemplate>
+                            <Icon Name="IconName.PersonFill" Class="me-1" /> Visualiza
+                        </TitleTemplate>
+                        <Content>
+                            <div class="carousel-wrapper">
+                                <Carousel ShowIndicators="true" Autoplay="CarouselAutoPlay.StartOnPageLoad" class="custom-carousel">
+                                @for (int i = 0; i < CarouselItems.Count; i++)
+                                {
+                                    var item = CarouselItems[i];
+                                    <CarouselItem Active="@(i == 0)">
+                                            <Image Src="@item.Base64Image" Class="carousel-image"/>
+                                        <CarouselCaption>
+                                            <h2>@item.Titulo</h2>
+                                            <p>@item.Descripcion</p>
+                                        </CarouselCaption>
+                                    </CarouselItem>
+                                }
+                            </Carousel>
+                            </div>
+                        </Content>
+                    </AccordionItem>
+
+                </Accordion>
+                
+            </CardBody>
+            <CardFooter class="d-flex justify-content-end ">
+                <button class="btn btn-primary" @onclick=@(() => ShowModal())>Nuevo Registro</button>
+            </CardFooter>
+        </Card>
+    </div>
+</div>
+
+
+
+@code {
+    [Parameter] public int IdProducto { get; set; }
+    [Parameter] public string ProductoName { get; set; } = string.Empty;
+    private ConfirmDialog dialog = default!;
+    [Inject] protected PreloadService PreloadService { get; set; } = default!;
+    public ImagenProdDTO Input = new ImagenProdDTO();
+    [Inject] ToastService ToastService { get; set; } = default!;
+    private List<ImagenProdDTO> ListaImag { get; set; } = default!;
+    private BlazorBootstrap.Grid<ImagenProdDTO>? grid;
+    private List<Estado> items = new();
+    [CascadingParameter]
+    IModalService Modal { get; set; } = default!;
+    private List<CarouselItemData> CarouselItems = new();
+    public ImagenProdDTO ReturnUrl = new ImagenProdDTO();
+    private bool IsChecked(string value) => (value ?? "").ToLower() == "true";
+    private string ConvertToString(ChangeEventArgs e)
+    {
+        return (e.Value != null && e.Value.ToString().ToLower() == "true") ? "true" : "false";
+    }
+    private void NavigateBack()
+    {
+        if (ReturnUrl?.Productos is not null)
+        {
+            NavManager.NavigateTo($"/ListProd/{ReturnUrl.Productos.Categorias!.Id_Categoria}/{ReturnUrl.Productos.Categorias.Descripcion_Cat}");
+        }
+        else
+        {
+            NavManager.NavigateTo("/ListCategoria");
+        }
+    }
+
+    private async Task CargaImagenes(List<ImagenProdDTO> Lista)
+    {
+        CarouselItems.Clear();
+
+        foreach (var img in Lista)
+        {
+            string dataUrl;
+
+            if (img.Foto_Producto != null && img.Foto_Producto.Length > 0)
+            {
+                string base64Img = Convert.ToBase64String(img.Foto_Producto);
+                dataUrl = $"data:image/png;base64,{base64Img}";
+            }
+            else
+            {
+                // Imagen por defecto si no hay bytes
+                dataUrl = "_content/BlazorBootstrap.Demo.RCL/images/placeholder.png";
+            }
+
+            CarouselItems.Add(new CarouselItemData
+            {
+                Base64Image = dataUrl,
+                Titulo = img.Name_imagen ?? "Imagen del producto",
+                Descripcion = img.Descripcion_imagen ?? "Descripción opcional"
+            });
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private string? ObtenerImagen(byte[]? bytes)
+    {
+        if (bytes == null || bytes.Length == 0)
+            return null;
+
+        string base64 = Convert.ToBase64String(bytes);
+        return $"data:image/jpeg;base64,{base64}";
+    }
+
+    private byte[]? ObtenerBytes(string? base64Image)
+    {
+        if (string.IsNullOrWhiteSpace(base64Image))
+            return null;
+
+        // Si la cadena incluye el encabezado tipo "data:image/jpeg;base64,"
+        var parts = base64Image.Split(',');
+        string base64 = parts.Length > 1 ? parts[1] : parts[0];
+
+        return Convert.FromBase64String(base64);
+    }
+
+    private async Task ShowModal(int id = 0, bool isEdit = false)
+
+    {
+        IModalReference modalReference;
+
+        if (isEdit)
+        {
+            var parameters = new ModalParameters();
+            parameters.Add("InputDTO", Input);
+            parameters.Add("SubmitButtonText", "Update");
+            parameters.Add("Titulo", "Modifica Datos De Imagen");
+            modalReference = Modal.Show<ImagenComponent>(parameters);
+        }
+        else
+        {
+            var parameters = new ModalParameters();
+            parameters.Add("InputDTO", Input = new());
+            parameters.Add("SubmitButtonText", "Save");
+            parameters.Add("Titulo", "Registro De Imagnes");
+            modalReference = Modal.Show<ImagenComponent>(parameters);
+        }
+        var result = await modalReference.Result;
+        if (result.Confirmed)
+        {
+            await RefrescarGrid();
+        }
+
+    }
+
+    private async Task<GridDataProviderResult<ImagenProdDTO>> ImagenesDataProvider(GridDataProviderRequest<ImagenProdDTO> request)
+    {
+        if (ListaImag is null) // pull employees only one time for client-side filtering, sorting, and paging
+            await LoadImagenByProducto();
+        return await Task.FromResult(request.ApplyTo(ListaImag));
+    }
+    private async Task OnrowClick(GridRowEventArgs<ImagenProdDTO> args)
+    {
+        //await ModalService.ShowAsync(new ModalOption { Type = ModalType.Primary, Title = "Event: Row Click", Message = $"Id: {args.Item.Id_user}, Name: {args.Item.User_name}" });
+        Input.Id_producto = args.Item.Id_producto;
+        Input.Id_imagen = args.Item.Id_imagen;
+        Input.Foto_Producto = args.Item.Foto_Producto;
+        Input.Descripcion_imagen = args.Item.Descripcion_imagen;
+        Input.Estado_Imagen= args.Item.Estado_Imagen;
+        Input.Tipo_Imagen = args.Item.Tipo_Imagen;
+        Input.Name_imagen = args.Item.Name_imagen;
+        return;
+    }
+    private async Task LoadImagenByProducto()
+    {
+        PreloadService.Show(SpinnerColor.Light, "Loading data...");
+        var responseHttp = await repository.Get<List<ImagenProdDTO>>($"/api/ImagenProduct/ImagenByProducto/{IdProducto}");
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        ListaImag = responseHttp.Response?.ToList() ?? new List<ImagenProdDTO>();
+        StateHasChanged();
+        await CargaImagenes(ListaImag);
+        ReturnUrl = ListaImag.FirstOrDefault() ?? new ImagenProdDTO(); //url de regreso
+        PreloadService.Hide();
+    }
+    private async Task RefrescarGrid()
+    {
+        await LoadImagenByProducto();
+        await grid.RefreshDataAsync();
+    }
+
+    private async Task DeleteReg(int id, string nombre)
+    {
+        var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
+        var confirmation = await dialog.ShowAsync(
+            title: "Eliminacion De Regitro",
+            message1: "Desea Eliminar La Producto?",
+            message2: "ID:" + id + "  Producto:" + nombre,
+            confirmDialogOptions: options);
+
+        if (confirmation)
+        {
+            // call API to delete the employee
+            // show acknowledgment to the user
+            var responseHttp = await repository.Delete($"/api/ImagenProduct/{Input.Id_imagen}");
+            if (responseHttp.Error)
+            {
+                var message = await responseHttp.GetErrorMessageAsync();
+                await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                return;
+            }
+            ToastService.Notify(new ToastMessage(ToastType.Success, $"Pais Eliminado con Exito!"));
+            await RefrescarGrid();
+            return;
+        }
+        else
+        {
+            ToastService.Notify(new ToastMessage(ToastType.Secondary, $"Operacion Cancelada!"));
+        }
+
+    }
+}

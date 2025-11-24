@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
 using ProjectWeb.Shared.Enums;
+using ProjectWeb.Shared.Modelo.DTO.Categoria;
 using ProjectWeb.Shared.Modelo.DTO.Ciudad;
 using ProjectWeb.Shared.Modelo.DTO.Empresa;
 using ProjectWeb.Shared.Modelo.DTO.Menu;
 using ProjectWeb.Shared.Modelo.DTO.Pais;
 using ProjectWeb.Shared.Modelo.DTO.Persona;
+using ProjectWeb.Shared.Modelo.DTO.ProductImage;
+using ProjectWeb.Shared.Modelo.DTO.Producto;
 using ProjectWeb.Shared.Modelo.DTO.Provincia;
 using ProjectWeb.Shared.Modelo.DTO.Sucursal;
 using ProjectWeb.Shared.Modelo.DTO.User;
@@ -31,7 +34,12 @@ namespace ProjectWeb.API.AutoMaper
             CreateMap<Sucursal, SucursalDropDTO>().ReverseMap();
             CreateMap<Persona, PersonaDTO>().ReverseMap();
             CreateMap<Persona, PersonaDropDTO>().ReverseMap();
-            CreateMap<User,UsersDTO>().ReverseMap();
+            CreateMap<Categoria, CategoriaDTO>().ReverseMap();
+            CreateMap<Categoria, CategoriaDropDTO>().ReverseMap();
+            CreateMap<ImagenProd, ImagenProdDTO>().ReverseMap();
+            CreateMap<Producto, ProductoDTO>().ReverseMap();
+            CreateMap<Producto, ProductoDropDTO>().ReverseMap();
+            CreateMap<User, UsersDTO>().ReverseMap();
         }
     }
 }

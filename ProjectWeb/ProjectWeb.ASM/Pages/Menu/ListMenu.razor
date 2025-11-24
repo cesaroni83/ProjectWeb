@@ -20,70 +20,73 @@
 <ConfirmDialog @ref="dialog" />
 <div class="centrado-pantalla">
     <div class="container-tabla">
-        <Card style="width:93%; height:auto; margin:50px">
+        <Card >
             <CardHeader class="text-center fs-4">
                 Lista Del Menu
             </CardHeader>
             <CardBody>
-                <Grid TItem="MenuDTO"
-					  Class="table table-hover table-bordered align-middle grid-table"
-                      FiltersRowCssClass="bg-primary text-white bg-opacity-25 border-bottom-0"
-                      HeaderRowCssClass="bg-primary text-white border-bottom-0"
-                      DataProvider="PaisDataProvider"
-                      AllowFiltering="true"
-                      AllowPaging="true"
-                      PageSize="10"
-                      AllowSorting="true"
-                      AllowRowClick="true"
-                      OnRowClick="OnrowClick"
-                      Responsive="true"
-                      @ref="grid">
-                     <GridTemplates Class="gap-2">
-						<ExportLayout TItem="MenuDTO" GridRef="grid" Items="ListaMenu" />
-                     </GridTemplates>
-                     <GridColumn TItem="MenuDTO" HeaderText="ID Menu" PropertyName="Id_menu" SortString="Id_menu" SortKeySelector="item => item.Id_menu" FilterTextboxWidth="100" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
-                        @context.Id_menu
-                    </GridColumn>
+				<div class="tabla-responsive-wrapper">
+					<Grid TItem="MenuDTO"
+						  Class="table table-hover table-bordered align-middle grid-table"
+						  FiltersRowCssClass="bg-primary text-white bg-opacity-25 border-bottom-0"
+						  HeaderRowCssClass="bg-primary text-white border-bottom-0"
+						  DataProvider="PaisDataProvider"
+						  AllowFiltering="true"
+						  AllowPaging="true"
+						  PageSize="10"
+						  AllowSorting="true"
+						  AllowRowClick="true"
+						  OnRowClick="OnrowClick"
+						  Responsive="true"
+						  @ref="grid">
+						<GridTemplates Class="gap-2">
+							<ExportLayout TItem="MenuDTO" GridRef="grid" Items="ListaMenu" />
+						</GridTemplates>
+						<GridColumn TItem="MenuDTO" HeaderText="ID Menu" PropertyName="Id_menu" SortString="Id_menu" SortKeySelector="item => item.Id_menu" FilterTextboxWidth="100" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
+							@context.Id_menu
+						</GridColumn>
 
-                    <GridColumn TItem="MenuDTO" HeaderText="Nombre Menu" PropertyName="Decripcion" HeaderTextAlignment="Alignment.Center" SortString="Descripcion" SortKeySelector="item => item.Descripcion" FilterTextboxWidth="150">
-                        @context.Descripcion
-                    </GridColumn>
-                    <GridColumn TItem="MenuDTO" HeaderText="Pagina Navengacion" PropertyName="Referencia" HeaderTextAlignment="Alignment.Center" SortString="Referencia" SortKeySelector="item => item.Referencia" FilterTextboxWidth="150">
-                        @context.Referencia
-                    </GridColumn>
+						<GridColumn TItem="MenuDTO" HeaderText="Nombre Menu" PropertyName="Decripcion" HeaderTextAlignment="Alignment.Center" SortString="Descripcion" SortKeySelector="item => item.Descripcion" FilterTextboxWidth="150">
+							@context.Descripcion
+						</GridColumn>
+						<GridColumn TItem="MenuDTO" HeaderText="Pagina Navengacion" PropertyName="Referencia" HeaderTextAlignment="Alignment.Center" SortString="Referencia" SortKeySelector="item => item.Referencia" FilterTextboxWidth="150">
+							@context.Referencia
+						</GridColumn>
 
-                    <GridColumn TItem="MenuDTO" HeaderText="Información" PropertyName="Informacion_menu" SortString="Informacion_menu" SortKeySelector="item => item.Informacion_menu" FilterTextboxWidth="100">
-                        @context.Informacion_menu
-                    </GridColumn>
+						<GridColumn TItem="MenuDTO" HeaderText="Información" PropertyName="Informacion_menu" SortString="Informacion_menu" SortKeySelector="item => item.Informacion_menu" FilterTextboxWidth="100">
+							@context.Informacion_menu
+						</GridColumn>
 
-					<GridColumn TItem="MenuDTO" HeaderText="Icono" TextAlignment="Alignment.Center" HeaderTextAlignment="Alignment.Center">
-                        <Icon Name="@IconColorHelper.ParseToIconName(Icono.GetTextIcono(context.Icono_name ?? string.Empty))"
-                              Size="IconSize.x1"
-                              Color="@IconColorHelper.ParseToIconColor(IconoColor.GetTextIconoColor(context.Icono_color ?? string.Empty))" />
-                    </GridColumn>
+						<GridColumn TItem="MenuDTO" HeaderText="Icono" TextAlignment="Alignment.Center" HeaderTextAlignment="Alignment.Center">
+							<Icon Name="@IconColorHelper.ParseToIconName(Icono.GetTextIcono(context.Icono_name ?? string.Empty))"
+								  Size="IconSize.x1"
+								  Color="@IconColorHelper.ParseToIconColor(IconoColor.GetTextIconoColor(context.Icono_color ?? string.Empty))" />
+						</GridColumn>
 
-                    <GridColumn TItem="MenuDTO" HeaderText="Icono" PropertyName="Icono_name" SortString="Icono_name" SortKeySelector="item => item.Icono_name" FilterTextboxWidth="100">
-                        @(context.Icono_name != null ? Icono.GetTextIcono(context.Icono_name) : "")
-                    </GridColumn>
-                    <GridColumn TItem="MenuDTO" HeaderText="Color" PropertyName="Icono_color" SortString="Icono_color" SortKeySelector="item => item.Icono_color" FilterTextboxWidth="100">
-                        @(context.Icono_color != null ? IconoColor.GetTextIconoColor(context.Icono_color) : "")
-                    </GridColumn>
+						<GridColumn TItem="MenuDTO" HeaderText="Icono" PropertyName="Icono_name" SortString="Icono_name" SortKeySelector="item => item.Icono_name" FilterTextboxWidth="100">
+							@(context.Icono_name != null ? Icono.GetTextIcono(context.Icono_name) : "")
+						</GridColumn>
+						<GridColumn TItem="MenuDTO" HeaderText="Color" PropertyName="Icono_color" SortString="Icono_color" SortKeySelector="item => item.Icono_color" FilterTextboxWidth="100">
+							@(context.Icono_color != null ? IconoColor.GetTextIconoColor(context.Icono_color) : "")
+						</GridColumn>
 
-                    <GridColumn TItem="MenuDTO" HeaderText="Menu Padre" PropertyName="Nombre_padre" SortString="Nombre_padre" SortKeySelector="item => item.Nombre_padre" FilterTextboxWidth="100">
-                        @context.Nombre_padre
-                    </GridColumn>
+						<GridColumn TItem="MenuDTO" HeaderText="Menu Padre" PropertyName="Nombre_padre" SortString="Nombre_padre" SortKeySelector="item => item.Nombre_padre" FilterTextboxWidth="100">
+							@context.Nombre_padre
+						</GridColumn>
 
-                    <GridColumn TItem="MenuDTO" HeaderText="Estado" PropertyName="Estado_pais" HeaderTextAlignment="Alignment.Center" SortString="Estado_pais" SortKeySelector="item => item.Estado_menu" FilterTextboxWidth="100">
-                        @Estado.GetTextEstado(@context.Estado_menu)
-                    </GridColumn>
+						<GridColumn TItem="MenuDTO" HeaderText="Estado" PropertyName="Estado_pais" HeaderTextAlignment="Alignment.Center" SortString="Estado_pais" SortKeySelector="item => item.Estado_menu" FilterTextboxWidth="100">
+							@Estado.GetTextEstado(@context.Estado_menu)
+						</GridColumn>
 
-                    <GridColumn TItem="MenuDTO" HeaderText="Acción" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Start" Filterable="false" FilterTextboxWidth="250">
-                          <div class="btn-action-column">
-                            <button class="btn btn-success btn-sm" @onclick=@(() => ShowModal(context.Id_menu, true))>Update</button>
-                            <button class="btn btn-danger btn-sm" @onclick="() => DeleteReg(context.Id_menu, context.Descripcion)">Delete</button>
-                        </div>
-                    </GridColumn>
-                </Grid>
+						<GridColumn TItem="MenuDTO" HeaderText="Acción" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Start" Filterable="false" FilterTextboxWidth="250">
+							<div class="btn-action-column">
+								<button class="btn btn-success btn-sm" @onclick=@(() => ShowModal(context.Id_menu, true))>Update</button>
+								<button class="btn btn-danger btn-sm" @onclick="() => DeleteReg(context.Id_menu, context.Descripcion)">Delete</button>
+							</div>
+						</GridColumn>
+					</Grid>
+				</div>
+                
             </CardBody>
             <CardFooter class="d-flex justify-content-end ">
 				<button class="btn btn-primary" @onclick=@(() => ShowModal())>Nuevo Registro</button>

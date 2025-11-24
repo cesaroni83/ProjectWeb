@@ -1,0 +1,182 @@
+﻿@using ProjectWeb.ASM.Repositorio
+@using ProjectWeb.Shared.Modelo.DTO.Categoria
+@using ProjectWeb.Shared.Modelo.DTO.Producto
+@using ProjectWeb.Shared.Modelo.Estatico
+@inject ToastService ToastService
+@inject SweetAlertService sweetAlertService
+@inject IRepository repository
+
+<div class="principal">
+    <div class="formulario">
+
+        <!-- Título -->
+        <div class="form-panel">
+            <h2 class="form-title"><i class="bi bi-ui-checks-grid"></i>@Titulo</h2>
+        </div>
+
+        <EditForm Model="Input" OnValidSubmit="SubmitForm">
+            <DataAnnotationsValidator />
+            <ValidationSummary></ValidationSummary>
+            <div class="form-wrapper">
+                <!-- Categoria -->
+                <div class="form-group">
+                    <label>Categoria</label>
+                    <div class="input-icon">
+                        <span class="icon"><i class="fas fa-globe"></i></span>
+                        <select class="form-control" @onchange="CategoriaChangedAsync">
+                            <option value="">Seleccione una Categoria</option>
+                            @if (CategoriaDrop is not null)
+                            {
+                                @foreach (var categ in CategoriaDrop)
+                                {
+                                    <option selected="@(categ.Id_Categoria == Input?.Id_Categoria )" value="@categ.Id_Categoria">@categ.Descripcion_Cat</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <ValidationMessage For="() => Input!.Id_Categoria" />
+                </div>
+                <!-- Nombre -->
+                <div class="form-group">
+                    <label>Nombre Producto</label>
+                    <div class="input-icon">
+                        <span class="icon"><i class="fas fa-city"></i></span>
+                        <input type="text" class="form-control" placeholder="Nombre Producto" @bind="Input.Name" />
+                    </div>
+                    <ValidationMessage For="() => Input.Name" />
+                </div>
+                <!-- Información -->
+                <div class="form-group" style="flex:1 1 100%">
+                    <label>Información:</label>
+                    <div class="input-icon">
+                        <span class="icon"><i class="fas fa-info-circle"></i></span>
+                        <textarea class="form-control"
+                                  rows="4"
+                                  placeholder="Ingrese información"
+                                  @bind="Input.Description"></textarea>
+                    </div>
+                    <ValidationMessage For="() => Input.Description" />
+                </div>
+                <!-- stock -->
+                <div class="form-group">
+                    <label>Stock</label>
+                    <div class="input-icon">
+                        <span class="icon"><i class="fas fa-box"></i></span>
+                        <input type="text" class="form-control" placeholder="Stock Producto" @bind="Input.Stock" />
+                    </div>
+                    <ValidationMessage For="() => Input.Stock" />
+                </div>
+                <!-- precio -->
+                <div class="form-group">
+                    <label>Precio</label>
+                    <div class="input-icon">
+                        <span class="icon"><i class="fas fa-tag"></i></span>
+                        <input type="number" class="form-control" placeholder="Precio De Venta" @bind="Input.Price" step="0.01" />
+                    </div>
+                    <ValidationMessage For="() => Input.Price" />
+                </div>
+                <!-- Estado -->
+                <div class="form-group">
+                    <label>Estado:</label>
+                    <div class="input-icon">
+                        <span class="icon"><i class="fas fa-list"></i></span>
+                        <select class="form-control" @bind="Input.Estado_producto">
+                            <option value="">Seleccione</option>
+                            @foreach (var item in items)
+                            {
+                                <option value="@item.Id">@item.Text</option>
+                            }
+                        </select>
+                    </div>
+                    <ValidationMessage For="() => Input.Estado_producto" />
+                </div>
+                <!-- Botones -->
+                <div class="buttons-container">
+                    <button type="submit" class="btn btn-primary">@SubmitButtonText</button>
+                    <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+                </div>
+            </div>
+        </EditForm>
+
+    </div>
+</div>
+
+@code {
+
+    [CascadingParameter] BlazoredModalInstance Modal { get; set; } = default!;
+    [Parameter] public ProductoDTO InputDTO { get; set; } = new ProductoDTO();
+    [Parameter] public string SubmitButtonText { get; set; } = string.Empty;
+    [Parameter] public string Titulo { get; set; } = string.Empty;
+    private List<CategoriaDropDTO>? CategoriaDrop;
+
+    private ProductoDTO Input = new();
+    private List<Estado> items = new();
+    string Estados = "A";
+
+    private async Task SubmitForm()
+    {
+        if (SubmitButtonText == "Save")
+        {
+            var responseHttp = await repository.Post<ProductoDTO>("/api/Productos/CreateProducto", Input);
+            if (responseHttp.Error)
+            {
+                var message = await responseHttp.GetErrorMessageAsync();
+                await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                return;
+            }
+            ToastService.Notify(new(ToastType.Success, $"Record Pais Update Successfully."));
+            await Task.Delay(3000);
+            await Modal.CloseAsync(ModalResult.Ok(Input));
+            return;
+        }
+        if (SubmitButtonText == "Update")
+        {
+            var responseHttp = await repository.Put<ProductoDTO>($"/api/Productos/{Input.Id_producto}", Input);
+            if (responseHttp.Error)
+            {
+                var message = await responseHttp.GetErrorMessageAsync();
+                await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                return;
+            }
+            ToastService.Notify(new(ToastType.Success, $"Record Pais Saved Successfully."));
+            await Task.Delay(3000);
+            await Modal.CloseAsync(ModalResult.Ok(Input));
+            return;
+        }
+    }
+
+    private async Task Cancelar()
+    {
+        await Modal.CancelAsync();
+    }
+
+    private async Task LoadCategoriasAsync()
+    {
+        var responseHttp = await repository.Get<List<CategoriaDropDTO>>($"/api/Categorias/ComboCategoria/{Estados}");
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        CategoriaDrop = responseHttp.Response;
+    }
+
+    private async Task CategoriaChangedAsync(ChangeEventArgs e)
+    {
+        var selectedCountry = Convert.ToInt32(e.Value!);
+        Input.Id_Categoria = selectedCountry;
+    }
+    protected async override Task OnParametersSetAsync()
+    {
+        items = Estado.GetItems();
+        await LoadCategoriasAsync();
+        if (InputDTO.Name != null)
+        {
+            Input = InputDTO;
+            Input.Id_Categoria = InputDTO.Id_Categoria;
+        }
+
+    }
+}

@@ -1,0 +1,195 @@
+﻿@using ProjectWeb.ASM.Repositorio
+@using ProjectWeb.Shared.Modelo.DTO.ProductImage
+@using ProjectWeb.Shared.Modelo.DTO.Producto
+@using ProjectWeb.Shared.Modelo.Estatico
+@inject ToastService ToastService
+@inject SweetAlertService sweetAlertService
+@inject IRepository repository
+
+<div class="principal">
+    <div class="formulario">
+
+        <!-- Título -->
+        <div class="form-panel">
+            <h2 class="form-title"><i class="bi bi-ui-checks-grid"></i>@Titulo</h2>
+        </div>
+
+        <EditForm Model="Input" OnValidSubmit="SubmitForm">
+            <DataAnnotationsValidator />
+            <ValidationSummary></ValidationSummary>
+            <div class="form-wrapper">
+
+                <div class="form-group">
+                    <label>Producto</label>
+                    <div class="input-icon">
+                        <span class="icon"><i class="fas fa-globe"></i></span>
+                        <select class="form-control" @onchange="ProductoChangedAsync">
+                            <option value="">Seleccione un Producto</option>
+                            @if (ProductList is not null)
+                            {
+                                @foreach (var prod in ProductList)
+                                {
+                                    <option selected="@(prod.Id_producto == Input.Id_producto)" value="@prod.Id_producto">@prod.Name</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <ValidationMessage For="() => Input.Id_producto" />
+                </div>
+
+                <!-- Nombre Provincia -->
+                <div class="form-group">
+                    <label>Descripcion</label>
+                    <div class="input-icon">
+                        <span class="icon"><i class="fas fa-city"></i></span>
+                        <input type="text" class="form-control" placeholder="Nombre Imagen" @bind="Input.Name_imagen" />
+                    </div>
+                    <ValidationMessage For="() => Input.Name_imagen" />
+                </div>
+                <div class="form-group">
+                    <label>Descripcion</label>
+                    <div class="input-icon">
+                        <span class="icon"><i class="fas fa-city"></i></span>
+                        <textarea type="text" class="form-control" placeholder="Descripcion Imagen" @bind="Input.Descripcion_imagen" rows="4" />
+                    </div>
+                    <ValidationMessage For="() => Input.Descripcion_imagen" />
+                </div>
+                <div class="form-group">
+                    <!-- Previsualización Imagen -->
+                    <div class="img-preview-container">
+                        <img src="@ImagePrev" class="img-preview" />
+                        <i class="bi bi-camera icon-overlay"></i>
+                    </div>
+                    <InputFile OnChange="OnInputFileChange" class="mb-3" />
+                </div>
+                <div class="form-group">
+                    <label>Tipo Imagen</label>
+                    <div class="input-icon">
+                        <span class="icon"><i class="fas fa-list"></i></span>
+                        <select class="form-control" @bind="Input.Tipo_Imagen">
+                            <option value="">Seleccione</option>
+                            <option value="True">Imagen Principal</option>
+                            <option value="False">Imagen Secundaria</option>
+                        </select>
+                    </div>
+                    <ValidationMessage For="() => Input.Tipo_Imagen" />
+                </div>
+
+                <!-- Estado -->
+                <div class="form-group">
+                    <label>Estado:</label>
+                    <div class="input-icon">
+                        <span class="icon"><i class="fas fa-list"></i></span>
+                        <select class="form-control" @bind="Input.Estado_Imagen">
+                            <option value="">Seleccione</option>
+                            @foreach (var item in items)
+                            {
+                                <option value="@item.Id">@item.Text</option>
+                            }
+                        </select>
+                    </div>
+                    <ValidationMessage For="() => Input.Estado_Imagen" />
+                </div>
+
+                <!-- Botones -->
+                <div class="buttons-container">
+                    <button type="submit" class="btn btn-primary">@SubmitButtonText</button>
+                    <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+                </div>
+
+            </div>
+        </EditForm>
+
+    </div>
+</div>
+
+@code {
+
+    [CascadingParameter] BlazoredModalInstance Modal { get; set; } = default!;
+    [Parameter] public ImagenProdDTO InputDTO { get; set; } = new ImagenProdDTO();
+    [Parameter] public string SubmitButtonText { get; set; } = string.Empty;
+    [Parameter] public string Titulo { get; set; } = string.Empty;
+    private List<ProductoDropDTO>? ProductList;
+    private string ImagePrev { set; get; } = string.Empty;
+    private ImagenProdDTO Input = new();
+    private List<Estado> items = new();
+    string Estados = "A";
+
+    private async Task SubmitForm()
+    {
+        Input.Foto_Producto = ImagePrev != null ? Convert.FromBase64String(ImagePrev.Split(',')[1]) : null;
+        if (SubmitButtonText == "Save")
+        {
+            var responseHttp = await repository.Post<ImagenProdDTO>("/api/ImagenProduct/CreateImagenProd", Input);
+            if (responseHttp.Error)
+            {
+                var message = await responseHttp.GetErrorMessageAsync();
+                await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                return;
+            }
+            ToastService.Notify(new(ToastType.Success, $"Record Pais Update Successfully."));
+            await Task.Delay(3000);
+            await Modal.CloseAsync(ModalResult.Ok(Input));
+            return;
+        }
+        if (SubmitButtonText == "Update")
+        {
+            var responseHttp = await repository.Put<ImagenProdDTO>($"/api/ImagenProduct/{Input.Id_imagen}", Input);
+            if (responseHttp.Error)
+            {
+                var message = await responseHttp.GetErrorMessageAsync();
+                await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                return;
+            }
+            ToastService.Notify(new(ToastType.Success, $"Record Pais Saved Successfully."));
+            await Task.Delay(3000);
+            await Modal.CloseAsync(ModalResult.Ok(Input));
+            return;
+        }
+    }
+
+    private async Task Cancelar()
+    {
+        await Modal.CancelAsync();
+    }
+
+    private async Task LoadProductoAsync()
+    {
+        var responseHttp = await repository.Get<List<ProductoDropDTO>>($"/api/Productos/ComboProducto/{Estados}");
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        ProductList = responseHttp.Response;
+    }
+
+    private async Task ProductoChangedAsync(ChangeEventArgs e)
+    {
+        var selectedCountry = Convert.ToInt32(e.Value!);
+        Input.Id_producto = selectedCountry;
+    }
+
+    protected async override Task  OnParametersSetAsync()
+    {
+        items = Estado.GetItems();
+        await LoadProductoAsync();
+        if (InputDTO.Descripcion_imagen != null)
+        {
+            Input = InputDTO;
+            Input.Id_producto=InputDTO.Id_producto;
+            ImagePrev = Input.Foto_Producto != null ? $"data:image/jpeg;base64,{Convert.ToBase64String(Input!.Foto_Producto)}" : null;
+        }
+
+    }
+
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        var buffer = new byte[file.Size];
+        await file.OpenReadStream().ReadAsync(buffer);
+        ImagePrev = $"data:{file.ContentType};base64,{Convert.ToBase64String(buffer)}";
+    }
+}

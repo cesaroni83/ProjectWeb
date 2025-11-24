@@ -1,0 +1,220 @@
+﻿@page "/ListProd/{IdCategoria:int}/{CategoriaName}"
+@using Microsoft.AspNetCore.Authorization
+@using ProjectWeb.ASM.Repositorio
+@using ProjectWeb.Shared.Modelo.DTO.Producto
+@using ProjectWeb.Shared.Modelo.Estatico
+@inject NavigationManager navigationManager
+@inject SweetAlertService sweetAlertService
+@inject IRepository repository
+@attribute [Authorize(Roles = "Admin")]
+
+<PageTitle>Producto</PageTitle>
+<ConfirmDialog @ref="dialog" />
+
+<div class="centrado-pantalla">
+    <div class="container-tabla">
+        <div class="d-flex justify-content-lg-start">
+            <a href="/ListCategoria"><i class="fa-solid fa-arrow-left"></i></a>
+        </div>
+        <Card >
+            <CardHeader class="text-center fs-4">
+                Lista de Productos De @CategoriaName
+            </CardHeader>
+            <CardBody>
+                 <div class="tabla-responsive-wrapper">
+                    <Grid TItem="ProductoDTO"
+                          Class="table table-hover table-bordered grid-table"
+                          FiltersRowCssClass="bg-primary text-white bg-opacity-25 border-bottom-0"
+                          HeaderRowCssClass="bg-primary text-white border-bottom-0"
+                          DataProvider="ProductoDataProvider"
+                          AllowFiltering="true"
+                          AllowPaging="true"
+                          PageSize="10"
+                          AllowSorting="true"
+                          AllowRowClick="true"
+                          OnRowClick="OnrowClick"
+                          Responsive="true"
+                          @ref="grid">
+                        <GridTemplates Class="gap-2">
+                            <ExportLayout TItem="ProductoDTO" GridRef="grid" Items="ListaProd" />
+                        </GridTemplates>
+                        <GridColumn TItem="ProductoDTO" HeaderText="Foto" FilterTextboxWidth="50" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
+                            <div class="text-center">
+                                <a href="/ListImgProduc/@context.Id_producto/@context.Name"><Image Src="@ObtenerImagen(@context.MainImage)" Class="rounded img-pequena" Alt="placeholder" /></a>
+                            </div>
+                        </GridColumn>
+                        <GridColumn TItem="ProductoDTO" HeaderText="ID Producto" PropertyName="Id_producto" SortString="Id_producto" SortKeySelector="item => item.Id_producto" FilterTextboxWidth="100" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
+                            @context.Id_producto
+                        </GridColumn>
+                        <GridColumn TItem="ProductoDTO" HeaderText="Name" PropertyName="Name" HeaderTextAlignment="Alignment.Center" SortString="Name" SortKeySelector="item => item.Name" FilterTextboxWidth="200">
+                            @context.Name
+                        </GridColumn>
+                        <GridColumn TItem="ProductoDTO" HeaderText="Description" PropertyName="Description" SortString="Description" SortKeySelector="item => item.Description" FilterTextboxWidth="200">
+                            @context.Description
+                        </GridColumn>
+
+                        <GridColumn TItem="ProductoDTO" HeaderText="Stock" PropertyName="Stock" HeaderTextAlignment="Alignment.Center" SortString="Stock" SortKeySelector="item => item.Stock" FilterTextboxWidth="200">
+                            @context.Stock
+                        </GridColumn>
+                        <GridColumn TItem="ProductoDTO" HeaderText="Precio" PropertyName="Price" SortString="Price" SortKeySelector="item => item.Price" FilterTextboxWidth="200">
+                            @context.Price
+                        </GridColumn>
+
+                        <GridColumn TItem="ProductoDTO" HeaderText="Estado" PropertyName="Estado_producto" HeaderTextAlignment="Alignment.Center" SortString="Estado_producto" SortKeySelector="item => item.Estado_producto" FilterTextboxWidth="100">
+                            @Estado.GetTextEstado(@context.Estado_producto)
+                        </GridColumn>
+
+                        <GridColumn TItem="ProductoDTO" HeaderText="Acción" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Start" Filterable="false" FilterTextboxWidth="250">
+                            <div class="btn-action-column">
+                                <button class="btn btn-success btn-sm" @onclick=@(() => ShowModal(context.Id_producto, true))>Update</button>
+                                <button class="btn btn-danger btn-sm" @onclick="() => DeleteReg(context.Id_producto, context.Name)">Delete</button>
+                            </div>
+                        </GridColumn>
+                    </Grid>
+                 </div>
+                
+            </CardBody>
+            <CardFooter class="d-flex justify-content-end ">
+                <button class="btn btn-primary" @onclick=@(() => ShowModal())>Nuevo Registro</button>
+            </CardFooter>
+        </Card>
+    </div>
+</div>
+
+@code {
+    [Parameter] public int IdCategoria { get; set; }
+    [Parameter] public string CategoriaName { get; set; } = string.Empty;
+    private ConfirmDialog dialog = default!;
+    [Inject] protected PreloadService PreloadService { get; set; } = default!;
+    public ProductoDTO Input = new ProductoDTO();
+    [Inject] ToastService ToastService { get; set; } = default!;
+    private List<ProductoDTO> ListaProd { get; set; } = default!;
+    private BlazorBootstrap.Grid<ProductoDTO>? grid;
+    private List<Estado> items = new();
+    [CascadingParameter]
+    IModalService Modal { get; set; } = default!;
+
+
+    private async Task CargaImagenes(int id_producto)
+    {
+        
+    }
+
+    private string? ObtenerImagen(byte[]? bytes)
+    {
+        if (bytes == null || bytes.Length == 0)
+            return null;
+
+        string base64 = Convert.ToBase64String(bytes);
+        return $"data:image/jpeg;base64,{base64}";
+    }
+    private byte[]? ObtenerBytes(string? base64Image)
+    {
+        if (string.IsNullOrWhiteSpace(base64Image))
+            return null;
+
+        // Si la cadena incluye el encabezado tipo "data:image/jpeg;base64,"
+        var parts = base64Image.Split(',');
+        string base64 = parts.Length > 1 ? parts[1] : parts[0];
+
+        return Convert.FromBase64String(base64);
+    }
+
+    private async Task ShowModal(int id = 0, bool isEdit = false)
+
+    {
+        IModalReference modalReference;
+
+        if (isEdit)
+        {
+            var parameters = new ModalParameters();
+            parameters.Add("InputDTO", Input);
+            parameters.Add("SubmitButtonText", "Update");
+            parameters.Add("Titulo", "Modifica Datos De Producto");
+            modalReference = Modal.Show<ProductComponent>(parameters);
+        }
+        else
+        {
+            var parameters = new ModalParameters();
+            parameters.Add("InputDTO", Input = new());
+            parameters.Add("SubmitButtonText", "Save");
+            parameters.Add("Titulo", "Registro De Producto");
+            modalReference = Modal.Show<ProductComponent>(parameters);
+        }
+        var result = await modalReference.Result;
+        if (result.Confirmed)
+        {
+            await RefrescarGrid();
+        }
+
+    }
+
+    private async Task<GridDataProviderResult<ProductoDTO>> ProductoDataProvider(GridDataProviderRequest<ProductoDTO> request)
+    {
+        if (ListaProd is null) // pull employees only one time for client-side filtering, sorting, and paging
+            await LoadProducto();
+        return await Task.FromResult(request.ApplyTo(ListaProd));
+    }
+    private async Task OnrowClick(GridRowEventArgs<ProductoDTO> args)
+    {
+        //await ModalService.ShowAsync(new ModalOption { Type = ModalType.Primary, Title = "Event: Row Click", Message = $"Id: {args.Item.Id_user}, Name: {args.Item.User_name}" });
+        Input.Id_producto = args.Item.Id_producto;
+        Input.Id_Categoria = args.Item.Id_Categoria;
+        Input.Name = args.Item.Name;
+        Input.Description = args.Item.Description;
+        Input.Price = args.Item.Price;
+        Input.Stock = args.Item.Stock;
+        Input.Estado_producto = args.Item.Estado_producto;
+        return;
+    }
+    private async Task LoadProducto()
+    {
+        PreloadService.Show(SpinnerColor.Light, "Loading data...");
+        var responseHttp = await repository.Get<List<ProductoDTO>>($"/api/Productos/ProductoByCategoria/{IdCategoria}");
+        if (responseHttp.Error)
+        {
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        ListaProd = responseHttp.Response?.ToList() ?? new List<ProductoDTO>();
+        StateHasChanged();
+        PreloadService.Hide();
+    }
+    private async Task RefrescarGrid()
+    {
+        await LoadProducto();
+        await grid.RefreshDataAsync();
+    }
+    private async Task DeleteReg(int id, string nombre)
+    {
+        var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
+        var confirmation = await dialog.ShowAsync(
+            title: "Eliminacion De Regitro",
+            message1: "Desea Eliminar La Producto?",
+            message2: "ID:" + id + "  Producto:" + nombre,
+            confirmDialogOptions: options);
+
+        if (confirmation)
+        {
+            // call API to delete the employee
+            // show acknowledgment to the user
+            var responseHttp = await repository.Delete($"/api/Productos/{Input.Id_producto}");
+            if (responseHttp.Error)
+            {
+                var message = await responseHttp.GetErrorMessageAsync();
+                await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+                return;
+            }
+            ToastService.Notify(new ToastMessage(ToastType.Success, $"Pais Eliminado con Exito!"));
+            await RefrescarGrid();
+            return;
+        }
+        else
+        {
+            ToastService.Notify(new ToastMessage(ToastType.Secondary, $"Operacion Cancelada!"));
+        }
+
+    }
+}

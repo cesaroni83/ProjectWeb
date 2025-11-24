@@ -1,11 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using ProjectWeb.Shared.Modelo.Entidades;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ProjectWeb.Shared.Enums
 {

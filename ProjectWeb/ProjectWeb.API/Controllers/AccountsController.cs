@@ -327,8 +327,8 @@ namespace ProjectWeb.API.Controllers
 
             var users = await _context.Users
             .Include(u => u.Ciudades)
-                .ThenInclude(c => c.Provincias)
-                    .ThenInclude(s => s.Paises)
+                .ThenInclude(c => c!.Provincias)
+                    .ThenInclude(s => s!.Paises)
             .ToListAsync();
 
             // Mapear con AutoMapper
@@ -343,8 +343,8 @@ namespace ProjectWeb.API.Controllers
         {
             var user = await _context.Users
             .Include(u => u.Ciudades)
-            .ThenInclude(c => c.Provincias)
-            .ThenInclude(s => s.Paises)
+            .ThenInclude(c => c!.Provincias)
+            .ThenInclude(s => s!.Paises)
             .FirstOrDefaultAsync(u => u.Email == email);
 
             if (user == null)

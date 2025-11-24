@@ -9,53 +9,61 @@
 @inject ILoginService loginService
 @inject IJSRuntime JS
 @inject GoogleAuthService GoogleAuth
-<div class="principal">
-    <div class="login-register-container">
-        <div class="form-wrapper" id="formWrapper">
-            <!-- LOGIN -->
-            <div class="form-panel">
-                <div class="form-left">
+
+<div class="loginpage-principal">
+    <div class="loginpage-container">
+        <div class="loginpage-wrapper" id="formWrapper">
+            <div class="loginpage-panel">
+                <div class="loginpage-left-blue">
                     <h2>¡Hola, bienvenido!</h2>
                     <p>¿No tienes una cuenta?</p>
                     <button class="btn btn-light mt-2" @onclick="Register">Registrarse</button>
                 </div>
-                <div class="form-right w-100">
+                <div class="loginpage-right-white w-100">
                     <h2>Iniciar sesión</h2>
+
                     <EditForm class="login-form w-100" Model="loginDTO" OnValidSubmit="LoginAsync">
 
                         <div class="mb-3 w-100">
                             <label class="form-label">Usuario</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                            <div class="input-wrapper">
+                                <span class="input-icon"><i class="fas fa-envelope"></i></span>
                                 <input type="email" class="form-control" @bind-value="loginDTO.Email" placeholder="Email" />
                             </div>
                         </div>
+
                         <div class="mb-3 w-100">
                             <label class="form-label">Contraseña</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                            <div class="input-wrapper">
+                                <span class="input-icon"><i class="fas fa-lock"></i></span>
                                 <input type="password" class="form-control" @bind-value="loginDTO.Password" placeholder="Contraseña" />
                             </div>
                         </div>
+
                         <div class="mb-3 text-start w-100">
                             <Switch @ref="switch1" @bind-Value="agree" Label="Remember me" />
                         </div>
+
                         <div class="mb-3 text-start w-100">
                             <a href="/RecoverPassword">¿Olvidaste tu contraseña?</a>
                         </div>
+
                         <div class="d-flex justify-content-center gap-2">
                             <button type="submit" class="btn btn-primary">Login</button>
                             <button type="reset" class="btn btn-secondary">Reset</button>
                         </div>
                     </EditForm>
-                        <p class="text-center mt-4">O inicia sesión con</p>
-                        <div class="social-icons">
-                            <button @onclick="Google"><i class="fab fa-google"></i></button>
-                            <button @onclick="Facebook"><i class="fab fa-facebook-f"></i></button>
-                        </div>
-                    
+
+                    <p class="text-center mt-4">O inicia sesión con</p>
+
+                    <div class="loginpage-social-icons">
+                        <button @onclick="Google"><i class="fab fa-google"></i></button>
+                        <button @onclick="Facebook"><i class="fab fa-facebook-f"></i></button>
+                    </div>
+
                 </div>
             </div>
+
         </div>
     </div>
 </div>

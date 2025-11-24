@@ -26,11 +26,11 @@ namespace ProjectWeb.API.Data
         public async Task SeedAsync()
         {
             await _context.Database.EnsureCreatedAsync();
-            //await CheckPaisAsync();
-            await SeedPaisesAsync();/// craga ma si de pais, provincias y cantones pero trae error con los cantones
+            await CheckPaisAsync();
+            //await SeedPaisesAsync();/// 
             await CheckRolesAsync();
             await CheckUserAsync("Juana", "Pineda", "juana@hotmail.it", "322 311 4620", "Calle Luna Calle Sol", "", "Milagro", UserType.Employee);
-            await CheckUserAsync( "Cesar Armando", "Morocho Pucuna", "cesarmop83@gmail.com", "3483304971", "Via Mascagni 6", "", "Milan",UserType.Admin);
+            await CheckUserAsync( "Cesar Armando", "Morocho Pucuna", "cesarmop83@gmail.com", "3483304971", "Via Mascagni 6", "", "Melzo",UserType.Admin);
             //await CheckUserAsync( "Christian", "Avila", "avila@hotmail.it", "322 311 4620", "Calle Luna Calle Sol", "", UserType.User);
             await CreateMenu();
         }
@@ -51,9 +51,10 @@ namespace ProjectWeb.API.Data
                 var menuPaises = new Menu { Descripcion = "Paises", Referencia = "/ListPaises",  Icono_name="92",Icono_color = "1", Id_parend = menuMantenimiento.Id_menu.ToString(), Estado_menu = "A" };
                 var menuEmpresa = new Menu { Descripcion = "Empresa", Referencia = "/ListEmpresa", Icono_name = "94",Icono_color = "1", Id_parend = menuMantenimiento.Id_menu.ToString(), Estado_menu = "A" };
                 var menuMenu = new Menu { Descripcion = "Menu", Referencia = "/ListMenu", Icono_name = "93", Icono_color = "1", Id_parend = menuMantenimiento.Id_menu.ToString(), Estado_menu = "A" };
+                var menuCategoria = new Menu { Descripcion = "Categoria Producto", Referencia = "/ListCategoria", Icono_name = "52", Icono_color = "1", Id_parend = menuMantenimiento.Id_menu.ToString(), Estado_menu = "A" };
                 var menuUser = new Menu { Descripcion = "User", Referencia = "/ListUsers", Icono_name = "87", Icono_color = "1", Id_parend = menuAdmin.Id_menu.ToString(), Estado_menu = "A" };
                 var menuLogout = new Menu { Descripcion = "Logout", Referencia = "/logout", Icono_name = "19", Icono_color = "1", Id_parend = menuAuthentication.Id_menu.ToString(), Estado_menu = "A" };
-                _context.Tbl_Menu.AddRange(menuPaises, menuEmpresa, menuMenu, menuUser, menuLogout);
+                _context.Tbl_Menu.AddRange(menuPaises, menuEmpresa, menuMenu,menuCategoria, menuUser, menuLogout);
                 await _context.SaveChangesAsync();
             }
         }
@@ -88,7 +89,17 @@ namespace ProjectWeb.API.Data
                 _context.Tbl_Pais.Add(new Pais { Nombre_pais = "Uruguay", Informacion = "", Foto_pais = null, Date_reg = DateTime.Now, Estado_pais = "A" });
                 _context.Tbl_Pais.Add(new Pais { Nombre_pais = "Venezuela", Informacion = "", Foto_pais = null, Date_reg = DateTime.Now, Estado_pais = "A" });
                 _context.Tbl_Pais.Add(new Pais { Nombre_pais = "Estado Unidos", Informacion = "", Foto_pais = null, Date_reg = DateTime.Now, Estado_pais = "A" });
-                _context.Tbl_Pais.Add(new Pais { Nombre_pais = "Italia", Informacion = "", Foto_pais = null, Date_reg = DateTime.Now, Estado_pais = "A" });
+                _context.Tbl_Pais.Add(new Pais { Nombre_pais = "Italia", Informacion = "", Foto_pais = null, Date_reg = DateTime.Now, Estado_pais = "A",
+                    Provincias = new List<Provincia>
+                    {
+                        new Provincia {Nombre_provincia="Milan",Informacion_provincia="",Date_reg=DateTime.Now, Estado_provincia="A",
+                        Ciudades = new List<Ciudad>
+                        {
+                            new Ciudad {Nombre_ciudad="Melzo",Informacion_ciudad="",Date_reg=DateTime.Now,Estado_ciudad="A"},
+                            new Ciudad {Nombre_ciudad="Inzago",Informacion_ciudad="",Date_reg=DateTime.Now,Estado_ciudad="A"},
+                            new Ciudad {Nombre_ciudad="Peschiera Borromeo",Informacion_ciudad="",Date_reg=DateTime.Now,Estado_ciudad="A"},
+                        }}}
+                });
             }
             await _context.SaveChangesAsync();
         }

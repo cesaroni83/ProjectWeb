@@ -19,50 +19,53 @@
                     <i class="fa-solid fa-arrow-left"></i>
                 </button>
         </div>
-        <Card style="width:93%; height:auto; margin:50px">
+        <Card >
             <CardHeader class="text-center fs-4">
                 Lista De Ciudades De @ProvinciaName
             </CardHeader>
             <CardBody>
-                <Grid TItem="CiudadDTO"
-                      Class="table table-hover table-bordered grid-table"
-                      FiltersRowCssClass="bg-primary text-white bg-opacity-25 border-bottom-0"
-                      HeaderRowCssClass="bg-primary text-white border-bottom-0"
-                      DataProvider="ProvinciaDataProvider"
-                      AllowFiltering="true"
-                      AllowPaging="true"
-                      PageSize="10"
-                      AllowSorting="true"
-                      AllowRowClick="true"
-                      OnRowClick="OnrowClick"
-                      Responsive="true"
-                      @ref="grid">
-                    <GridTemplates Class="gap-2">
-                        <ExportLayout TItem="CiudadDTO" GridRef="grid" Items="ListaCiudad" />
-                    </GridTemplates>
-                    <GridColumn TItem="CiudadDTO" HeaderText="Id Ciudad" PropertyName="Id_ciudad" SortString="Id_ciudad" SortKeySelector="item => item.Id_ciudad" FilterTextboxWidth="100" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
-                        @context.Id_ciudad
-                    </GridColumn>
+                 <div class="tabla-responsive-wrapper">
+                    <Grid TItem="CiudadDTO"
+                          Class="table table-hover table-bordered grid-table"
+                          FiltersRowCssClass="bg-primary text-white bg-opacity-25 border-bottom-0"
+                          HeaderRowCssClass="bg-primary text-white border-bottom-0"
+                          DataProvider="ProvinciaDataProvider"
+                          AllowFiltering="true"
+                          AllowPaging="true"
+                          PageSize="10"
+                          AllowSorting="true"
+                          AllowRowClick="true"
+                          OnRowClick="OnrowClick"
+                          Responsive="true"
+                          @ref="grid">
+                        <GridTemplates Class="gap-2">
+                            <ExportLayout TItem="CiudadDTO" GridRef="grid" Items="ListaCiudad" />
+                        </GridTemplates>
+                        <GridColumn TItem="CiudadDTO" HeaderText="Id Ciudad" PropertyName="Id_ciudad" SortString="Id_ciudad" SortKeySelector="item => item.Id_ciudad" FilterTextboxWidth="100" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
+                            @context.Id_ciudad
+                        </GridColumn>
 
-                    <GridColumn TItem="CiudadDTO" HeaderText="Provincia" PropertyName="Nombre_ciudad" HeaderTextAlignment="Alignment.Center" SortString="Nombre_ciudad" SortKeySelector="item => item.Nombre_ciudad" FilterTextboxWidth="200">
-                        @context.Nombre_ciudad
-                    </GridColumn>
+                        <GridColumn TItem="CiudadDTO" HeaderText="Provincia" PropertyName="Nombre_ciudad" HeaderTextAlignment="Alignment.Center" SortString="Nombre_ciudad" SortKeySelector="item => item.Nombre_ciudad" FilterTextboxWidth="200">
+                            @context.Nombre_ciudad
+                        </GridColumn>
 
-                    <GridColumn TItem="CiudadDTO" HeaderText="Información" PropertyName="Informacion_ciudad" SortString="Informacion_ciudad" SortKeySelector="item => item.Informacion_ciudad" FilterTextboxWidth="200">
-                        @context.Informacion_ciudad
-                    </GridColumn>
+                        <GridColumn TItem="CiudadDTO" HeaderText="Información" PropertyName="Informacion_ciudad" SortString="Informacion_ciudad" SortKeySelector="item => item.Informacion_ciudad" FilterTextboxWidth="200">
+                            @context.Informacion_ciudad
+                        </GridColumn>
 
-                    <GridColumn TItem="CiudadDTO" HeaderText="Estado" PropertyName="Estado_provincia" HeaderTextAlignment="Alignment.Center" SortString="Estado_provincia" SortKeySelector="item => item.Estado_ciudad" FilterTextboxWidth="100">
-                        @Estado.GetTextEstado(@context.Estado_ciudad)
-                    </GridColumn>
+                        <GridColumn TItem="CiudadDTO" HeaderText="Estado" PropertyName="Estado_provincia" HeaderTextAlignment="Alignment.Center" SortString="Estado_provincia" SortKeySelector="item => item.Estado_ciudad" FilterTextboxWidth="100">
+                            @Estado.GetTextEstado(@context.Estado_ciudad)
+                        </GridColumn>
 
-                    <GridColumn TItem="CiudadDTO" HeaderText="Acción" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Start" Filterable="false" FilterTextboxWidth="250">
-                        <div class="btn-action-column">
-                            <button class="btn btn-success btn-sm" @onclick=@(() => ShowModal(@context.Id_ciudad, true))>Update</button> 
-                            <button class="btn btn-danger btn-sm" @onclick="() => DeleteReg(context.Id_ciudad, context.Nombre_ciudad)">Delete</button>
-                        </div>
-                    </GridColumn>
-                </Grid>
+                        <GridColumn TItem="CiudadDTO" HeaderText="Acción" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Start" Filterable="false" FilterTextboxWidth="250">
+                            <div class="btn-action-column">
+                                <button class="btn btn-success btn-sm" @onclick=@(() => ShowModal(@context.Id_ciudad, true))>Update</button>
+                                <button class="btn btn-danger btn-sm" @onclick="() => DeleteReg(context.Id_ciudad, context.Nombre_ciudad)">Delete</button>
+                            </div>
+                        </GridColumn>
+                    </Grid>
+                 </div>
+                
             </CardBody>
             <CardFooter class="d-flex justify-content-end ">
                 <button class="btn btn-primary" @onclick=@(() => ShowModal())>Nuevo Registro</button>
@@ -160,7 +163,7 @@
     private async Task RefrescarGrid()
     {
         await LoadProvincia();
-        await grid.RefreshDataAsync();
+        await grid!.RefreshDataAsync();
     }
     private void NavigateBack()
     {

@@ -402,6 +402,10 @@ else
 
     private async Task Cancelar()
     {
-        await Modal.CancelAsync();
+        if (Modal != null)
+        {
+            await Modal.CancelAsync();
+        }
+        navigationManager.NavigateTo("/");
     }
 }

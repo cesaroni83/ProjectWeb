@@ -18,66 +18,69 @@
         <div class="d-flex justify-content-lg-start">
             <a href="/ListEmpresa"><i class="fa-solid fa-arrow-left"></i></a>
         </div>
-        <Card style="width:93%; height:auto; margin:50px">
+        <Card >
             <CardHeader class="text-center fs-4">
                 Lista De Sucurales De @EmpresaName
             </CardHeader>
             <CardBody>
-                <Grid TItem="SucursalDTO"
-                      Class="table table-hover table-bordered grid-table"
-                      FiltersRowCssClass="bg-primary text-white bg-opacity-25 border-bottom-0"
-                      HeaderRowCssClass="bg-primary text-white border-bottom-0"
-                      DataProvider="SucursalDataProvider"
-                      AllowFiltering="true"
-                      AllowPaging="true"
-                      PageSize="10"
-                      AllowSorting="true"
-                      AllowRowClick="true"
-                      OnRowClick="OnrowClick"
-                      Responsive="true"
-                      @ref="grid">
-                    <GridTemplates Class="gap-2">
-                        <ExportLayout TItem="SucursalDTO" GridRef="grid" Items="ListaSucursal" />
-                    </GridTemplates>
-                    <GridColumn TItem="SucursalDTO" HeaderText="ID Sucursal" PropertyName="Id_sucursal" SortString="Id_sucursal" SortKeySelector="item => item.Id_sucursal" FilterTextboxWidth="100" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
-                        @context.Id_sucursal
-                    </GridColumn>
+                <div class="tabla-responsive-wrapper">
+                    <Grid TItem="SucursalDTO"
+                          Class="table table-hover table-bordered grid-table"
+                          FiltersRowCssClass="bg-primary text-white bg-opacity-25 border-bottom-0"
+                          HeaderRowCssClass="bg-primary text-white border-bottom-0"
+                          DataProvider="SucursalDataProvider"
+                          AllowFiltering="true"
+                          AllowPaging="true"
+                          PageSize="10"
+                          AllowSorting="true"
+                          AllowRowClick="true"
+                          OnRowClick="OnrowClick"
+                          Responsive="true"
+                          @ref="grid">
+                        <GridTemplates Class="gap-2">
+                            <ExportLayout TItem="SucursalDTO" GridRef="grid" Items="ListaSucursal" />
+                        </GridTemplates>
+                        <GridColumn TItem="SucursalDTO" HeaderText="ID Sucursal" PropertyName="Id_sucursal" SortString="Id_sucursal" SortKeySelector="item => item.Id_sucursal" FilterTextboxWidth="100" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
+                            @context.Id_sucursal
+                        </GridColumn>
 
-                    <GridColumn TItem="SucursalDTO" HeaderText="Sucursal" PropertyName="Nombre_sucursal" HeaderTextAlignment="Alignment.Center" SortString="Nombre_sucursal" SortKeySelector="item => item.Nombre_sucursal" FilterTextboxWidth="150">
-                        @context.Nombre_sucursal
-                    </GridColumn>
+                        <GridColumn TItem="SucursalDTO" HeaderText="Sucursal" PropertyName="Nombre_sucursal" HeaderTextAlignment="Alignment.Center" SortString="Nombre_sucursal" SortKeySelector="item => item.Nombre_sucursal" FilterTextboxWidth="150">
+                            @context.Nombre_sucursal
+                        </GridColumn>
 
 
-                    <GridColumn TItem="SucursalDTO" HeaderText="Ciudad" PropertyName="NombreCiudad" SortString="NombreCiudad" SortKeySelector="item => item.NombreCiudad" FilterTextboxWidth="100" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
-                        @context.NombreCiudad
-                    </GridColumn>
+                        <GridColumn TItem="SucursalDTO" HeaderText="Ciudad" PropertyName="NombreCiudad" SortString="NombreCiudad" SortKeySelector="item => item.NombreCiudad" FilterTextboxWidth="100" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
+                            @context.NombreCiudad
+                        </GridColumn>
 
-                    <GridColumn TItem="SucursalDTO" HeaderText="Direccion" PropertyName="Direccion_sucursal" HeaderTextAlignment="Alignment.Center" SortString="Direccion_sucursal" SortKeySelector="item => item.Direccion_sucursal" FilterTextboxWidth="150">
-                        @context.Direccion_sucursal
-                    </GridColumn>
-                    <GridColumn TItem="SucursalDTO" HeaderText="Telefono" PropertyName="Telefono" SortString="Telefono" SortKeySelector="item => item.Telefono" FilterTextboxWidth="100" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
-                        @context.Telefono
-                    </GridColumn>
+                        <GridColumn TItem="SucursalDTO" HeaderText="Direccion" PropertyName="Direccion_sucursal" HeaderTextAlignment="Alignment.Center" SortString="Direccion_sucursal" SortKeySelector="item => item.Direccion_sucursal" FilterTextboxWidth="150">
+                            @context.Direccion_sucursal
+                        </GridColumn>
+                        <GridColumn TItem="SucursalDTO" HeaderText="Telefono" PropertyName="Telefono" SortString="Telefono" SortKeySelector="item => item.Telefono" FilterTextboxWidth="100" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
+                            @context.Telefono
+                        </GridColumn>
 
-                    <GridColumn TItem="SucursalDTO" HeaderText="Horario Atencion" PropertyName="Horario_atencion" HeaderTextAlignment="Alignment.Center" SortString="Horario_atencion" SortKeySelector="item => item.Horario_atencion" FilterTextboxWidth="150">
-                        @context.Horario_atencion
-                    </GridColumn>
+                        <GridColumn TItem="SucursalDTO" HeaderText="Horario Atencion" PropertyName="Horario_atencion" HeaderTextAlignment="Alignment.Center" SortString="Horario_atencion" SortKeySelector="item => item.Horario_atencion" FilterTextboxWidth="150">
+                            @context.Horario_atencion
+                        </GridColumn>
 
-                    <GridColumn TItem="SucursalDTO" HeaderText="Información" PropertyName="Informacion_sucursal" SortString="Informacion_sucursal" SortKeySelector="item => item.Informacion_sucursal" FilterTextboxWidth="200">
-                        @context.Informacion_sucursal
-                    </GridColumn>
+                        <GridColumn TItem="SucursalDTO" HeaderText="Información" PropertyName="Informacion_sucursal" SortString="Informacion_sucursal" SortKeySelector="item => item.Informacion_sucursal" FilterTextboxWidth="200">
+                            @context.Informacion_sucursal
+                        </GridColumn>
 
-                    <GridColumn TItem="SucursalDTO" HeaderText="Estado" PropertyName="Estado_sucursal" HeaderTextAlignment="Alignment.Center" SortString="Estado_sucursal" SortKeySelector="item => item.Estado_sucursal" FilterTextboxWidth="100">
-                        @Estado.GetTextEstado(@context.Estado_sucursal)
-                    </GridColumn>
+                        <GridColumn TItem="SucursalDTO" HeaderText="Estado" PropertyName="Estado_sucursal" HeaderTextAlignment="Alignment.Center" SortString="Estado_sucursal" SortKeySelector="item => item.Estado_sucursal" FilterTextboxWidth="100">
+                            @Estado.GetTextEstado(@context.Estado_sucursal)
+                        </GridColumn>
 
-                    <GridColumn TItem="SucursalDTO" HeaderText="Acción" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Start" Filterable="false" FilterTextboxWidth="250">
-                        <div class="btn-action-column">
-                            <button class="btn btn-success btn-sm" @onclick=@(() => ShowModal(context.Id_sucursal, true))>Update</button>
-                            <button class="btn btn-danger btn-sm" @onclick="() => DeleteReg(context.Id_sucursal, context.Nombre_sucursal)">Delete</button>
-                        </div>
-                    </GridColumn>
-                </Grid>
+                        <GridColumn TItem="SucursalDTO" HeaderText="Acción" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Start" Filterable="false" FilterTextboxWidth="250">
+                            <div class="btn-action-column">
+                                <button class="btn btn-success btn-sm" @onclick=@(() => ShowModal(context.Id_sucursal, true))>Update</button>
+                                <button class="btn btn-danger btn-sm" @onclick="() => DeleteReg(context.Id_sucursal, context.Nombre_sucursal)">Delete</button>
+                            </div>
+                        </GridColumn>
+                    </Grid>
+                </div>
+                
             </CardBody>
             <CardFooter class="d-flex justify-content-end ">
                 <button class="btn btn-primary" @onclick=@(() => ShowModal())>Nuevo Registro</button>

@@ -19,8 +19,17 @@ namespace ProjectWeb.API.Data
         public DbSet<Sucursal> Tbl_Sucursal { get; set; }
         public DbSet<Persona> Tbl_Persona { get; set; }
         public DbSet<Menu> Tbl_Menu { get; set; }
-
         public DbSet<Credential> Credentials => Set<Credential>();
+
+
+        public DbSet<Categoria> Tbl_Categoria { get; set; }
+        public DbSet<Producto> Tbl_Producto { get; set; }
+        public DbSet<ImagenProd> Tbl_ProductImages { get; set; }
+        public DbSet<Sale> Tbl_Sales { get; set; }
+        public DbSet<SaleDetail> Tbl_SaleDetails { get; set; }
+        public DbSet<TemporalSale> Tbl_TemporalSales { get; set; }
+
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -101,6 +110,54 @@ namespace ProjectWeb.API.Data
            .WithOne(u => u.Personas)
             .HasForeignKey<Persona>(p => p.Id_user)
            .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Producto>()
+            .HasOne(c => c.Categorias)
+             .WithMany(p => p.Productos)
+              .HasForeignKey(c => c.Id_Categoria)
+              .OnDelete(DeleteBehavior.Cascade);
+
+             modelBuilder.Entity<ImagenProd>()
+            .HasOne(i => i.Productos)
+            .WithMany(p => p.ProductImages)
+            .HasForeignKey(i => i.Id_producto)
+            .OnDelete(DeleteBehavior.Cascade);
+
+
+            // Producto → SaleDetail (uno a muchos)
+            modelBuilder.Entity<SaleDetail>()
+                .HasOne(sd => sd.Product)
+                .WithMany(p => p.SaleDetails)
+                .HasForeignKey(sd => sd.Id_producto)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Sale → SaleDetail (uno a muchos)
+            modelBuilder.Entity<SaleDetail>()
+                .HasOne(sd => sd.Sale)
+                .WithMany(s => s.SaleDetails)
+                .HasForeignKey(sd => sd.Id_sale)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Producto → TemporalSale (uno a muchos)
+            modelBuilder.Entity<TemporalSale>()
+                .HasOne(ts => ts.Product)
+                .WithMany(p => p.TemporalSales)
+                .HasForeignKey(ts => ts.Id_producto)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Sale → User (opcional)
+            modelBuilder.Entity<Sale>()
+                .HasOne(s => s.User)
+                .WithMany()
+                .HasForeignKey(s => s.UserId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // TemporalSale → User (opcional)
+            modelBuilder.Entity<TemporalSale>()
+                .HasOne(ts => ts.User)
+                .WithMany()
+                .HasForeignKey(ts => ts.UserId)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

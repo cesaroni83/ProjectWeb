@@ -14,12 +14,13 @@
 
 <div class="centrado-pantalla">
     <div class="container-tabla">
-        <Card style="width:93%; height:auto; margin:50px">
+        <Card >
             <CardHeader class="text-center fs-4">
                 Lista De Empresas
             </CardHeader>
             <CardBody>
-                <Grid TItem="EmpresaDTO"
+                <div class="tabla-responsive-wrapper">
+                    <Grid TItem="EmpresaDTO"
                       Class="table table-hover table-bordered"
                       FiltersRowCssClass="bg-primary text-white bg-opacity-25 border-bottom-0"
                       HeaderRowCssClass="bg-primary text-white border-bottom-0"
@@ -76,6 +77,7 @@
                         </div>
                     </GridColumn>
                 </Grid>
+                </div>
             </CardBody>
             <CardFooter class="d-flex justify-content-end ">
                 <button class="btn btn-primary" @onclick=@(() => ShowModal())>Nuevo Registro</button>

@@ -13,64 +13,67 @@
 
 <div class="centrado-pantalla">
     <div class="container-tabla">
-        <Card style="width:93%; height:auto; margin:50px">
+        <Card>
             <CardHeader class="text-center fs-4">
                 Lista De Usuarios
             </CardHeader>
             <CardBody>
-                <Grid TItem="UsersDTO"
-                      Class="table table-hover table-bordered grid-table"
-                      FiltersRowCssClass="bg-primary text-white bg-opacity-25 border-bottom-0"
-                      HeaderRowCssClass="bg-primary text-white border-bottom-0"
-                      DataProvider="UsersDataProvider"
-                      AllowFiltering="true"
-                      AllowPaging="true"
-                      PageSize="10"
-                      AllowSorting="true"
-                      AllowRowClick="true"
-                      OnRowClick="OnrowClick"
-                      Responsive="true"
-                      @ref="grid">
-                    <GridTemplates Class="gap-2">
-                        <ExportLayout TItem="UsersDTO" GridRef="grid" Items="ListaUsers" />
-                    </GridTemplates>
-                    <GridColumn TItem="UsersDTO" HeaderText="Foto" FilterTextboxWidth="50" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
-                        <div class="text-center">
-                            <Image Src="@context.Photo" Class="rounded img-pequena" Alt="placeholder" />
-                        </div>
-                    </GridColumn>
+                <div class="tabla-responsive-wrapper">
+                    <Grid TItem="UsersDTO"
+                          Class="table table-hover table-bordered grid-table"
+                          FiltersRowCssClass="bg-primary text-white bg-opacity-25 border-bottom-0"
+                          HeaderRowCssClass="bg-primary text-white border-bottom-0"
+                          DataProvider="UsersDataProvider"
+                          AllowFiltering="true"
+                          AllowPaging="true"
+                          PageSize="10"
+                          AllowSorting="true"
+                          AllowRowClick="true"
+                          OnRowClick="OnrowClick"
+                          Responsive="true"
+                          @ref="grid">
+                        <GridTemplates Class="gap-2">
+                            <ExportLayout TItem="UsersDTO" GridRef="grid" Items="ListaUsers" />
+                        </GridTemplates>
+                        <GridColumn TItem="UsersDTO" HeaderText="Foto" FilterTextboxWidth="50" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
+                            <div class="text-center">
+                                <Image Src="@context.Photo" Class="rounded img-pequena" Alt="placeholder" />
+                            </div>
+                        </GridColumn>
 
-                    <GridColumn  TItem="UsersDTO" HeaderText="Email" HeaderTextAlignment="Alignment.Center" PropertyName="Email" SortString="Email" SortKeySelector="item => item.Email" FilterTextboxWidth="200" TextAlignment="Alignment.Start">
-                        @context.Email
-                    </GridColumn>
+                        <GridColumn TItem="UsersDTO" HeaderText="Email" HeaderTextAlignment="Alignment.Center" PropertyName="Email" SortString="Email" SortKeySelector="item => item.Email" FilterTextboxWidth="200" TextAlignment="Alignment.Start">
+                            @context.Email
+                        </GridColumn>
 
-                    <GridColumn  TItem="UsersDTO" HeaderText="Name" HeaderTextAlignment="Alignment.Center" PropertyName="FullName" SortString="FullName" SortKeySelector="item => item.FullName" FilterTextboxWidth="300" TextAlignment="Alignment.Start">
-                        @context.FullName
-                    </GridColumn>
+                        <GridColumn TItem="UsersDTO" HeaderText="Name" HeaderTextAlignment="Alignment.Center" PropertyName="FullName" SortString="FullName" SortKeySelector="item => item.FullName" FilterTextboxWidth="300" TextAlignment="Alignment.Start">
+                            @context.FullName
+                        </GridColumn>
 
-                    <GridColumn  TItem="UsersDTO" HeaderText="City" HeaderTextAlignment="Alignment.Center" PropertyName="Nombre_Ciudad" SortString="Nombre_Ciudad" SortKeySelector="item => item.Nombre_Ciudad" FilterTextboxWidth="150" TextAlignment="Alignment.Start">
-                        @context.Nombre_Ciudad
-                    </GridColumn>
+                        <GridColumn TItem="UsersDTO" HeaderText="City" HeaderTextAlignment="Alignment.Center" PropertyName="Nombre_Ciudad" SortString="Nombre_Ciudad" SortKeySelector="item => item.Nombre_Ciudad" FilterTextboxWidth="150" TextAlignment="Alignment.Start">
+                            @context.Nombre_Ciudad
+                        </GridColumn>
 
-                    <GridColumn  TItem="UsersDTO" HeaderText="Address" HeaderTextAlignment="Alignment.Center" PropertyName="Address" SortString="Address" SortKeySelector="item => item.Address" FilterTextboxWidth="250" TextAlignment="Alignment.Start">
-                        @context.Address
-                    </GridColumn>
-                    <GridColumn  TItem="UsersDTO" HeaderText="Phone" HeaderTextAlignment="Alignment.Center" PropertyName="PhoneNumber" SortString="PhoneNumber" SortKeySelector="item => item.PhoneNumber" FilterTextboxWidth="200" TextAlignment="Alignment.Start">
-                        @context.PhoneNumber
-                    </GridColumn>
-                    <GridColumn  TItem="UsersDTO" HeaderText="User Type" PropertyName="UserType" HeaderTextAlignment="Alignment.Center" SortString="UserType" SortKeySelector="item => item.UserType.ToString()" FilterTextboxWidth="100" TextAlignment="Alignment.Start">
-                        @context.UserType.ToString()
-                    </GridColumn>
-                    <GridColumn  TItem="UsersDTO" HeaderText="Enabled" PropertyName="LockoutEnabled" HeaderTextAlignment="Alignment.Center" SortString="LockoutEnabled" SortKeySelector="item => item.LockoutEnabled" FilterTextboxWidth="200" TextAlignment="Alignment.Start">
-                        @context.LockoutEnabled
-                    </GridColumn>
-                    <GridColumn TItem="UsersDTO" HeaderText="Acción" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" Filterable="false" FilterTextboxWidth="250">
-                        <div class="btn-action-column">
-                            <button class="btn btn-success btn-sm" @onclick=@(() => ShowModal(context.Email!, true))>Update</button>
-                            <button class="btn btn-danger btn-sm" @onclick="() => DeleteReg(context.Email!, context.FullName)">Lock</button>
-                        </div>
-                    </GridColumn>
-                </Grid>
+                        <GridColumn TItem="UsersDTO" HeaderText="Address" HeaderTextAlignment="Alignment.Center" PropertyName="Address" SortString="Address" SortKeySelector="item => item.Address" FilterTextboxWidth="250" TextAlignment="Alignment.Start">
+                            @context.Address
+                        </GridColumn>
+                        <GridColumn TItem="UsersDTO" HeaderText="Phone" HeaderTextAlignment="Alignment.Center" PropertyName="PhoneNumber" SortString="PhoneNumber" SortKeySelector="item => item.PhoneNumber" FilterTextboxWidth="200" TextAlignment="Alignment.Start">
+                            @context.PhoneNumber
+                        </GridColumn>
+                        <GridColumn TItem="UsersDTO" HeaderText="User Type" PropertyName="UserType" HeaderTextAlignment="Alignment.Center" SortString="UserType" SortKeySelector="item => item.UserType.ToString()" FilterTextboxWidth="100" TextAlignment="Alignment.Start">
+                            @context.UserType.ToString()
+                        </GridColumn>
+                        <GridColumn TItem="UsersDTO" HeaderText="Enabled" PropertyName="LockoutEnabled" HeaderTextAlignment="Alignment.Center" SortString="LockoutEnabled" SortKeySelector="item => item.LockoutEnabled" FilterTextboxWidth="200" TextAlignment="Alignment.Start">
+                            @context.LockoutEnabled
+                        </GridColumn>
+                        <GridColumn TItem="UsersDTO" HeaderText="Acción" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center" Filterable="false" FilterTextboxWidth="250">
+                            <div class="btn-action-column">
+                                <button class="btn btn-success btn-sm" @onclick=@(() => ShowModal(context.Email!, true))>Update</button>
+                                <button class="btn btn-danger btn-sm" @onclick="() => DeleteReg(context.Email!, context.FullName)">Lock</button>
+                            </div>
+                        </GridColumn>
+                    </Grid>
+                </div>
+                
             </CardBody>
             <CardFooter class="d-flex justify-content-end ">
                 <button class="btn btn-primary" @onclick=@(() => ShowModal())>New User </button>
