@@ -87,12 +87,27 @@ namespace ProjectWeb.ASM.Repositorio.Implementacion
 
         private async Task<T> UnserializeAnswer<T>(HttpResponseMessage httpResponse, JsonSerializerOptions jsonSerializerOptions)
         {
-            //var respuestaString = await httpResponse.Content.ReadAsStringAsync();
-            //return JsonSerializer.Deserialize<T>(respuestaString, jsonSerializerOptions)!;
             var respuestaString = await httpResponse.Content.ReadAsStringAsync();
+
+            // Log para ver qué contenido estás recibiendo
+            Console.WriteLine($"⚠️ Contenido recibido: {respuestaString}");
 
             if (string.IsNullOrWhiteSpace(respuestaString))
                 return default!;
+
+            // Si la respuesta es un número directo, intenta convertirlo directamente a T
+            if (typeof(T) == typeof(int))
+            {
+                if (int.TryParse(respuestaString, out int result))
+                {
+                    return (T)(object)result;
+                }
+                else
+                {
+                    Console.WriteLine("⚠️ No se pudo convertir la respuesta a int.");
+                    return default!;
+                }
+            }
 
             // Si parece JSON (empieza con { o [)
             if (respuestaString.TrimStart().StartsWith("{") || respuestaString.TrimStart().StartsWith("["))
@@ -104,7 +119,6 @@ namespace ProjectWeb.ASM.Repositorio.Implementacion
                 catch (JsonException ex)
                 {
                     Console.WriteLine($"⚠️ Error al deserializar JSON: {ex.Message}");
-                    Console.WriteLine($"Contenido recibido: {respuestaString}");
                     return default!;
                 }
             }

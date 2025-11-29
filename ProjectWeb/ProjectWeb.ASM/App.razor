@@ -1,4 +1,4 @@
-﻿<CascadingBlazoredModal Position="ModalPosition.Middle" Size=" Blazored.Modal.ModalSize.Large" HideHeader="true" DisableBackgroundCancel="true" AnimationType="ModalAnimationType.FadeInOut">
+﻿@* <CascadingBlazoredModal Position="ModalPosition.Middle" Size=" Blazored.Modal.ModalSize.Large" HideHeader="true" DisableBackgroundCancel="true" AnimationType="ModalAnimationType.FadeInOut">
     <Router AppAssembly="@typeof(App).Assembly">
     <Found Context="routeData">
         <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
@@ -14,3 +14,49 @@
     </NotFound>
 </Router>
  </CascadingBlazoredModal>
+ *@
+@* <CascadingBlazoredModal Position="ModalPosition.Middle"
+                        Size="Blazored.Modal.ModalSize.Large"
+                        HideHeader="true"
+                        DisableBackgroundCancel="true"
+                        AnimationType="ModalAnimationType.FadeInOut">
+
+    <CascadingAuthenticationState>
+        <Router AppAssembly="@typeof(App).Assembly">
+            <Found Context="routeData">
+                <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+                <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+            </Found>
+            <NotFound>
+                <PageTitle>Not found</PageTitle>
+                <LayoutView Layout="@typeof(MainLayout)">
+                    <p role="alert">Sorry, there's nothing at this address.</p>
+                </LayoutView>
+            </NotFound>
+        </Router>
+    </CascadingAuthenticationState>
+
+</CascadingBlazoredModal> *@
+<CascadingAuthenticationState>
+    <CascadingBlazoredModal Position="ModalPosition.Middle"
+                            Size="Blazored.Modal.ModalSize.Large"
+                            HideHeader="true"
+                            DisableBackgroundCancel="true"
+                            AnimationType="ModalAnimationType.FadeInOut">
+
+        <Router AppAssembly="@typeof(App).Assembly">
+            <Found Context="routeData">
+                <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+                <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+            </Found>
+
+            <NotFound>
+                <PageTitle>Not found</PageTitle>
+                <LayoutView Layout="@typeof(MainLayout)">
+                    <p role="alert">Sorry, there's nothing at this address.</p>
+                </LayoutView>
+            </NotFound>
+        </Router>
+
+    </CascadingBlazoredModal>
+</CascadingAuthenticationState>

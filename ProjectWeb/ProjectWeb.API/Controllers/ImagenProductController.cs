@@ -123,7 +123,7 @@ namespace ProjectWeb.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CancelImagenProd(int id_img)
         {
-            var Registro = await _img.DeleteImagenProdLogica(id_img);
+            var Registro = await _img.DeleteImagenProd(id_img);
             return Ok(Registro);
         }
 

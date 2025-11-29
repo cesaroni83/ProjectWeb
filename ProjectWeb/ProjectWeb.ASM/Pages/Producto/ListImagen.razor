@@ -49,7 +49,8 @@
                                 </GridTemplates>
                                 <GridColumn TItem="ImagenProdDTO" HeaderText="Foto" FilterTextboxWidth="50" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
                                     <div class="text-center">
-                                        <Image Src="@ObtenerImagen(@context.Foto_Producto)" Class="rounded img-pequena" Alt="placeholder" />
+                                       @*  <Image Src="@ObtenerImagen(@context.Foto_Producto)" Class="rounded img-pequena" Alt="placeholder" /> *@
+                                        <Image Src="@context.Foto_Producto" Class="rounded img-pequena" Alt="placeholder" />
                                     </div>
                                 </GridColumn>
                                 <GridColumn TItem="ImagenProdDTO" HeaderText="ID Imagen" PropertyName="Id_imagen" SortString="Id_imagen" SortKeySelector="item => item.Id_imagen" FilterTextboxWidth="100" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
@@ -77,7 +78,7 @@
                                 <GridColumn TItem="ImagenProdDTO" HeaderText="Acción" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Start" Filterable="false" FilterTextboxWidth="250">
                                     <div class="btn-action-column">
                                         <button class="btn btn-success btn-sm" @onclick=@(() => ShowModal(context.Id_imagen, true))>Update</button>
-                                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteReg(context.Id_imagen, context.Descripcion_imagen)">Delete</button>
+                                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteReg(context.Id_imagen, context.Name_imagen)">Delete</button>
                                     </div>
                                 </GridColumn>
                             </Grid>
@@ -133,6 +134,7 @@
     private List<CarouselItemData> CarouselItems = new();
     public ImagenProdDTO ReturnUrl = new ImagenProdDTO();
     private bool IsChecked(string value) => (value ?? "").ToLower() == "true";
+
     private string ConvertToString(ChangeEventArgs e)
     {
         return (e.Value != null && e.Value.ToString().ToLower() == "true") ? "true" : "false";
@@ -155,22 +157,9 @@
 
         foreach (var img in Lista)
         {
-            string dataUrl;
-
-            if (img.Foto_Producto != null && img.Foto_Producto.Length > 0)
-            {
-                string base64Img = Convert.ToBase64String(img.Foto_Producto);
-                dataUrl = $"data:image/png;base64,{base64Img}";
-            }
-            else
-            {
-                // Imagen por defecto si no hay bytes
-                dataUrl = "_content/BlazorBootstrap.Demo.RCL/images/placeholder.png";
-            }
-
             CarouselItems.Add(new CarouselItemData
             {
-                Base64Image = dataUrl,
+                Base64Image = img.Foto_Producto!,
                 Titulo = img.Name_imagen ?? "Imagen del producto",
                 Descripcion = img.Descripcion_imagen ?? "Descripción opcional"
             });
@@ -275,7 +264,7 @@
         var options = new ConfirmDialogOptions { IsVerticallyCentered = true };
         var confirmation = await dialog.ShowAsync(
             title: "Eliminacion De Regitro",
-            message1: "Desea Eliminar La Producto?",
+            message1: "Desea Eliminar La Imagen?",
             message2: "ID:" + id + "  Producto:" + nombre,
             confirmDialogOptions: options);
 

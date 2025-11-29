@@ -22,6 +22,7 @@ namespace ProjectWeb.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+
     public class AccountsController : ControllerBase
     {
         private readonly IUserHelper _userHelper;
@@ -295,6 +296,7 @@ namespace ProjectWeb.API.Controllers
             {
                 new Claim(ClaimTypes.Name, user.Email!),
                 new Claim(ClaimTypes.Role, user.UserType.ToString()),
+                new Claim(ClaimTypes.Email, user.Email!),
                 //new Claim("Document", user.Document),
                 new Claim("FirstName", user.FirstName),
                 new Claim("LastName", user.LastName),

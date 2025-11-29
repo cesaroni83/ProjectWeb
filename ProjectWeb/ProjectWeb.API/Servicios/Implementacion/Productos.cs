@@ -235,5 +235,27 @@ namespace ProjectWeb.API.Servicios.Implementacion
                 throw ex;
             }
         }
+
+        public async Task<ProductoDTO> GetProductoWithImg(int id)
+        {
+            try
+            {
+                var productoQuery = _modeloRepositorio.GetAllWithWhere(p => p.Id_producto == id)
+                    .Include(p => p.Categorias)
+                    .Include(p => p.ProductImages); // Incluimos las imágenes del producto
+                    
+                var producto = await productoQuery.FirstOrDefaultAsync();
+
+                if (producto == null)
+                    throw new KeyNotFoundException($"No se encontró producto con Id {id}");
+
+                return _mapper.Map<ProductoDTO>(producto);
+            }
+            catch (Exception)
+            {
+                throw; // Mantener el stack trace original
+            }
+
+        }
     }
 }

@@ -44,6 +44,15 @@ namespace ProjectWeb.API.Controllers
             return Ok(lista);
         }
 
+
+        [HttpGet("GetProductoWithImagen/{id:int}", Name = "GetProductoWithImagen")]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> GetProductoWithImagen(int id)
+        {
+            var lista = await _prod.GetProductoWithImg(id);
+            return Ok(lista);
+        }
         /*--------------------------------- Insert ---------------------------------*/
 
         [HttpPost("CreateProducto")]
@@ -180,5 +189,7 @@ namespace ProjectWeb.API.Controllers
             var lista = await _prod.GetProductoCombo(Estado);
             return Ok(lista);
         }
+
+
     }
 }

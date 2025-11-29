@@ -260,26 +260,68 @@ button.btn-danger:hover {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 20px; /* espacio arriba */
-    margin-bottom: 20px; /* espacio abajo */
+    margin-top: 20px;
+    margin-bottom: 20px;
     width: 100%;
 }
 
-/* Ajuste del contenedor del carousel */
+/* Contenedor del carousel */
 .custom-carousel {
-    width: 700px !important;
-    height: 700px !important;
+    width: 800px; /* ancho fijo */
+    height: 800px; /* alto fijo */
     display: flex;
     justify-content: center;
     align-items: center;
     border-radius: 20px;
-    overflow: hidden; /* muy importante para que las esquinas se recorten */
+    overflow: hidden; /* recorta la imagen que sobresalga */
+    position: relative;
 }
 
-/* Imagen dentro del carousel */
+/* Imagen dentro del carousel con tamaño fijo */
 .carousel-image {
-    width: 100%;
-    height: 100%;
+    width: 80%;
+    height: 80%;
     border-radius: 20px;
-    object-fit: contain; /* evita deformación */
+    object-fit: contain; /* mantiene proporción y recorta exceso */
+}
+
+/* ===== CAPTION ===== */
+.carousel-caption-inner {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    padding: 10px 15px;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.5); /* fondo semitransparente */
+    backdrop-filter: blur(5px);
+    border-radius: 10px;
+    color: white;
+    z-index: 10; /* aseguramos que quede sobre la imagen */
+}
+
+    .carousel-caption-inner h2,
+    .carousel-caption-inner p {
+        color: white !important;
+        text-shadow: 1px 1px 5px black;
+        margin: 5px 0;
+    }
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .custom-carousel {
+        width: 100%;
+        height: auto;
+    }
+
+    .carousel-image {
+        width: 100%;
+        height: auto;
+    }
+
+    .carousel-caption-inner {
+        width: 95%;
+        font-size: 0.9rem;
+    }
 }

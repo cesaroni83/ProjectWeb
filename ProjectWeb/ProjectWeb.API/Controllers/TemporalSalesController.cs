@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectWeb.API.Data;
 using ProjectWeb.Shared.Modelo.DTO.TemporalSale;
@@ -6,18 +8,22 @@ using ProjectWeb.Shared.Modelo.Entidades;
 
 namespace ProjectWeb.API.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
-    public class Tbl_TemporalSalesController : ControllerBase
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Route("api/[controller]")]
+    
+    public class TemporalSalesController : ControllerBase
     {
         private readonly AppDbContext _context;
 
-        public Tbl_TemporalSalesController(AppDbContext context)
+        public TemporalSalesController(AppDbContext context)
         {
             _context = context;
         }
 
+        [AllowAnonymous]
         [HttpPost]
+        
         public async Task<ActionResult> Post(TemporalSaleDTO temporalSaleDTO)
         {
             var product = await _context.Tbl_Producto.FirstOrDefaultAsync(x => x.Id_producto == temporalSaleDTO.ProductId);
@@ -52,7 +58,9 @@ namespace ProjectWeb.API.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpGet]
+        
         public async Task<ActionResult> Get()
         {
             return Ok(await _context.Tbl_TemporalSales
@@ -65,14 +73,30 @@ namespace ProjectWeb.API.Controllers
                 .ToListAsync());
         }
 
+        [AllowAnonymous]
         [HttpGet("count")]
         public async Task<ActionResult> GetCount()
         {
-            return Ok(await _context.Tbl_TemporalSales
-                .Where(x => x.User!.Email == User.Identity!.Name)
-                .SumAsync(x => x.Quantity));
+            //return Ok(await _context.Tbl_TemporalSales
+            //    .Where(x => x.User!.Email == User.Identity!.Name)
+            //    .SumAsync(x => x.Quantity));
+            // Obtener el UserId basado en el email del usuario autenticado
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == User.Identity!.Name);
+
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            // Ahora filtrar las ventas temporales por UserId
+            var totalQuantity = await _context.Tbl_TemporalSales
+                .Where(x => x.UserId == user.Id)  // Aquí usamos UserId en lugar de User.Email
+                .SumAsync(x => x.Quantity);
+
+            return Ok(totalQuantity);
         }
 
+        [AllowAnonymous]
         [HttpGet("{id:int}")]
         public async Task<ActionResult> Get(int id)
         {
@@ -85,7 +109,9 @@ namespace ProjectWeb.API.Controllers
                 .FirstOrDefaultAsync(x => x.Id == id));
         }
 
+        [AllowAnonymous]
         [HttpPut]
+        
         public async Task<ActionResult> Put(TemporalSaleDTO temporalSaleDTO)
         {
             var currentTemporalSale = await _context.Tbl_TemporalSales.FirstOrDefaultAsync(x => x.Id == temporalSaleDTO.Id);
@@ -102,7 +128,9 @@ namespace ProjectWeb.API.Controllers
             return Ok(temporalSaleDTO);
         }
 
+        [AllowAnonymous]
         [HttpDelete("{id:int}")]
+       
         public async Task<IActionResult> DeleteAsync(int id)
         {
             var temporalSale = await _context.Tbl_TemporalSales.FirstOrDefaultAsync(x => x.Id == id);

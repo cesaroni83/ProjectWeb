@@ -1,0 +1,549 @@
+﻿/*
+ =======================
+   Contenedor de búsqueda
+======================= */
+/*.search-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: nowrap;*/  /*todo en la misma fila */
+/*}*/
+
+/* Input con ícono 
+*//*.input-icon {
+    position: relative;
+    flex: 1 1 200px;*/  /*crece pero no demasiado pequeño */
+    /*min-width: 80px;
+    max-width: 400px;*/  /*nunca demasiado ancho*/ 
+/*}
+
+    .input-icon i {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #888;
+        pointer-events: none;
+    }
+
+    .input-icon input {
+        width: 100%;
+        padding-left: 35px;
+    }*/
+
+/* Botones */
+/*.search-container button {
+    flex: 0 0 auto;*/  /*tamaño fijo, no crece */
+    /*display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    white-space: nowrap;
+    font-size: 0.9rem;
+    padding: 6px 10px;
+    min-width: 70px;*/  /*ancho mínimo */
+    /*max-width: 120px;*/ /* no se alargue */
+/*}*/
+/*
+ =======================
+   Contenedor de cards
+======================= */
+/*.cards-container {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);*/ /* máximo 8 por fila */
+    /*gap: 20px;
+    padding: 20px 0;
+    grid-auto-rows: 1fr;*/  /*filas de altura uniforme */
+    /*max-height: calc(2 * 550px);*/  /*máximo 2 filas */
+    /*overflow-y: scroll;*/  /*sin scroll */
+/*}*/
+
+ /*Card base */
+/*.card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease;
+}
+
+    .card:hover {
+        transform: translateY(-5px);
+    }
+
+     Imagen del producto 
+    .card img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+    }*/
+
+/* Contenido del card 
+*/
+/*.card-content {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 1;
+}
+
+.card-title {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.card-text {
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 10px;
+    flex: 1;
+}
+
+.price {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 12px;
+    color: #2d8cf0;
+}*/
+
+/* Botones en fila dentro del card 
+*/
+/*.card-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}*/
+
+/* Botones base */
+/*.card a.btn,
+.card button.add-to-cart {
+    flex: 1;
+    max-width: 140px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    transition: background-color 0.2s, transform 0.2s;
+    cursor: pointer;
+    text-decoration: none;
+}*/
+
+ /*Botón Detalles */
+/*.card a.btn {
+    background-color: var(--bs-secondary);
+    color: #fff;
+}
+
+    .card a.btn:hover {
+        background-color: #6c757d;
+        transform: scale(1.05);
+    }*/
+/*
+ Botón Agregar al carrito 
+*//*.card button.add-to-cart {
+    background-color: var(--bs-primary);
+    color: #fff;
+    border: none;
+}
+
+    .card button.add-to-cart:hover {
+        background-color: #0d6efd;
+        transform: scale(1.05);
+    }*/
+
+ /*Contador del carrito */
+/*#cart-counter {
+    background-color: var(--bs-primary);
+    color: #fff;
+    font-weight: bold;
+    padding: 4px 10px;
+    border-radius: 50%;
+    margin-left: 10px;
+}*/
+
+/* =======================
+   Responsive
+======================= */
+
+ /*Tablets: 3 cards por fila */
+/*@media (max-width: 992px) {
+    .cards-container {
+        grid-template-columns: repeat(3, 1fr);
+        max-height: calc(2 * 450px);
+    }
+}*/
+
+ /*Móviles: 1 card por fila */
+/*@media (max-width: 600px) {
+    .cards-container {
+        grid-template-columns: 1fr;
+        max-height: calc(2 * 450px);
+    }
+
+    .card img {
+        height: 200px;
+    }
+}*/
+
+/* Barra de búsqueda en pantallas muy pequeñas */
+/*@media (max-width: 500px) {
+    .search-container {
+        gap: 5px;
+    }
+
+        .search-container button {
+            font-size: 0.8rem;
+            padding: 5px 8px;
+            min-width: 60px;
+            max-width: 100px;
+        }
+
+    .input-icon {
+        max-width: 250px;*/ /* input más pequeño en móviles */
+    /*}
+}*/
+/* ============================================
+   CONTENEDOR DE BÚSQUEDA
+============================================ */
+.search-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: nowrap;
+}
+
+.input-icon {
+    position: relative;
+    flex: 1 1 200px;
+    min-width: 80px;
+    max-width: 400px;
+}
+
+    .input-icon i {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #888;
+    }
+
+    .input-icon input {
+        width: 100%;
+        padding-left: 35px;
+    }
+
+/* Botones de búsqueda */
+.search-container button
+ {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    white-space: nowrap;
+    font-size: 0.9rem;
+    padding: 6px 10px;
+    min-width: 70px;
+    max-width: 120px;
+}
+.search-container .search-btn {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    white-space: nowrap;
+    font-size: 0.9rem;
+    padding: 6px 10px;
+    min-width: 70px;
+    max-width: 120px;
+    border-radius:50px;
+}
+
+/* ============================================
+   CONTENEDOR DE CARDS (GRID)
+============================================ */
+.cards-container {
+    display: grid;
+    gap: 20px;
+    padding: 20px 0;
+    overflow: visible;
+}
+
+/* DESKTOP — 8 POR FILA (si entran) */
+/*@media (min-width: 1400px) {
+    .cards-container {
+        grid-template-columns: repeat(8, minmax(350px, 450px)) !important;
+        justify-content: center;
+        overflow-x:auto;
+    }
+}*/
+/*@media (min-width: 1400px) {
+    .cards-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 20px;
+        justify-content: center;
+        overflow-x: auto;
+    }
+}*/
+@media (min-width: 1400px) {
+    .cards-container {
+        display: grid;
+        /* 👇 ESTE es el bueno */
+        grid-template-columns: repeat(auto-fit, minmax(300px, 400px));
+        gap: 40px;
+        justify-content: center;
+    }
+}
+
+
+/* Desktop mediano — 6 por fila */
+@media (max-width: 1399px) and (min-width: 1200px) {
+    .cards-container {
+        grid-template-columns: repeat(6, minmax(350px, 450px));
+        justify-content: center;
+    }
+}
+
+/* TABLETS — 3 POR FILA */
+@media (max-width: 1199px) and (min-width: 768px) {
+    .cards-container {
+        grid-template-columns: repeat(3, minmax(350px, 450px));
+        justify-content: center;
+    }
+}
+
+/* MÓVILES — 1 POR FILA */
+@media (max-width: 767px) {
+    .cards-container {
+        grid-template-columns: 1fr;
+        justify-items: center;
+    }
+}
+
+
+/* ============================================
+   CARD (min 350px – max 450px)
+============================================ */
+.card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease;
+    min-width: 350px; /* solicitado */
+    max-width: 450px; /* solicitado */
+    width: 100%;
+}
+
+    .card:hover {
+        transform: translateY(-5px);
+    }
+
+    .card img {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+    }
+
+/* Contenido */
+.card-content {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.card-title {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.card-text {
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.price {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #2d8cf0;
+    margin-bottom: 10px;
+}
+
+
+/* ============================================
+   BOTONES DEL CARD
+============================================ */
+.card-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.card a.btn,
+.card button.add-to-cart {
+    flex: 1;
+    max-width: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 50px;
+    font-size: 0.9rem;
+}
+
+.card a.btn {
+    background-color: var(--bs-secondary);
+    color: #fff;
+}
+
+.card button.add-to-cart {
+    background-color: var(--bs-primary);
+    color: #fff;
+    border: none;
+}
+
+
+/* ============================================
+   CONTADOR DEL CARRITO
+============================================ */
+#cart-counter {
+    background-color: var(--bs-primary);
+    color: #fff;
+    font-weight: bold;
+    padding: 4px 10px;
+    border-radius: 50%;
+    margin-left: 10px;
+}
+
+
+/* ============================================
+   RESPONSIVE EXTRA
+============================================ */
+/*@media (max-width: 500px) {
+    .search-container {
+        gap: 5px;
+    }
+
+        .search-container button {
+            font-size: 0.8rem;
+            padding: 5px 8px;
+            min-width: 60px;
+            max-width: 100px;
+        }
+
+    .input-icon {
+        max-width: 250px;
+    }
+}*/
+/* MODO RESPONSIVE: los botones bajan y el input ocupa todo */
+@media (max-width: 600px) {
+
+    .search-container {
+        flex-wrap: wrap; /* permite salto de línea */
+        justify-content: center;
+    }
+
+    .input-icon {
+        flex: 1 1 100%; /* input ocupa todo el ancho */
+        max-width: 100%;
+    }
+
+    .search-container button,
+    .search-container a,
+    .search-container Button {
+        flex: 1 1 calc(50% - 10px); /* botones ocupan media fila (ajustable) */
+        max-width: 100px; /* máximo ancho de 120px */
+    }
+}
+
+/* Contenedor del botón y el carrito */
+.carrito-container {
+    position: relative;
+    display: inline-block;
+}
+
+/* Botón */
+#verCarrito {
+    padding: 10px 20px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
+
+/* Mini carrito */
+#miniCarrito {
+    display: none; /*Oculto por defecto */
+    position: absolute;
+    top: 40px; /*debajo del botón */
+    left: 30%;
+    transform: translateX(-30%);
+    width: 1100px;
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    z-index: 100;
+    color: black; /*Asegura que el texto sea visible */
+    max-height: 550px; /* Altura máxima */
+    overflow-y: auto;
+}
+
+/* Mostrar al pasar el mouse */
+.carrito-container:hover #miniCarrito {
+    display: block;
+}
+/* Contenedor del botón a la izquierda */
+
+
+/*.carrito-container {
+    position: relative;
+    display: inline-block;
+    margin-left: 20px;*/ /* separa del borde izquierdo */
+/*}*/
+
+/* Botón */
+/*#verCarrito {
+    padding: 10px 20px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+}*/
+
+/* Mini carrito fijo en el lado derecho */
+/*#miniCarrito {
+    display: none;*/ /* oculto por defecto */
+    /*position: fixed;*/ /* posición fija en la pantalla */
+    /*top: 55px;*/ /* a 20px desde arriba */
+    /*right: 20px;*/ /* a 20px desde la derecha */
+    /*width: 250px;
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    color: black;
+    z-index: 999;
+}*/
+
+/* Mostrar ventana al pasar el mouse sobre el botón */
+/*.carrito-container:hover #miniCarrito {
+    display: block;
+}*/

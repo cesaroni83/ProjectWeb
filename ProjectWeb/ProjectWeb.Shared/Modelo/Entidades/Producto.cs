@@ -48,7 +48,8 @@ namespace ProjectWeb.Shared.Modelo.Entidades
         public int ProductImagesNumber => ProductImages == null ? 0 : ProductImages.Count;
 
         [Display(Name = "Imagén")]
-        public byte[]? MainImage { get; set; }
+        //public byte[]? MainImage { get; set; }
+        public string? MainImage { get; set; }
 
         public ICollection<TemporalSale>? TemporalSales { get; set; }
 

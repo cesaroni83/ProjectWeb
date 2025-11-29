@@ -1,12 +1,10 @@
 ﻿
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.Facebook;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -77,7 +75,7 @@ builder.Services.AddScoped<IPaises, Paises>();
 builder.Services.AddScoped<IProvincias, Provincias>();
 builder.Services.AddScoped<ICiudades, Ciudades>();
 builder.Services.AddScoped<IMenus, Menus>();
-builder.Services.AddScoped<IPersonas,Personas>();
+builder.Services.AddScoped<IPersonas, Personas>();
 builder.Services.AddScoped<IEmpresas, Empresas>();
 builder.Services.AddScoped<ISucursales, Sucursales>();
 builder.Services.AddScoped<ICategorias, Categorias>();
@@ -129,6 +127,20 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
+    options.Events = new JwtBearerEvents
+    {
+        OnTokenValidated = context =>
+        {
+            Console.WriteLine("Token Validated: " + context.Principal?.Identity?.Name);
+            return Task.CompletedTask;
+        },
+        OnAuthenticationFailed = context =>
+        {
+            Console.WriteLine("Authentication Failed: " + context.Exception.Message);
+            return Task.CompletedTask;
+        }
+    };
+
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = false,
@@ -201,7 +213,7 @@ builder.Services.AddAuthentication(options =>
 })
 //-------------------- Handler personalizado para tokens Google --------------------//
 .AddScheme<AuthenticationSchemeOptions, GoogleAccessTokenAuthenticationHandler>(
-    Constant.Scheme, "GoogleAccessToken",null);
+    Constant.Scheme, "GoogleAccessToken", null);
 
 
 builder.Services.AddCors(options =>
@@ -210,8 +222,10 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy.WithOrigins("https://localhost:7188")
+                 
                   .AllowAnyHeader()
                   .AllowAnyMethod()
+                  //.SetIsOriginAllowed(origin => true)
                   .AllowCredentials(); // necesario si usas cookies o JWT
         });
 });
@@ -249,7 +263,7 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
     app.UseSwagger();
     app.UseSwaggerUI();
-    
+
 }
 
 app.UseHttpsRedirection();
@@ -259,17 +273,29 @@ app.UseAuthorization();
 
 //-------------------- Static Files --------------------//
 string webRootPath = Path.Combine(builder.Environment.ContentRootPath, "wwwroot");
-string userImagePath = Path.Combine(webRootPath, "UserImagen");
 
-if (!Directory.Exists(webRootPath))
-    Directory.CreateDirectory(webRootPath);
+// Carpeta para UserImagen
+string userImagePath = Path.Combine(webRootPath, "UserImagen");
 if (!Directory.Exists(userImagePath))
     Directory.CreateDirectory(userImagePath);
 
+// Carpeta para Productos/Imagenes
+string productImagePath = Path.Combine(webRootPath, "Productos", "Imagenes");
+if (!Directory.Exists(productImagePath))
+    Directory.CreateDirectory(productImagePath);
+
+// Servir UserImagen
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(userImagePath),
     RequestPath = "/UserImagen"
+});
+
+// Servir Productos/Imagenes
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(productImagePath),
+    RequestPath = "/Productos/Imagenes"
 });
 
 ////-------------------- CORS --------------------//

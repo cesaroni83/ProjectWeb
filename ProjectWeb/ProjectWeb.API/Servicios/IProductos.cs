@@ -13,5 +13,6 @@ namespace ProjectWeb.API.Servicios
         Task<List<ProductoDropDTO>> GetProductoCombo(string Estado_Activo);
         Task<bool> DeleteProductoLogica(int id);
         Task<List<ProductoDTO>> GetProductoByCategoria(int id);
+        Task<ProductoDTO> GetProductoWithImg(int id);
     }
 }

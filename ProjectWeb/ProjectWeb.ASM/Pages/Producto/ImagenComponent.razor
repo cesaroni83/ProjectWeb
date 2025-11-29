@@ -117,7 +117,7 @@
 
     private async Task SubmitForm()
     {
-        Input.Foto_Producto = ImagePrev != null ? Convert.FromBase64String(ImagePrev.Split(',')[1]) : null;
+        Input.Foto_Producto = ImagePrev;
         if (SubmitButtonText == "Save")
         {
             var responseHttp = await repository.Post<ImagenProdDTO>("/api/ImagenProduct/CreateImagenProd", Input);
@@ -180,7 +180,8 @@
         {
             Input = InputDTO;
             Input.Id_producto=InputDTO.Id_producto;
-            ImagePrev = Input.Foto_Producto != null ? $"data:image/jpeg;base64,{Convert.ToBase64String(Input!.Foto_Producto)}" : null;
+            // ImagePrev = Input.Foto_Producto != null ? $"data:image/jpeg;base64,{Convert.ToBase64String(Input!.Foto_Producto)}" : null;
+            ImagePrev = Input.Foto_Producto != null ? Input.Foto_Producto : null;
         }
 
     }

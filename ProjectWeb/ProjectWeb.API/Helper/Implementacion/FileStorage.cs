@@ -2,6 +2,114 @@
 
 namespace ProjectWeb.API.Helper.Implementacion
 {
+//    public class FileStorage : IFileStorage
+//    {
+//        private readonly IWebHostEnvironment _env;
+//        private readonly IHttpContextAccessor _httpContextAccessor;
+
+//        public FileStorage(IWebHostEnvironment env, IHttpContextAccessor httpContextAccessor)
+//        {
+//            _env = env;
+//            _httpContextAccessor = httpContextAccessor;
+//        }
+
+//        public async Task<string> SaveImageAsync(string base64Image)
+//        {
+//            try
+//            {
+//                // 1️⃣ Limpiar encabezado si viene con data:image/...
+//                if (base64Image.Contains(","))
+//                    base64Image = base64Image[(base64Image.IndexOf(",") + 1)..];
+
+//                // 2️⃣ Decodificar base64
+//                byte[] imageBytes = Convert.FromBase64String(base64Image);
+
+//                // 3️⃣ Obtener ruta segura de wwwroot
+//                string webRootPath = _env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot");
+
+//                // Crear carpeta wwwroot si no existe
+//                if (!Directory.Exists(webRootPath))
+//                    Directory.CreateDirectory(webRootPath);
+
+//                // Crear carpeta UserImagen dentro de wwwroot
+//                string uploadsPath = Path.Combine(webRootPath, "UserImagen");
+//                if (!Directory.Exists(uploadsPath))
+//                    Directory.CreateDirectory(uploadsPath);
+
+//                // 4️⃣ Nombre único
+//                string fileName = $"{Guid.NewGuid()}.jpg";
+//                string filePath = Path.Combine(uploadsPath, fileName);
+
+//                // 5️⃣ Guardar archivo
+//                await File.WriteAllBytesAsync(filePath, imageBytes);
+
+//                // 6️⃣ Construir URL completa usando IHttpContextAccessor
+//                var request = _httpContextAccessor.HttpContext?.Request;
+//                if (request == null)
+//                    throw new InvalidOperationException("No se pudo obtener el contexto HTTP para construir la URL.");
+
+//                string baseUrl = $"{request.Scheme}://{request.Host}";
+//                string publicUrl = $"{baseUrl}/UserImagen/{fileName}";
+
+//                return publicUrl;
+//            }
+//            catch (FormatException)
+//            {
+//                throw new ArgumentException("El formato Base64 no es válido.");
+//            }
+//            catch (Exception ex)
+//            {
+//                throw new InvalidOperationException($"Error al guardar la imagen: {ex.Message}");
+//            }
+//        }
+
+//        public async Task<string> UpdateImageAsync(string oldImageUrl, string newBase64Image)
+//        {
+//            // Eliminar la imagen antigua
+//            await DeleteImageAsync(oldImageUrl);
+//            // Guardar la nueva imagen
+//            return await SaveImageAsync(newBase64Image);
+//        }
+
+//        public Task<bool> DeleteImageAsync(string imageUrl)
+//        {
+//            try
+//            {
+//                string fileName = Path.GetFileName(imageUrl);
+//                string filePath = Path.Combine(_env.WebRootPath, "UserImagen", fileName);
+
+//                if (File.Exists(filePath))
+//                {
+//                    File.Delete(filePath);
+//                    return Task.FromResult(true);
+//                }
+
+//                return Task.FromResult(false);
+//            }
+//            catch
+//            {
+//                return Task.FromResult(false);
+//            }
+//        }
+
+//        public async Task<string> SaveImageFromUrlAsync(string imageUrl)
+//        {
+//            if (string.IsNullOrEmpty(imageUrl))
+//                return null;
+
+//            using var httpClient = new HttpClient();
+//            var imageBytes = await httpClient.GetByteArrayAsync(imageUrl);
+
+//            // Convertir a base64
+//            string base64Image = Convert.ToBase64String(imageBytes);
+
+//            // Guardar usando tu FileStorage
+//            var publicUrl = await SaveImageAsync(base64Image);
+
+//            return publicUrl;
+//        }
+//    }
+//}
     public class FileStorage : IFileStorage
     {
         private readonly IWebHostEnvironment _env;
@@ -13,43 +121,41 @@ namespace ProjectWeb.API.Helper.Implementacion
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<string> SaveImageAsync(string base64Image)
+        /// <summary>
+        /// Guarda una imagen en base64 en la carpeta especificada dentro de wwwroot
+        /// </summary>
+        /// <param name="base64Image">Imagen en Base64</param>
+        /// <param name="folderName">Carpeta donde guardar la imagen (por defecto "UserImagen")</param>
+        /// <returns>URL pública de la imagen</returns>
+        public async Task<string> SaveImageAsync(string base64Image, string folderName = "UserImagen")
         {
             try
             {
-                // 1️⃣ Limpiar encabezado si viene con data:image/...
                 if (base64Image.Contains(","))
                     base64Image = base64Image[(base64Image.IndexOf(",") + 1)..];
 
-                // 2️⃣ Decodificar base64
                 byte[] imageBytes = Convert.FromBase64String(base64Image);
 
-                // 3️⃣ Obtener ruta segura de wwwroot
                 string webRootPath = _env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot");
-
-                // Crear carpeta wwwroot si no existe
                 if (!Directory.Exists(webRootPath))
                     Directory.CreateDirectory(webRootPath);
 
-                // Crear carpeta UserImagen dentro de wwwroot
-                string uploadsPath = Path.Combine(webRootPath, "UserImagen");
+                // Carpeta dinámica según el parámetro folderName
+                string uploadsPath = Path.Combine(webRootPath, folderName);
                 if (!Directory.Exists(uploadsPath))
                     Directory.CreateDirectory(uploadsPath);
 
-                // 4️⃣ Nombre único
                 string fileName = $"{Guid.NewGuid()}.jpg";
                 string filePath = Path.Combine(uploadsPath, fileName);
 
-                // 5️⃣ Guardar archivo
                 await File.WriteAllBytesAsync(filePath, imageBytes);
 
-                // 6️⃣ Construir URL completa usando IHttpContextAccessor
                 var request = _httpContextAccessor.HttpContext?.Request;
                 if (request == null)
                     throw new InvalidOperationException("No se pudo obtener el contexto HTTP para construir la URL.");
 
                 string baseUrl = $"{request.Scheme}://{request.Host}";
-                string publicUrl = $"{baseUrl}/UserImagen/{fileName}";
+                string publicUrl = $"{baseUrl}/{folderName}/{fileName}";
 
                 return publicUrl;
             }
@@ -63,28 +169,23 @@ namespace ProjectWeb.API.Helper.Implementacion
             }
         }
 
-        public async Task<string> UpdateImageAsync(string oldImageUrl, string newBase64Image)
+        public async Task<string> UpdateImageAsync(string oldImageUrl, string newBase64Image, string folderName = "UserImagen")
         {
-            // Eliminar la imagen antigua
-            await DeleteImageAsync(oldImageUrl);
-            // Guardar la nueva imagen
-            return await SaveImageAsync(newBase64Image);
+            await DeleteImageAsync(oldImageUrl, folderName);
+            return await SaveImageAsync(newBase64Image, folderName);
         }
 
-        public Task<bool> DeleteImageAsync(string imageUrl)
+        public Task<bool> DeleteImageAsync(string imageUrl, string folderName = "UserImagen")
         {
             try
             {
                 string fileName = Path.GetFileName(imageUrl);
-                string filePath = Path.Combine(_env.WebRootPath, "UserImagen", fileName);
+                string filePath = Path.Combine(_env.WebRootPath, folderName, fileName);
 
                 if (File.Exists(filePath))
-                {
                     File.Delete(filePath);
-                    return Task.FromResult(true);
-                }
 
-                return Task.FromResult(false);
+                return Task.FromResult(true);
             }
             catch
             {
@@ -92,21 +193,18 @@ namespace ProjectWeb.API.Helper.Implementacion
             }
         }
 
-        public async Task<string> SaveImageFromUrlAsync(string imageUrl)
+        public async Task<string> SaveImageFromUrlAsync(string imageUrl, string folderName = "UserImagen")
         {
             if (string.IsNullOrEmpty(imageUrl))
                 return null;
 
             using var httpClient = new HttpClient();
             var imageBytes = await httpClient.GetByteArrayAsync(imageUrl);
-
-            // Convertir a base64
             string base64Image = Convert.ToBase64String(imageBytes);
 
-            // Guardar usando tu FileStorage
-            var publicUrl = await SaveImageAsync(base64Image);
-
-            return publicUrl;
+            return await SaveImageAsync(base64Image, folderName);
         }
+
     }
+
 }

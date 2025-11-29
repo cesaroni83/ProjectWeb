@@ -2,13 +2,8 @@
 using ProjectWeb.Shared.Modelo.DTO.ProductImage;
 using ProjectWeb.Shared.Modelo.DTO.TemporalSale;
 using ProjectWeb.Shared.Modelo.Entidades;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ProjectWeb.Shared.Modelo.DTO.Producto
 {
@@ -49,6 +44,7 @@ namespace ProjectWeb.Shared.Modelo.DTO.Producto
         public string Estado_producto { get; set; } = string.Empty;
 
         public CategoriaDTO? Categorias { get; set; }
+       // public List<ImagenProdDTO>? Imagenes { get; set; }
         public ICollection<ImagenProdDTO>? ProductImages { get; set; }
 
 
@@ -56,10 +52,13 @@ namespace ProjectWeb.Shared.Modelo.DTO.Producto
         public int ProductImagesNumber => ProductImages == null ? 0 : ProductImages.Count;
 
         [Display(Name = "Imagén")]
-        public byte[]? MainImage { get; set; }
+        //public byte[]? MainImage { get; set; }
+        public string? MainImage { get; set; }
 
         public ICollection<TemporalSaleDTO>? TemporalSales { get; set; }
 
         public ICollection<SaleDetail>? SaleDetails { get; set; }
+
+
     }
 }

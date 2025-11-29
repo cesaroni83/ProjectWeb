@@ -40,7 +40,8 @@
                         </GridTemplates>
                         <GridColumn TItem="ProductoDTO" HeaderText="Foto" FilterTextboxWidth="50" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">
                             <div class="text-center">
-                                <a href="/ListImgProduc/@context.Id_producto/@context.Name"><Image Src="@ObtenerImagen(@context.MainImage)" Class="rounded img-pequena" Alt="placeholder" /></a>
+                               @*  <a href="/ListImgProduc/@context.Id_producto/@context.Name"><Image Src="@ObtenerImagen(@context.MainImage)" Class="rounded img-pequena" Alt="placeholder" /></a> *@
+                                <a href="/ListImgProduc/@context.Id_producto/@context.Name"><Image Src="@context.MainImage" Class="rounded img-pequena" Alt="placeholder" /></a>
                             </div>
                         </GridColumn>
                         <GridColumn TItem="ProductoDTO" HeaderText="ID Producto" PropertyName="Id_producto" SortString="Id_producto" SortKeySelector="item => item.Id_producto" FilterTextboxWidth="100" HeaderTextAlignment="Alignment.Center" TextAlignment="Alignment.Center">

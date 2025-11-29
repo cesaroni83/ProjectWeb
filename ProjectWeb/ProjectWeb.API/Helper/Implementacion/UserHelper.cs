@@ -205,6 +205,7 @@ namespace ProjectWeb.API.Helper.Implementacion
                 LastName = user.LastName,
                 Address = user.Address,
                 Email = user.Email,
+                UserName=user.Email,
                 UserType = user.UserType,
                 Ciudades = new CiudadDTO
                 {
